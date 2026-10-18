@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Plus, Star, Trash2, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { slugify } from '@/lib/utils';
+import { ProductVideoEditor } from '@/components/admin/videos';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import {
@@ -21,6 +22,9 @@ const empty = {
   name: '',
   slug: '',
   category: '',
+  categories: [],
+  video: '',
+  videoDescription: '',
   shortDescription: '',
   description: '',
   images: [],
@@ -50,6 +54,7 @@ function ProductEditor({ initial, categories, id }) {
       : { ...empty, category: categories[0]?._id || '' },
   );
   const [busy, setBusy] = useState(false),
+    [uploading, setUploading] = useState(false),
     [error, setError] = useState(null),
     [preview, setPreview] = useState(false);
   const router = useRouter();
@@ -70,6 +75,7 @@ function ProductEditor({ initial, categories, id }) {
   }
   async function save(e) {
     e.preventDefault();
+    if (uploading) return;
     setBusy(true);
     setError(null);
     try {
@@ -205,6 +211,26 @@ function ProductEditor({ initial, categories, id }) {
               </p>
             </section>
             <section className="admin-panel">
+              <h2>Video giới thiệu</h2>
+              <ProductVideoEditor
+                value={form.video}
+                onChange={(src) => set('video', src)}
+                poster={form.thumbnail}
+                onBusy={setUploading}
+              />
+              <Field
+                label="Nội dung video bằng văn bản"
+                hint="Mô tả thao tác hoặc chép lời nói để khách có thể đọc khi không bật âm thanh."
+              >
+                <textarea
+                  rows={4}
+                  maxLength={12000}
+                  value={form.videoDescription}
+                  onChange={(e) => set('videoDescription', e.target.value)}
+                />
+              </Field>
+            </section>
+            <section className="admin-panel">
               <h2>Thông số sản phẩm</h2>
               <p className="muted text-xs mb-4">Chỉ nhập thông tin thực tế đã được xác nhận.</p>
               {form.specifications.map((spec, i) => (
@@ -294,6 +320,29 @@ function ProductEditor({ initial, categories, id }) {
                   Tạo danh mục trước
                 </Link>
               )}
+              <fieldset className="additional-categories">
+                <legend>Hiển thị thêm trong danh mục</legend>
+                {categories
+                  .filter((c) => c._id !== form.category)
+                  .map((c) => (
+                    <label className="checkbox-field" key={c._id}>
+                      <input
+                        type="checkbox"
+                        checked={form.categories.includes(c._id)}
+                        onChange={(e) =>
+                          set(
+                            'categories',
+                            e.target.checked
+                              ? [...form.categories, c._id]
+                              : form.categories.filter((id) => id !== c._id),
+                          )
+                        }
+                      />
+                      {c.name}
+                      {!c.isActive ? ' (đang ẩn)' : ''}
+                    </label>
+                  ))}
+              </fieldset>
               <Field label="Trạng thái">
                 <select value={form.status} onChange={(e) => set('status', e.target.value)}>
                   <option value="draft">Bản nháp</option>
@@ -395,8 +444,8 @@ function ProductEditor({ initial, categories, id }) {
           <Button asChild variant="outline">
             <Link href="/admin/san-pham">Hủy</Link>
           </Button>
-          <Button type="submit" disabled={busy}>
-            {busy ? 'Đang lưu…' : 'Lưu sản phẩm'}
+          <Button type="submit" disabled={busy || uploading}>
+            {uploading ? 'Đang tải video…' : busy ? 'Đang lưu…' : 'Lưu sản phẩm'}
           </Button>
         </div>
       </form>

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useResource, ResourceState, Pager } from '@/components/admin/shared';
+import { AdminVideos } from '@/components/admin/videos';
 export function AdminMedia() {
   const [page, setPage] = useState(1),
     [query, setQuery] = useState(''),
@@ -69,6 +70,7 @@ export function AdminMedia() {
           <Pager page={page} pages={resource.data.pages} onChange={setPage} />
         </>
       )}
+      <AdminVideos />
       <Dialog
         open={Boolean(preview)}
         onOpenChange={(open) => {

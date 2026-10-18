@@ -53,16 +53,17 @@ Kiểm tra hồi quy khởi động bằng `npm run test:startup` khi đã dừn
 
 Toàn bộ cấu hình ban đầu đặt trong `.env` tại root; xem `.env.example`.
 
-| Biến                            | Mục đích                                                                          |
-| ------------------------------- | --------------------------------------------------------------------------------- |
-| `MONGODB_URI`                   | URI MongoDB, local mặc định `mongodb://127.0.0.1:27018/kiha`                      |
-| `API_PORT`, `API_HOST`          | Cổng và interface Express; mặc định 4000 và loopback                              |
-| `API_INTERNAL_URL`              | Địa chỉ nội bộ từ Next.js đến Express; không đưa lên client                       |
-| `SITE_URL`                      | URL website, dùng cho canonical, Open Graph và sitemap                            |
-| `ALLOWED_ORIGINS`               | Danh sách origin được phép ghi API, phân cách bằng dấu phẩy                       |
-| `SEED_DEMO`                     | `true` để tạo 6 bản ghi ảnh tham khảo tại local; không seed demo trong production |
-| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Chỉ dùng để tạo tài khoản admin bằng CLI                                          |
-| `SHOP_*`                        | Giá trị liên hệ ban đầu cho seed, xem file mẫu                                    |
+| Biến                            | Mục đích                                                                                |
+| ------------------------------- | --------------------------------------------------------------------------------------- |
+| `MONGODB_URI`                   | URI MongoDB, local mặc định `mongodb://127.0.0.1:27018/kiha`                            |
+| `API_PORT`, `API_HOST`          | Cổng và interface Express; mặc định 4000 và loopback                                    |
+| `API_INTERNAL_URL`              | Địa chỉ nội bộ từ Next.js đến Express; không đưa lên client                             |
+| `SITE_URL`                      | URL website, dùng cho canonical, Open Graph và sitemap                                  |
+| `ALLOWED_ORIGINS`               | Danh sách origin được phép ghi API, phân cách bằng dấu phẩy                             |
+| `SEED_DEMO`                     | Chỉ tạo dữ liệu mẫu khi chưa có bộ ảnh sản phẩm đã đặt tên; không dùng trong production |
+| `VIDEO_UPLOAD_DIR`              | Thư mục lưu video bền vững; mặc định `.local/uploads/videos`                            |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Chỉ dùng để tạo tài khoản admin bằng CLI                                                |
+| `SHOP_*`                        | Giá trị liên hệ ban đầu cho seed, xem file mẫu                                          |
 
 Frontend gọi `/api` cùng origin. Next.js chuyển tiếp sang Express; trình duyệt không cần biết địa chỉ backend. Sau khi seed, cấu hình liên hệ và nội dung thương hiệu nằm trong MongoDB, được sửa tại `/admin/cai-dat`. Chạy lại seed **không ghi đè** nội dung admin đã chỉnh. `.env` local đã chứa thông tin liên hệ chủ shop cung cấp trong phiên làm việc.
 
@@ -94,7 +95,7 @@ Kiểm tra giao diện với `npm run test:design` khi MongoDB và web đang ch�
 
 - Trang chủ tông kem, beige và nâu gỗ; dùng logo và ảnh KIHA có sẵn.
 - Bộ sưu tập có tìm kiếm, lọc danh mục, sắp xếp và phân trang phía server. Bộ lọc nằm trong URL và hỗ trợ back/forward.
-- Trang chi tiết với gallery, chọn thumbnail, phóng to bằng dialog, thông số, giá tùy chọn và sản phẩm liên quan.
+- Trang chi tiết với gallery, phóng to ảnh, video có nút phát/tạm dừng/tua, nội dung video bằng văn bản, thông số, giá tùy chọn và sản phẩm liên quan.
 - CTA Zalo, gọi điện, Facebook, TikTok, Google Maps lấy từ cấu hình. Không có giỏ hàng hay thanh toán.
 - Sao chép tên và URL sản phẩm để dán vào Zalo; không giả lập khả năng tự điền tin nhắn của Zalo.
 - Header mobile dạng drawer, animation Motion có hỗ trợ reduced motion, trạng thái loading, empty, error và 404.
@@ -109,26 +110,40 @@ Kiểm tra giao diện với `npm run test:design` khi MongoDB và web đang ch�
 - Lưu lịch sử slug và chuyển hướng 308 từ slug cũ khi sản phẩm còn được công khai.
 - Xem trước nội dung sản phẩm chưa lưu.
 - Thư viện ảnh có tìm kiếm, phân trang, thông tin định dạng/kích thước và xem ảnh lớn.
+- Upload video MP4/WebM, tiến độ và hủy tải, chọn lại từ thư viện, gỡ khỏi sản phẩm, xóa video chưa được sử dụng.
+- Một sản phẩm có danh mục chính và nhiều danh mục bổ sung; bộ lọc tìm theo tất cả các nhóm đã chọn.
 - Cấu hình logo, ảnh hero, nội dung hero, giới thiệu, nội dung tư vấn/cam kết, liên hệ và SEO.
 - Form có validation, thông báo kết quả, dialog xác nhận xóa; phản hồi khi hết phiên hoặc lỗi API.
 
-## Dữ liệu và ảnh cần chủ shop duyệt
+## Bộ ảnh và danh mục của chủ shop
 
-Đã cấu hình bốn danh mục theo xác nhận của chủ shop: **Giường pallet bệt**, **Giường pallet hộp**, **Giường pallet gấp gọn**, **Giường pallet gấp làm ghế sofa**. Danh mục được hiển thị trên trang chủ, bộ lọc và form quản trị, có ảnh đại diện lấy từ thư viện. Danh sách khởi tạo nằm trong `data/catalog.json`; seed tạo cả khi không dùng dữ liệu demo. Phân loại của các bản ghi ảnh tham khảo vẫn cần chủ shop duyệt cùng thông tin sản phẩm.
+Đã nhập **38 sản phẩm thật theo tên ảnh**, gồm 37 PNG và 1 JPEG, từ `apps/web/public/media/Tên Giường/`. Nhóm được xác định bằng cách đối chiếu SHA-256 với các bản sao trong `apps/web/public/media/Phân loại/<tên danh mục>/`, không suy đoán theo ảnh. Sáu nhóm gồm **Giường pallet bệt**, **Giường pallet hộp**, **Giường pallet gấp gọn**, **Giường pallet gấp làm ghế sofa**, **Giường pallet chân cao**, **Nệm**.
 
-Đã kiểm tra 39 file: 38 JPEG, 1 PNG; không có ảnh trùng nội dung. File gốc trong `img/` được giữ nguyên. Không tải ảnh thay thế từ Internet.
+Ảnh trong nhiều nhóm được nhập thành một sản phẩm có nhiều danh mục. Giữ nguyên tên do chủ shop đặt, chỉ bỏ đuôi file và khoảng trắng dư. Hai tên khác dấu có thể tạo cùng slug không dấu; importer thêm mã ngắn để đường dẫn không trùng. Sáu mẫu chạy thử ban đầu được chuyển sang nháp, không xóa. Giá và thông số chưa được cung cấp riêng nên để trống; CTA hiển thị “Liên hệ báo giá”.
 
-- `data/media-manifest.json`: file gốc → đường dẫn web, định dạng thật, kích thước, SHA-256, dung lượng.
-- `data/product-image-map.json`: sáu nhãn ảnh tham khảo → file gốc; cờ cần duyệt rõ ràng.
-- `reports/image-audit.json`, `reports/media-summary.json`: kết quả kiểm kê.
-- `reports/contact-sheet.jpg`: bảng ảnh thu nhỏ để đối chiếu trên máy này.
-- `apps/web/public/media/`: bản sao có tên SHA-256 và extension theo nội dung ảnh.
+- `data/owner-catalog.json`: tên ảnh, định dạng thật, SHA-256 và nhóm đối chiếu.
+- `data/product-image-map.json`: 38 sản phẩm → slug, ảnh gốc, ảnh phục vụ web và các danh mục.
+- `data/media-manifest.json`: kiểm kê 39 ảnh cũ trong `img/`, vẫn được bảo toàn.
+- `apps/web/public/media/`: giữ nguyên các thư mục chủ shop; bản sao phục vụ web dùng tên SHA-256.
+- `.local/backups/catalog-*.json`: bản sao dữ liệu sản phẩm, danh mục, ảnh và cấu hình trước mỗi lần nhập; không chứa tài khoản/phiên admin.
 
-Chưa có danh sách tên model, giá, thông số và nhóm ảnh sản phẩm được xác nhận. Vì vậy seed tạo **6 bản ghi tham khảo**, không giả định mỗi ảnh là một mẫu hàng chính thức. Các bản ghi có `isDemo: true`, hiển thị nhãn tham khảo tại local và bị public API loại khỏi **production**, kể cả khi trạng thái là `published`.
+Khi bổ sung hoặc đổi tên/phân nhóm ảnh, giữ cấu trúc hai thư mục trên rồi chạy (khi MongoDB đã bật):
 
-Để xuất bản thật: sửa từng bản ghi, gộp ảnh đúng mẫu, nhập thông tin được xác nhận, bỏ chọn **Dữ liệu tham khảo**, chọn **Xuất bản** và bảo đảm danh mục đang hiển thị. Giá/thông số in sẵn trên ảnh vẫn thuộc ảnh gốc; cần KIHA rà soát trước khi sử dụng thương mại. Nội dung giới thiệu/cam kết mặc định là đề xuất biên tập, có thể sửa trong admin. Địa chỉ dạng chữ đang để trống vì chủ shop chỉ cung cấp liên kết Google Maps; liên kết bản đồ đã được cấu hình.
+```powershell
+npm run catalog:import
+```
 
-Khi thêm ảnh mới: đặt file vào `img/`, chạy `npm run media:scan`, rồi `npm run seed`. Seed chỉ bổ sung asset mới, không tự tạo sản phẩm mới. MVP dùng thư viện ảnh đã quét, chưa có upload từ trình duyệt. Không cho admin truyền URL ảnh ngoài hoặc đường dẫn filesystem tùy ý.
+Lệnh quét kiểm tra đủ ảnh khớp rồi mới nhập; cập nhật tên/nhóm theo file, không sửa mô tả, giá, video hoặc trạng thái đã chỉnh trong admin. Không tự xóa sản phẩm khi ảnh biến mất. Danh tính bản nhập được nhận diện theo SHA-256; thay nội dung ảnh sẽ tạo sản phẩm mới. `npm run seed` dùng bộ ảnh này cho cài đặt mới; chạy lại không ghi đè tên/nhóm đã sửa trong admin và không tạo trùng. Thêm danh mục mới ngoài sáu nhóm cần bổ sung `data/catalog.json` trước khi nhập.
+
+Với ảnh gallery bổ sung không tạo sản phẩm mới: đặt vào `img/`, chạy `npm run media:scan` rồi `npm run seed`, sau đó chọn ảnh trong admin. Không tự xóa hoặc đổi tên file gốc. Địa chỉ dạng chữ vẫn để trống vì chủ shop cung cấp liên kết Google Maps.
+
+## Video sản phẩm
+
+Trong **Quản trị → Sản phẩm → Chỉnh sửa → Video giới thiệu**, chọn **Tải video lên**, chờ hoàn tất rồi **Lưu sản phẩm**. Mỗi sản phẩm gắn một video. Có thể chọn video đã tải, thay hoặc gỡ video; nhập mô tả/chép lời trong “Nội dung video bằng văn bản”. Thư viện tại **Ảnh & video** cho phép quản lý và xóa video chưa dùng. Gỡ video chỉ bỏ liên kết, không xóa file.
+
+API nhận `multipart/form-data` với đúng một field file tên `video`, tối đa **100 MB**, định dạng **MP4/WebM**. Kiểm tra phiên admin, Origin, đuôi file, MIME và chữ ký nội dung; ghi tạm xuống đĩa rồi chuyển sang tên UUID. API không chuyển mã codec hoặc tạo phụ đề tự động; nên xuất MP4 H.264/AAC. Video tải lên chưa gắn với sản phẩm công khai chỉ xem được bằng phiên admin. Trình phát không autoplay, tải khi cần và hỗ trợ HTTP Range để tua.
+
+File nằm ngoài `public/`, mặc định `.local/uploads/videos`. Phải sao lưu thư mục này **cùng MongoDB**. Khi triển khai dùng `VIDEO_UPLOAD_DIR` trỏ tới volume bền vững, cho tiến trình API quyền đọc/ghi và đặt giới hạn reverse proxy lớn hơn 100 MB để tính cả multipart overhead. Không sử dụng filesystem tạm của serverless cho video.
 
 ## Cấu trúc
 
@@ -176,11 +191,14 @@ Response thành công: `{ "data": ... }`. Lỗi: `{ "error": { "message": "...",
 | GET, POST        | `/api/admin/categories`     | Liệt kê/tạo danh mục                                                  |
 | PUT, DELETE      | `/api/admin/categories/:id` | Sửa/xóa danh mục                                                      |
 | GET              | `/api/admin/media`          | Tìm kiếm/phân trang asset                                             |
+| GET, POST        | `/api/admin/videos`         | Thư viện / upload multipart field `video` (100 MB)                    |
+| DELETE           | `/api/admin/videos/:id`     | Xóa video chưa gắn với sản phẩm                                       |
+| GET, HEAD        | `/api/videos/:filename`     | Phát video, hỗ trợ Range; video nháp cần phiên admin                  |
 | GET, PUT         | `/api/admin/settings`       | Đọc/sửa cấu hình                                                      |
 
 Mọi API admin trừ login đều kiểm tra tài khoản active và quyền admin từ database. Mutations yêu cầu `Origin` trong allowlist, kể cả khi gọi bằng cURL. Cookie HttpOnly, SameSite=Lax, Secure khi production. Session token ngẫu nhiên 256 bit, database chỉ giữ SHA-256 của token, thời hạn 8 giờ và TTL index. Đăng xuất thu hồi token, không chỉ xóa cookie.
 
-Zod dùng schema strict, validate ObjectId, slug, URL của từng kênh và ảnh trong manifest; chống truyền object query để NoSQL injection. Request body tối đa 100 KB. Helmet, CORS allowlist, generic production errors; không trả password hash hay stack trace cho client.
+Zod dùng schema strict, validate ObjectId, slug, URL của từng kênh và ảnh trong manifest; chống truyền object query để NoSQL injection. JSON body tối đa 100 KB; upload video có giới hạn riêng 100 MB. Sản phẩm dùng `category` cho danh mục chính, `categories` cho các nhóm, `video` cho đường dẫn trả về từ API upload và `videoDescription` cho nội dung văn bản. Helmet, CORS allowlist, generic production errors; không trả password hash hay stack trace cho client.
 
 ## Kiểm thử
 
@@ -193,7 +211,7 @@ npm run test:browser
 npm audit
 ```
 
-API test chạy 16 trường hợp với database tạm độc lập: auth/authorization, CSRF, cookie, CRUD, slug trùng/lịch sử slug, ảnh sai/thiếu, giá âm, trường thừa, draft, danh mục ẩn, tìm kiếm/phân trang, loại demo khi production, xóa danh mục còn sản phẩm, URL không hợp lệ, logout/replay, admin inactive, phiên hết hạn và login rate limit.
+API test chạy 23 trường hợp với database tạm độc lập: auth, CSRF, CRUD, slug, ảnh, lọc nhiều danh mục, trạng thái hiển thị, settings, session, rate limit; upload MP4/WebM, từ chối giả định dạng/quá dung lượng, dọn file lỗi, quyền xem video, Range và xóa video đang sử dụng.
 
 Browser QA dùng Playwright + Chrome headless, kiểm tra desktop 1440 px, tablet 768 px và mobile 390 px. Có thao tác tạo/sửa/xuất bản/xóa dữ liệu QA, lựa chọn và sắp xếp ảnh, cập nhật lại cấu hình không thay đổi giá trị, thử lỗi API rồi retry. Script chỉ xóa các bản ghi QA do chính lần chạy tạo ra. Kết quả ghi ở `reports/browser-results.json`; screenshots trong `reports/`. Bộ test browser kiểm tra cấu hình KIHA ban đầu, nên cần cập nhật assertion khi bạn đổi số điện thoại hoặc kênh liên hệ.
 
@@ -207,6 +225,6 @@ Browser QA dùng Playwright + Chrome headless, kiểm tra desktop 1440 px, table
 6. Reverse proxy HTTPS vào Next.js cổng 3000. Express cổng 4000 chỉ cần truy cập nội bộ. Nếu hai ứng dụng ở các container khác nhau, cấu hình `API_HOST=0.0.0.0` và mạng private phù hợp. `API_INTERNAL_URL` dùng cho rewrite khi build nên build lại khi thay đổi endpoint.
 7. Kiểm tra cookie Secure, Zalo, gọi điện, sitemap và canonical dưới domain thật. Không sử dụng HTTP production cho luồng đăng nhập.
 
-Kiến trúc Next.js + Express + MongoDB cần Node runtime và database riêng. Dự án này được bàn giao tại workspace local, chưa được publish lên hosting. Chưa bổ sung upload trình duyệt/object storage, form thu lead riêng, giỏ hàng hoặc thanh toán; các yêu cầu tư vấn đi trực tiếp qua Zalo như phạm vi MVP.
+Kiến trúc Next.js + Express + MongoDB cần Node runtime và database riêng. Dự án được bàn giao tại workspace local, chưa publish lên hosting. Video upload dùng đĩa của API; ảnh vẫn dùng thư viện quét từ file. Chưa có object storage, form thu lead riêng, giỏ hàng hoặc thanh toán; tư vấn đi trực tiếp qua Zalo như phạm vi MVP.
 
 Tài liệu tham khảo: [Next.js App Router](https://nextjs.org/docs/app/getting-started/installation), [shadcn/ui](https://ui.shadcn.com/docs/components).

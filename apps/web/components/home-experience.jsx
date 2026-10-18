@@ -106,6 +106,8 @@ const descriptions = {
   'giuong-pallet-hop': 'Đường nét gọn gàng cho không gian của bạn.',
   'giuong-pallet-gap-gon': 'Thêm linh hoạt cho nhịp sống mỗi ngày.',
   'giuong-pallet-gap-lam-ghe-sofa': 'Một thiết kế, nhiều khoảnh khắc tận hưởng.',
+  'giuong-pallet-chan-cao': 'Thêm một lựa chọn cho góc nghỉ của bạn.',
+  nem: 'Tìm chiếc nệm vừa vặn cùng giường của bạn.',
 };
 export function CategoryExplorer({ categories }) {
   const [active, setActive] = useState(0);

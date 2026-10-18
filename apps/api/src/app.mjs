@@ -7,7 +7,8 @@ import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import { ZodError } from 'zod';
 import { config } from './config.mjs';
-import { Admin, Category, Media, Product, Session, Settings } from './models.mjs';
+import { Admin, Category, Media, Product, Session, Settings, Video } from './models.mjs';
+import { videoRoutes } from './videos.mjs';
 import {
   categoryInput,
   productInput,
@@ -20,7 +21,19 @@ import {
 import { requireAdmin, createSession, hashToken, cookieName, cookieOptions } from './auth.mjs';
 const fail = (status, message) => Object.assign(new Error(message), { status });
 const ok = (res, data, status = 200) => res.status(status).json({ data });
-const publicFields = '-previousSlugs';
+const publicFields = '-previousSlugs -sourceImageHash';
+const categoryPopulation = [
+  { path: 'category', select: 'name slug isActive' },
+  { path: 'categories', select: 'name slug isActive' },
+];
+function publicProduct(product) {
+  if (!product) return product;
+  product.categories = (
+    product.categories?.length ? product.categories : [product.category]
+  ).filter((c) => c?.isActive);
+  if (!product.category?.isActive) product.category = product.categories[0];
+  return product;
+}
 const sortMap = {
   featured: { isFeatured: -1, sortOrder: 1, _id: 1 },
   newest: { createdAt: -1, _id: -1 },
@@ -37,7 +50,14 @@ async function publicFilter() {
   const categories = await Category.find({ isActive: true }).select('_id').lean();
   return {
     status: 'published',
-    category: { $in: categories.map((c) => c._id) },
+    $and: [
+      {
+        $or: [
+          { category: { $in: categories.map((c) => c._id) } },
+          { categories: { $in: categories.map((c) => c._id) } },
+        ],
+      },
+    ],
     ...(config.production ? { isDemo: false } : {}),
   };
 }
@@ -52,22 +72,28 @@ async function listProducts(query, isAdmin) {
       ...(isAdmin ? {} : { isActive: true }),
     }).lean();
     if (!c) return { items: [], total: 0, page, pages: 0, limit };
-    filter.category = c._id;
+    filter.$and = [...(filter.$and || []), { $or: [{ category: c._id }, { categories: c._id }] }];
   }
   if (featured) filter.isFeatured = featured === 'true';
   const [items, total] = await Promise.all([
     Product.find(filter)
       .select(isAdmin ? '' : publicFields)
-      .populate('category', 'name slug')
+      .populate(categoryPopulation)
       .sort(sortMap[sort])
       .skip((page - 1) * limit)
       .limit(limit)
       .lean(),
     Product.countDocuments(filter),
   ]);
-  return { items, total, page, limit, pages: Math.ceil(total / limit) };
+  return {
+    items: isAdmin ? items : items.map(publicProduct),
+    total,
+    page,
+    limit,
+    pages: Math.ceil(total / limit),
+  };
 }
-export function createApp() {
+export function createApp(options = {}) {
   const app = express();
   app.disable('x-powered-by');
   app.use(helmet());
@@ -108,10 +134,10 @@ export function createApp() {
       $or: [{ slug: req.params.slug }, { previousSlugs: req.params.slug }],
     })
       .select(publicFields)
-      .populate('category', 'name slug')
+      .populate(categoryPopulation)
       .lean();
     if (!product) throw fail(404, 'Không tìm thấy sản phẩm.');
-    ok(res, product);
+    ok(res, publicProduct(product));
   });
   app.get('/api/settings/public', async (_req, res) =>
     ok(
@@ -119,6 +145,7 @@ export function createApp() {
       await Settings.findOne({ key: 'site' }).select('-_id -key -createdAt -updatedAt').lean(),
     ),
   );
+  videoRoutes(app, publicFilter, options);
   app.post(
     '/api/admin/auth/login',
     rateLimit({
@@ -176,8 +203,13 @@ export function createApp() {
     const id = req.params.id && objectId.parse(req.params.id);
     const current = id ? await Product.findById(id) : null;
     if (id && !current) throw fail(404, 'Sản phẩm không tồn tại.');
-    if (!(await Category.exists({ _id: data.category })))
+    data.categories = [...new Set([data.category, ...data.categories])];
+    if (
+      (await Category.countDocuments({ _id: { $in: data.categories } })) !== data.categories.length
+    )
       throw fail(422, 'Danh mục không tồn tại.');
+    if (data.video && !(await Video.exists({ src: data.video })))
+      throw fail(422, 'Video không tồn tại trong thư viện. Hãy tải lên hoặc chọn lại.');
     await validateImages([...data.images, data.thumbnail, data.seoImage]);
     if (
       await Product.exists({
@@ -222,7 +254,7 @@ export function createApp() {
   app.put('/api/admin/categories/:id', saveCategory);
   app.delete('/api/admin/categories/:id', async (req, res) => {
     const id = objectId.parse(req.params.id);
-    if (await Product.exists({ category: id }))
+    if (await Product.exists({ $or: [{ category: id }, { categories: id }] }))
       throw fail(409, 'Danh mục đang có sản phẩm. Hãy chuyển hoặc xóa các sản phẩm trước.');
     if (!(await Category.findByIdAndDelete(id))) throw fail(404, 'Danh mục không tồn tại.');
     ok(res, { success: true });
@@ -261,15 +293,14 @@ export function createApp() {
     res.status(404).json({ error: { message: 'Đường dẫn API không tồn tại.' } }),
   );
   app.use((err, _req, res, _next) => {
+    if (res.headersSent) return _next(err);
     if (err instanceof ZodError)
-      return res
-        .status(422)
-        .json({
-          error: {
-            message: 'Vui lòng kiểm tra thông tin đã nhập.',
-            fields: err.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
-          },
-        });
+      return res.status(422).json({
+        error: {
+          message: 'Vui lòng kiểm tra thông tin đã nhập.',
+          fields: err.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
+        },
+      });
     if (err.code === 11000)
       return res
         .status(409)
@@ -279,11 +310,9 @@ export function createApp() {
     if (err instanceof SyntaxError && 'body' in err)
       return res.status(400).json({ error: { message: 'Dữ liệu JSON không hợp lệ.' } });
     if (!err.status) console.error('[api]', err.name, err.message);
-    res
-      .status(err.status || 500)
-      .json({
-        error: { message: err.status ? err.message : 'Hệ thống đang bận. Vui lòng thử lại sau.' },
-      });
+    res.status(err.status || 500).json({
+      error: { message: err.status ? err.message : 'Hệ thống đang bận. Vui lòng thử lại sau.' },
+    });
   });
   return app;
 }

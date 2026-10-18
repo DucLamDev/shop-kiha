@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-export function useResource(path) {
+export function useResource(path, revision = 0) {
   const [data, setData] = useState(null),
     [error, setError] = useState(null),
     [version, setVersion] = useState(0),
@@ -32,7 +32,7 @@ export function useResource(path) {
     return () => {
       live = false;
     };
-  }, [path, version]);
+  }, [path, version, revision]);
   return {
     data,
     error,

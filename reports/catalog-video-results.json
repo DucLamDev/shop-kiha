@@ -1,0 +1,38 @@
+{
+  "products": 38,
+  "originalsPreserved": 77,
+  "importedDuplicates": 0,
+  "staleTestRecords": 0,
+  "groups": [
+    {
+      "name": "Giường pallet bệt",
+      "count": 6
+    },
+    {
+      "name": "Giường pallet hộp",
+      "count": 12
+    },
+    {
+      "name": "Giường pallet gấp gọn",
+      "count": 11
+    },
+    {
+      "name": "Giường pallet gấp làm ghế sofa",
+      "count": 3
+    },
+    {
+      "name": "Giường pallet chân cao",
+      "count": 10
+    },
+    {
+      "name": "Nệm",
+      "count": 1
+    }
+  ],
+  "multiCategoryProducts": 5,
+  "videoBrowserUploadBytes": 12584837,
+  "apiTests": 23,
+  "browserChecks": 13,
+  "designChecks": 6,
+  "productionBuild": "passed"
+}

@@ -7,6 +7,7 @@ import { Gallery, CopyProduct } from '@/components/gallery';
 import { ContactCTA, PhoneCTA } from '@/components/contact-cta';
 import { ProductCard } from '@/components/product-card';
 import { priceText } from '@/lib/utils';
+import { ProductVideo } from '@/components/product-video';
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const p = await getData(`/products/${encodeURIComponent(slug)}`);
@@ -54,10 +55,20 @@ export default async function ProductDetail({ params }) {
       <div className="product-detail">
         <Gallery product={product} />
         <div className="product-info">
-          <Link className="eyebrow" href={`/san-pham?category=${product.category.slug}`}>
-            {product.category.name}
-            <ArrowUpRight size={14} />
-          </Link>
+          <div className="product-category-links">
+            {(product.categories?.length ? product.categories : [product.category]).map(
+              (category) => (
+                <Link
+                  key={category._id}
+                  className="eyebrow"
+                  href={`/san-pham?category=${category.slug}`}
+                >
+                  {category.name}
+                  <ArrowUpRight size={14} />
+                </Link>
+              ),
+            )}
+          </div>
           {product.isDemo && (
             <p className="demo-note">Ảnh tham khảo · Chưa xác nhận thông tin sản phẩm</p>
           )}
@@ -95,6 +106,22 @@ export default async function ProductDetail({ params }) {
           )}
         </div>
       </div>
+      {product.video && (
+        <section className="section detail-video-section" aria-labelledby="video-heading">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">NHÌN GẦN HƠN</p>
+              <h2 id="video-heading">Video giới thiệu sản phẩm.</h2>
+            </div>
+          </div>
+          <ProductVideo
+            src={product.video}
+            poster={product.thumbnail}
+            name={product.name}
+            description={product.videoDescription}
+          />
+        </section>
+      )}
       <section className="section">
         <div className="section-heading">
           <div>

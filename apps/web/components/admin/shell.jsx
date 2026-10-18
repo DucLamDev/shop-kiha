@@ -16,7 +16,7 @@ const links = [
   ['/admin', 'Tổng quan', LayoutDashboard],
   ['/admin/san-pham', 'Sản phẩm', BedDouble],
   ['/admin/danh-muc', 'Danh mục', Layers],
-  ['/admin/hinh-anh', 'Hình ảnh', Images],
+  ['/admin/hinh-anh', 'Ảnh & video', Images],
   ['/admin/cai-dat', 'Cài đặt website', Settings],
 ];
 export function AdminShell({ admin, children }) {

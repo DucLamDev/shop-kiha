@@ -2,6 +2,7 @@ import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 const base = process.env.SITE_URL || 'http://localhost:3000';
+const catalog = JSON.parse(await fs.readFile('data/catalog.json', 'utf8'));
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const errors = [];
 const results = [];
@@ -60,7 +61,7 @@ try {
       false,
       `Overflow at ${width}px`,
     );
-    assert.equal(await rows.count(), 4);
+    assert.equal(await rows.count(), catalog.length);
     if (width === 390) {
       await page.screenshot({ path: 'reports/redesign-mobile-hero.png' });
       await page.screenshot({ path: 'reports/redesign-mobile.png', fullPage: true });

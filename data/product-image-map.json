@@ -1,56 +1,387 @@
 [
   {
-    "slug": "giuong-pallet-anh-01",
-    "label": "Giường pallet · Ảnh 01",
-    "category": "Giường pallet gấp làm ghế sofa",
-    "categorySlug": "giuong-pallet-gap-lam-ghe-sofa",
-    "source": "1wupukr35mkgdclpznkn2jacgvlnhx2wcniokstsxldeg2fddalals3kgorxzvntntl2.jpg",
-    "src": "/media/a9f32d95a8304ac8e833611e61cd35675ecc5db7e4eeacbfc0af68b3d2630877.jpg",
-    "reviewRequired": true
+    "name": "Giường pallet bệt 10cm có tựa đầu giường",
+    "slug": "giuong-pallet-bet-10cm-co-tua-dau-giuong",
+    "categories": [
+      "Giường pallet bệt"
+    ],
+    "source": "Tên Giường/Giường pallet bệt 10cm có tựa đầu giường.png",
+    "sha256": "c9219a8d9b28b8bc2e1541849cedfac4587dd107816809ed49d5735068138cbe",
+    "src": "/media/c9219a8d9b28b8bc2e1541849cedfac4587dd107816809ed49d5735068138cbe.png"
   },
   {
-    "slug": "giuong-pallet-anh-02",
-    "label": "Giường pallet · Ảnh 02",
-    "category": "Giường pallet gấp gọn",
-    "categorySlug": "giuong-pallet-gap-gon",
-    "source": "1wupukr35mkhe3qlkex7fn7mox5ggufxm65qatblffn9obhfrci1fnc0ygtl5xzu1se4.jpg",
-    "src": "/media/29390038fe707f9e0d367eb0b9f4d391e1ccf15623cdf88917546c3e7631ec46.jpg",
-    "reviewRequired": true
+    "name": "Giường pallet bệt cao 10cm có gờ chắn nệm kèm tựa đầu giường",
+    "slug": "giuong-pallet-bet-cao-10cm-co-go-chan-nem-kem-tua-dau-giuong",
+    "categories": [
+      "Giường pallet bệt"
+    ],
+    "source": "Tên Giường/Giường pallet bệt cao 10cm có gờ chắn nệm kèm tựa đầu giường.png",
+    "sha256": "4a856f6b477288caae64cfb1af90eb91322a9df5af56849d802d167731ab2588",
+    "src": "/media/4a856f6b477288caae64cfb1af90eb91322a9df5af56849d802d167731ab2588.png"
   },
   {
-    "slug": "giuong-pallet-anh-03",
-    "label": "Giường pallet · Ảnh 03",
-    "category": "Giường pallet hộp",
-    "categorySlug": "giuong-pallet-hop",
-    "source": "1wupukr35mkqfbttomf7ue6zyfcrz4ooetnds6hxhcm7eingvfmhvpmju0nuvsorzgt13.jpg",
-    "src": "/media/4aae5ff006a752b38f86216c4687bb7ace4b97e35ca7b520a34dc4367c9e8af8.jpg",
-    "reviewRequired": true
+    "name": "Giường pallet bệt cao 10cm có gờ chắn nệm",
+    "slug": "giuong-pallet-bet-cao-10cm-co-go-chan-nem",
+    "categories": [
+      "Giường pallet bệt"
+    ],
+    "source": "Tên Giường/Giường pallet bệt cao 10cm có gờ chắn nệm.png",
+    "sha256": "57faceddbceb2580ebb6bbe12638295eb34d1753c6687211f12a12ef8d72ee80",
+    "src": "/media/57faceddbceb2580ebb6bbe12638295eb34d1753c6687211f12a12ef8d72ee80.png"
   },
   {
-    "slug": "giuong-pallet-anh-04",
-    "label": "Giường pallet · Ảnh 04",
-    "category": "Giường pallet gấp làm ghế sofa",
-    "categorySlug": "giuong-pallet-gap-lam-ghe-sofa",
-    "source": "1wupukr35mkqfbttomf7ue73uqy6ektisxuxnhvoiufxhayitq2wte12xu75mx2tiqc3.jpg",
-    "src": "/media/db431e1b3e3b4a953871e3069c58bf5832a8c437c17497a5e07359f163c6d511.jpg",
-    "reviewRequired": true
+    "name": "Giường pallet bệt cao 10cm thiết kế kín mặt có thêm tựa đầu giường",
+    "slug": "giuong-pallet-bet-cao-10cm-thiet-ke-kin-mat-co-them-tua-dau-giuong",
+    "categories": [
+      "Giường pallet bệt"
+    ],
+    "source": "Tên Giường/Giường pallet bệt cao 10cm thiết kế kín mặt có thêm tựa đầu giường.png",
+    "sha256": "4afc818e6e2e291b1889872fc3f5c47fe1f3683481ff954b9b4893cef9ee400a",
+    "src": "/media/4afc818e6e2e291b1889872fc3f5c47fe1f3683481ff954b9b4893cef9ee400a.png"
   },
   {
-    "slug": "giuong-pallet-anh-05",
-    "label": "Giường pallet · Ảnh 05",
-    "category": "Giường pallet bệt",
-    "categorySlug": "giuong-pallet-bet",
-    "source": "1wupukr35ml1i2xi8dbmasf2dipagt8pquz4boewrfr3duincplm7xnnmkn7rvssgbo20.jpg",
-    "src": "/media/c0ea3b5ca3f3d3b7774779415ba3eba7baeb5c46ae77ea38569240dbac1d567f.jpg",
-    "reviewRequired": true
+    "name": "Giường pallet bệt cao 10cm thiết kế kín mặt",
+    "slug": "giuong-pallet-bet-cao-10cm-thiet-ke-kin-mat",
+    "categories": [
+      "Giường pallet bệt"
+    ],
+    "source": "Tên Giường/Giường pallet bệt cao 10cm thiết kế kín mặt.png",
+    "sha256": "60c3701697c4962b81d4b672b475f25c6970248dab0f8348a41440701ec0b1a2",
+    "src": "/media/60c3701697c4962b81d4b672b475f25c6970248dab0f8348a41440701ec0b1a2.png"
   },
   {
-    "slug": "giuong-pallet-anh-06",
-    "label": "Giường pallet · Ảnh 06",
-    "category": "Giường pallet hộp",
-    "categorySlug": "giuong-pallet-hop",
-    "source": "1wupukr35ml4zkh8pcqrrp86a0j4lgiubfmxmpxtwr3luhztar6kg1ecnq1kqbvqtvd31.jpg",
-    "src": "/media/fb30bca2a8de4ea5f36f0dbc8a015374d8e364a3884162814a3f8befefe7dc80.jpg",
-    "reviewRequired": true
+    "name": "Giường pallet bệt cao 10cm thiết kế nan giường thưa",
+    "slug": "giuong-pallet-bet-cao-10cm-thiet-ke-nan-giuong-thua",
+    "categories": [
+      "Giường pallet bệt"
+    ],
+    "source": "Tên Giường/Giường pallet bệt cao 10cm thiết kế nan giường thưa .png",
+    "sha256": "bfc7ca71806a29cd76c66850f2509bc717d6e461e8f75f8b5d6a028bba16bc0d",
+    "src": "/media/bfc7ca71806a29cd76c66850f2509bc717d6e461e8f75f8b5d6a028bba16bc0d.png"
+  },
+  {
+    "name": "Giường pallet chân cao 20cm",
+    "slug": "giuong-pallet-chan-cao-20cm",
+    "categories": [
+      "Giường pallet gấp gọn",
+      "Giường pallet chân cao"
+    ],
+    "source": "Tên Giường/Giường pallet chân cao 20cm.png",
+    "sha256": "c18e2797115af3d1f431b7f1563282f63ec8a660fe62d267467b4679c7f39d77",
+    "src": "/media/c18e2797115af3d1f431b7f1563282f63ec8a660fe62d267467b4679c7f39d77.png"
+  },
+  {
+    "name": "Giường pallet chân cao 25cm phổ thông",
+    "slug": "giuong-pallet-chan-cao-25cm-pho-thong",
+    "categories": [
+      "Giường pallet chân cao"
+    ],
+    "source": "Tên Giường/Giường pallet chân cao 25cm phổ thông.png",
+    "sha256": "c16741877187e7c0d991c0ebee333fb029cbb0a89f594f76e9007ea3ef9bb7f9",
+    "src": "/media/c16741877187e7c0d991c0ebee333fb029cbb0a89f594f76e9007ea3ef9bb7f9.png"
+  },
+  {
+    "name": "Giường pallet chân cao 30cm có gờ chắn nệm kèm tựa đầu giường",
+    "slug": "giuong-pallet-chan-cao-30cm-co-go-chan-nem-kem-tua-dau-giuong",
+    "categories": [
+      "Giường pallet chân cao"
+    ],
+    "source": "Tên Giường/Giường pallet chân cao 30cm có gờ chắn nệm kèm tựa đầu giường.png",
+    "sha256": "005dc69a13be2533e54633aabd770d9d2af86a64c780744c6cab52a33f513fc1",
+    "src": "/media/005dc69a13be2533e54633aabd770d9d2af86a64c780744c6cab52a33f513fc1.png"
+  },
+  {
+    "name": "Giường pallet chân cao 30cm có gờ chắn nệm",
+    "slug": "giuong-pallet-chan-cao-30cm-co-go-chan-nem",
+    "categories": [
+      "Giường pallet chân cao"
+    ],
+    "source": "Tên Giường/Giường pallet chân cao 30cm có gờ chắn nệm.png",
+    "sha256": "e6cb41f0960894772d3118b5f1f26c6df2b5fda10f1f9c7fa067971da7f878e1",
+    "src": "/media/e6cb41f0960894772d3118b5f1f26c6df2b5fda10f1f9c7fa067971da7f878e1.png"
+  },
+  {
+    "name": "Giường pallet chân cao 30cm có tựa đầu giường",
+    "slug": "giuong-pallet-chan-cao-30cm-co-tua-dau-giuong",
+    "categories": [
+      "Giường pallet gấp gọn",
+      "Giường pallet chân cao"
+    ],
+    "source": "Tên Giường/Giường pallet chân cao 30cm có tựa đầu giường.png",
+    "sha256": "a4d0fbffa22f9aac06340dde4f2817b1787e10c71eb66c03f068ec3cd946f62c",
+    "src": "/media/a4d0fbffa22f9aac06340dde4f2817b1787e10c71eb66c03f068ec3cd946f62c.png"
+  },
+  {
+    "name": "Giường pallet chân cao 30cm kín mặt",
+    "slug": "giuong-pallet-chan-cao-30cm-kin-mat",
+    "categories": [
+      "Giường pallet gấp gọn",
+      "Giường pallet chân cao"
+    ],
+    "source": "Tên Giường/Giường pallet chân cao 30cm kín mặt .png",
+    "sha256": "88ead0d675555af7fe1f3aa2506b1d743b9668662290d2ac331f79148bbd3760",
+    "src": "/media/88ead0d675555af7fe1f3aa2506b1d743b9668662290d2ac331f79148bbd3760.png"
+  },
+  {
+    "name": "Giường pallet chân cao 30cm thiết kế nan giường thưa",
+    "slug": "giuong-pallet-chan-cao-30cm-thiet-ke-nan-giuong-thua",
+    "categories": [
+      "Giường pallet gấp gọn",
+      "Giường pallet chân cao"
+    ],
+    "source": "Tên Giường/Giường pallet chân cao 30cm thiết kế nan giường thưa.png",
+    "sha256": "46f6fb754ded513961bff1839766ccc0d5e7bbfe3b103f1d545556cce0cfc001",
+    "src": "/media/46f6fb754ded513961bff1839766ccc0d5e7bbfe3b103f1d545556cce0cfc001.png"
+  },
+  {
+    "name": "Giường pallet chân cao 40cm lắp ráp",
+    "slug": "giuong-pallet-chan-cao-40cm-lap-rap",
+    "categories": [
+      "Giường pallet chân cao"
+    ],
+    "source": "Tên Giường/Giường pallet chân cao 40cm lắp ráp.png",
+    "sha256": "cb564969331fbe904af3e584c2652140232d31fe4a8b340a1cf3e206583257cd",
+    "src": "/media/cb564969331fbe904af3e584c2652140232d31fe4a8b340a1cf3e206583257cd.png"
+  },
+  {
+    "name": "Giường pallet chân cao có gờ chắn nệm kèm tựa đầu giường thiết kế nan thưa",
+    "slug": "giuong-pallet-chan-cao-co-go-chan-nem-kem-tua-dau-giuong-thiet-ke-nan-thua",
+    "categories": [
+      "Giường pallet chân cao"
+    ],
+    "source": "Tên Giường/Giường pallet chân cao có gờ chắn nệm kèm tựa đầu giường thiết kế nan thưa.png",
+    "sha256": "794c350b1781462adede1b3cae89d8e4ee2dbe675822bced39ffe038b42479ca",
+    "src": "/media/794c350b1781462adede1b3cae89d8e4ee2dbe675822bced39ffe038b42479ca.png"
+  },
+  {
+    "name": "Giường pallet chân cao có gờ chắn nệm thiết kế nan thư",
+    "slug": "giuong-pallet-chan-cao-co-go-chan-nem-thiet-ke-nan-thu",
+    "categories": [
+      "Giường pallet chân cao"
+    ],
+    "source": "Tên Giường/Giường pallet chân cao có gờ chắn nệm thiết kế nan thư.png",
+    "sha256": "5deee83195255fc15e595964730545661928a07ac5de51f3bb6b1ad302c326ee",
+    "src": "/media/5deee83195255fc15e595964730545661928a07ac5de51f3bb6b1ad302c326ee.png"
+  },
+  {
+    "name": "Giường pallet gấp 3 khúc có tựa đầu giường",
+    "slug": "giuong-pallet-gap-3-khuc-co-tua-dau-giuong",
+    "categories": [
+      "Giường pallet gấp gọn"
+    ],
+    "source": "Tên Giường/Giường pallet gấp 3 khúc có tựa đầu giường .png",
+    "sha256": "be434db67b429c39b6ae69f3983728962b8c3e837548e229001345d791206df0",
+    "src": "/media/be434db67b429c39b6ae69f3983728962b8c3e837548e229001345d791206df0.png"
+  },
+  {
+    "name": "Giường pallet gấp 3 khúc thấp cao 5cm",
+    "slug": "giuong-pallet-gap-3-khuc-thap-cao-5cm",
+    "categories": [
+      "Giường pallet gấp gọn"
+    ],
+    "source": "Tên Giường/Giường pallet gấp 3 khúc thấp cao 5cm .png",
+    "sha256": "5d954e83578b34903844ad3968fd10a42002a5404cff45cb082e09151e83c105",
+    "src": "/media/5d954e83578b34903844ad3968fd10a42002a5404cff45cb082e09151e83c105.png"
+  },
+  {
+    "name": "Giường pallet gấp 3 khúc thiết kế kín mặt",
+    "slug": "giuong-pallet-gap-3-khuc-thiet-ke-kin-mat",
+    "categories": [
+      "Giường pallet gấp gọn"
+    ],
+    "source": "Tên Giường/Giường pallet gấp 3 khúc thiết kế kín mặt .png",
+    "sha256": "04ce5410f624cfb351a83344d7c0705a37b693574b41a2295d5204ba701db013",
+    "src": "/media/04ce5410f624cfb351a83344d7c0705a37b693574b41a2295d5204ba701db013.png"
+  },
+  {
+    "name": "Giường pallet gấp 3 khúc",
+    "slug": "giuong-pallet-gap-3-khuc",
+    "categories": [
+      "Giường pallet gấp gọn"
+    ],
+    "source": "Tên Giường/Giường pallet gấp 3 khúc.png",
+    "sha256": "eeffe491b49fecc9c3ddf5a1ac2394a57f6e8f51fb20cc43fdd5742ab5cb8211",
+    "src": "/media/eeffe491b49fecc9c3ddf5a1ac2394a57f6e8f51fb20cc43fdd5742ab5cb8211.png"
+  },
+  {
+    "name": "Giường pallet gấp 4 khúc",
+    "slug": "giuong-pallet-gap-4-khuc",
+    "categories": [
+      "Giường pallet gấp gọn"
+    ],
+    "source": "Tên Giường/Giường pallet gấp 4 khúc.jpg",
+    "sha256": "2f23bf926b1a2def9ad03613382cceae17c1effc3bb06a4691a179abf214fbea",
+    "src": "/media/2f23bf926b1a2def9ad03613382cceae17c1effc3bb06a4691a179abf214fbea.jpg"
+  },
+  {
+    "name": "Giường pallet gấp gọn làm sofa chất liệu gỗ thông",
+    "slug": "giuong-pallet-gap-gon-lam-sofa-chat-lieu-go-thong",
+    "categories": [
+      "Giường pallet gấp làm ghế sofa"
+    ],
+    "source": "Tên Giường/Giường pallet gấp gọn làm sofa chất liệu gỗ thông.png",
+    "sha256": "087009d271da2b197872daa8591c0383a94110816c34efdbd034704ac704a22d",
+    "src": "/media/087009d271da2b197872daa8591c0383a94110816c34efdbd034704ac704a22d.png"
+  },
+  {
+    "name": "Giường pallet gấp làm sofa gỗ sồi(Đỏ)",
+    "slug": "giuong-pallet-gap-lam-sofa-go-soi-do",
+    "categories": [
+      "Giường pallet gấp làm ghế sofa"
+    ],
+    "source": "Tên Giường/Giường pallet gấp làm sofa gỗ sồi(Đỏ).png",
+    "sha256": "2e328b8894c9b01d0d850d1c562427e37e665b25aa68698cf07bfc676862c9b4",
+    "src": "/media/2e328b8894c9b01d0d850d1c562427e37e665b25aa68698cf07bfc676862c9b4.png"
+  },
+  {
+    "name": "Giường pallet gấp làm sofa gỗ sồi(Vàng)",
+    "slug": "giuong-pallet-gap-lam-sofa-go-soi-vang",
+    "categories": [
+      "Giường pallet gấp gọn"
+    ],
+    "source": "Tên Giường/Giường pallet gấp làm sofa gỗ sồi(Vàng).png",
+    "sha256": "b1dd99cc5c4fff59561bdfb1c17951f4b175bc487204aab768fa5e25ff89709d",
+    "src": "/media/b1dd99cc5c4fff59561bdfb1c17951f4b175bc487204aab768fa5e25ff89709d.png"
+  },
+  {
+    "name": "Giường pallet gấp thành sofa gỗ thông",
+    "slug": "giuong-pallet-gap-thanh-sofa-go-thong",
+    "categories": [
+      "Giường pallet gấp làm ghế sofa"
+    ],
+    "source": "Tên Giường/Giường pallet gấp thành sofa gỗ thông.png",
+    "sha256": "b329125d9f5810380ad6329ecb1c3b5dd59d1dedfc8fef5fdc77c45e3f6f78a2",
+    "src": "/media/b329125d9f5810380ad6329ecb1c3b5dd59d1dedfc8fef5fdc77c45e3f6f78a2.png"
+  },
+  {
+    "name": "Giường pallet hộp 20cm",
+    "slug": "giuong-pallet-hop-20cm",
+    "categories": [
+      "Giường pallet hộp"
+    ],
+    "source": "Tên Giường/Giường pallet hộp 20cm .png",
+    "sha256": "e9b426704ec482fb3cd1a15bc299ff9e47e2076904f071fbe4da485166f52264",
+    "src": "/media/e9b426704ec482fb3cd1a15bc299ff9e47e2076904f071fbe4da485166f52264.png"
+  },
+  {
+    "name": "Giường pallet hộp 20cm nan thưa",
+    "slug": "giuong-pallet-hop-20cm-nan-thua",
+    "categories": [
+      "Giường pallet hộp"
+    ],
+    "source": "Tên Giường/Giường pallet hộp 20cm nan thưa.png",
+    "sha256": "a102b7a3c9c48533f18a904b4cbef07503258372cabaa424d4fb5dc640a6a4a9",
+    "src": "/media/a102b7a3c9c48533f18a904b4cbef07503258372cabaa424d4fb5dc640a6a4a9.png"
+  },
+  {
+    "name": "Giường pallet hộp cao 20 lắp ráp",
+    "slug": "giuong-pallet-hop-cao-20-lap-rap",
+    "categories": [
+      "Giường pallet hộp"
+    ],
+    "source": "Tên Giường/Giường pallet hộp cao 20 lắp ráp.png",
+    "sha256": "bce5fb652be575d31133cd9634bba121b6681af95a24400131c04c80abb6d343",
+    "src": "/media/bce5fb652be575d31133cd9634bba121b6681af95a24400131c04c80abb6d343.png"
+  },
+  {
+    "name": "Giường pallet hộp cao 30cm nan thưa kèm tựa đầu giường",
+    "slug": "giuong-pallet-hop-cao-30cm-nan-thua-kem-tua-dau-giuong",
+    "categories": [
+      "Giường pallet hộp"
+    ],
+    "source": "Tên Giường/Giường pallet hộp cao 30cm nan thưa kèm tựa đầu giường.png",
+    "sha256": "f5b116c044a6cbd0928bdc068906e9c2867178fef0bcadd3ad6d3a9c7860003a",
+    "src": "/media/f5b116c044a6cbd0928bdc068906e9c2867178fef0bcadd3ad6d3a9c7860003a.png"
+  },
+  {
+    "name": "Giường pallet hộp cao 30cm nan thưa",
+    "slug": "giuong-pallet-hop-cao-30cm-nan-thua",
+    "categories": [
+      "Giường pallet hộp"
+    ],
+    "source": "Tên Giường/Giường pallet hộp cao 30cm nan thưa.png",
+    "sha256": "6d1a35b7e0e46e3dd6cbff950f8f6f5fe09651b7b8e50113c7e63e63b3305499",
+    "src": "/media/6d1a35b7e0e46e3dd6cbff950f8f6f5fe09651b7b8e50113c7e63e63b3305499.png"
+  },
+  {
+    "name": "Giường pallet hộp có gờ chắn nệm kèm tựa đầu giường",
+    "slug": "giuong-pallet-hop-co-go-chan-nem-kem-tua-dau-giuong",
+    "categories": [
+      "Giường pallet hộp"
+    ],
+    "source": "Tên Giường/Giường pallet hộp có gờ chắn nệm kèm tựa đầu giường.png",
+    "sha256": "ab5149106e42f1c6cb57f8766a55af7f024e50cd4c0b15b8a271c26eeb5584d0",
+    "src": "/media/ab5149106e42f1c6cb57f8766a55af7f024e50cd4c0b15b8a271c26eeb5584d0.png"
+  },
+  {
+    "name": "Giường pallet hộp gấp gọn trống 2 đầu",
+    "slug": "giuong-pallet-hop-gap-gon-trong-2-dau",
+    "categories": [
+      "Giường pallet hộp",
+      "Giường pallet gấp gọn"
+    ],
+    "source": "Tên Giường/Giường pallet hộp gấp gọn trống 2 đầu.png",
+    "sha256": "bc01c87d504cde9565ddda28109c3c3d1e2bf0ad9e4fb44f35b724198752afc0",
+    "src": "/media/bc01c87d504cde9565ddda28109c3c3d1e2bf0ad9e4fb44f35b724198752afc0.png"
+  },
+  {
+    "name": "Giường pallet hộp kèm tựa đầu giường",
+    "slug": "giuong-pallet-hop-kem-tua-dau-giuong",
+    "categories": [
+      "Giường pallet hộp"
+    ],
+    "source": "Tên Giường/Giường pallet hộp kèm tựa đầu giường.png",
+    "sha256": "5593c785a0d153d0e4617867e07785e87564087d05d48932e4782a1e0012bf6d",
+    "src": "/media/5593c785a0d153d0e4617867e07785e87564087d05d48932e4782a1e0012bf6d.png"
+  },
+  {
+    "name": "Giường pallet hộp kín 2 đầu nan thưa",
+    "slug": "giuong-pallet-hop-kin-2-dau-nan-thua",
+    "categories": [
+      "Giường pallet hộp"
+    ],
+    "source": "Tên Giường/Giường pallet hộp kín 2 đầu nan thưa.png",
+    "sha256": "08d23a860a0a223b7e4a7fb822b4f35aac64dee66b85402f8e3f2b0f527e1d52",
+    "src": "/media/08d23a860a0a223b7e4a7fb822b4f35aac64dee66b85402f8e3f2b0f527e1d52.png"
+  },
+  {
+    "name": "Giường pallet hộp kín cao 20cm có tựa đầu giường",
+    "slug": "giuong-pallet-hop-kin-cao-20cm-co-tua-dau-giuong",
+    "categories": [
+      "Giường pallet hộp"
+    ],
+    "source": "Tên Giường/Giường pallet hộp kín cao 20cm có tựa đầu giường.png",
+    "sha256": "06eddce7a21511beff418df918ab6ac2fc2031ee172a3a7d64bbf0e0f000c394",
+    "src": "/media/06eddce7a21511beff418df918ab6ac2fc2031ee172a3a7d64bbf0e0f000c394.png"
+  },
+  {
+    "name": "Giường pallet hôp kín cao 30cm",
+    "slug": "giuong-pallet-hop-kin-cao-30cm",
+    "categories": [
+      "Giường pallet hộp"
+    ],
+    "source": "Tên Giường/Giường pallet hôp kín cao 30cm.png",
+    "sha256": "1124e24d0e0cb330a016d6a6a5e18ded7c8cef46af53797485012757cd9141b2",
+    "src": "/media/1124e24d0e0cb330a016d6a6a5e18ded7c8cef46af53797485012757cd9141b2.png"
+  },
+  {
+    "name": "Giường pallet hộp kín cao 30cm",
+    "slug": "giuong-pallet-hop-kin-cao-30cm-c853070588",
+    "categories": [
+      "Giường pallet hộp"
+    ],
+    "source": "Tên Giường/Giường pallet hộp kín cao 30cm.png",
+    "sha256": "c853070588e6c4ef294bee047d0e57721b991cfd640b05b2b044cd8fa9f994a6",
+    "src": "/media/c853070588e6c4ef294bee047d0e57721b991cfd640b05b2b044cd8fa9f994a6.png"
+  },
+  {
+    "name": "Nệm cao su gấp 3 khúc",
+    "slug": "nem-cao-su-gap-3-khuc",
+    "categories": [
+      "Nệm"
+    ],
+    "source": "Tên Giường/Nệm cao su gấp 3 khúc.png",
+    "sha256": "890cbd9ae02612f64b0f9af06f7c4f67b7bc811be7fb4b784a662d907683c721",
+    "src": "/media/890cbd9ae02612f64b0f9af06f7c4f67b7bc811be7fb4b784a662d907683c721.png"
   }
 ]

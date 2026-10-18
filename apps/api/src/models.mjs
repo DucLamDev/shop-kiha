@@ -18,10 +18,14 @@ const productSchema = new Schema(
     slug: { type: String, required: true, unique: true },
     previousSlugs: { type: [String], default: [] },
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
+    categories: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
+    sourceImageHash: { type: String, unique: true, sparse: true },
     shortDescription: String,
     description: String,
     images: [String],
     thumbnail: String,
+    video: { type: String, default: '' },
+    videoDescription: { type: String, default: '' },
     price: { type: Number, min: 0, default: null },
     priceLabel: String,
     specifications: [{ _id: false, label: String, value: String }],
@@ -37,6 +41,8 @@ const productSchema = new Schema(
 );
 productSchema.index({ status: 1, category: 1, sortOrder: 1, _id: 1 });
 productSchema.index({ previousSlugs: 1 });
+productSchema.index({ status: 1, categories: 1 });
+productSchema.index({ video: 1 });
 export const Category = model('Category', categorySchema);
 export const Product = model('Product', productSchema);
 export const Admin = model(
@@ -78,6 +84,19 @@ export const Media = model(
     options,
   ),
 );
+export const Video = model(
+  'Video',
+  new Schema(
+    {
+      filename: { type: String, required: true, unique: true },
+      src: { type: String, required: true, unique: true },
+      name: String,
+      mime: String,
+      bytes: Number,
+    },
+    options,
+  ),
+);
 export const Settings = model(
   'Settings',
   new Schema(
@@ -107,5 +126,7 @@ export const Settings = model(
 export async function connectDb(uri) {
   if (!uri) throw new Error('MONGODB_URI is required. Copy .env.example to .env first.');
   await mongoose.connect(uri, { serverSelectionTimeoutMS: 10000 });
-  await Promise.all([Category, Product, Admin, Session, Media, Settings].map((m) => m.init()));
+  await Promise.all(
+    [Category, Product, Admin, Session, Media, Video, Settings].map((m) => m.init()),
+  );
 }

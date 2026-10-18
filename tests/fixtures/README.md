@@ -1,0 +1,1 @@
+The two one-second silent tan frames are generated locally for upload and browser playback tests, using FFmpeg's `color` source. They contain no product imagery or third-party content. MP4 uses H.264/yuv420p and WebM uses VP9. No FFmpeg installation is required to run the API tests or the application.

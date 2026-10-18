@@ -3,6 +3,11 @@ import path from 'node:path';
 import mongoose from 'mongoose';
 import { config, root } from '../apps/api/src/config.mjs';
 import { connectDb, Media, Category, Product, Settings } from '../apps/api/src/models.mjs';
+import { importOwnerCatalog } from './owner-catalog.mjs';
+const hasOwnerCatalog = await fs.access(path.join(root, 'data/owner-catalog.json')).then(
+  () => true,
+  () => false,
+);
 const manifest = JSON.parse(await fs.readFile(path.join(root, 'data/media-manifest.json'), 'utf8'));
 const editorial = JSON.parse(
   await fs.readFile(path.join(root, 'data/editorial-media.json'), 'utf8'),
@@ -78,7 +83,7 @@ try {
     );
     categories.set(item.slug, category);
   }
-  if (process.env.SEED_DEMO === 'true' && !config.production) {
+  if (!hasOwnerCatalog && process.env.SEED_DEMO === 'true' && !config.production) {
     const legacyCategory = await Category.findOne({ slug: 'giuong-pallet', name: 'Giường pallet' });
     const references = [
       { image: 'a9f32d95', category: 'giuong-pallet-gap-lam-ghe-sofa', featured: false },
@@ -154,6 +159,7 @@ try {
       'Seeded 6 clearly marked reference records for local review. Production API excludes demo records.',
     );
   }
+  if (hasOwnerCatalog) await importOwnerCatalog();
   console.log('Media and initial settings seeded without overwriting existing content.');
 } finally {
   await mongoose.disconnect();

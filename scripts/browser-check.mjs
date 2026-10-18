@@ -22,7 +22,7 @@ page.on('pageerror', (error) => errors.push(error.message));
 const suffix = Date.now().toString(36),
   categoryName = `Danh mục QA ${suffix}`,
   productName = `Giường QA ${suffix}`;
-let categoryId, productId;
+let categoryId, productId, videoId, videoSrc;
 async function check(name, task) {
   await task();
   results.push(name);
@@ -81,7 +81,11 @@ try {
       const response = await context.request.get(`${base}/api/products?category=${category.slug}`);
       const { data } = await response.json();
       assert.ok(data.total > 0);
-      assert.ok(data.items.every((product) => product.category.slug === category.slug));
+      assert.ok(
+        data.items.every((product) =>
+          product.categories.some((group) => group.slug === category.slug),
+        ),
+      );
     }
     await page.goBack();
     await page.waitForURL('**/san-pham');
@@ -162,15 +166,49 @@ try {
       await page.getByRole('button', { name: 'Đặt ảnh 2 làm đại diện' }).click();
       await page.getByRole('button', { name: 'Đưa ảnh 2 về trước' }).click();
       await page.getByLabel('Dữ liệu tham khảo', { exact: true }).check();
+      // A valid MP4 with a free box verifies uploads larger than 10 MB through Next's rewrite.
+      const fixture = await fs.readFile(path.join(root, 'tests/fixtures/sample.mp4'));
+      const free = Buffer.alloc(12 * 1024 * 1024);
+      free.writeUInt32BE(free.length, 0);
+      free.write('free', 4, 'ascii');
+      const uploadResponse = page.waitForResponse(
+        (r) => r.url().endsWith('/api/admin/videos') && r.request().method() === 'POST',
+      );
+      await page
+        .getByLabel('Chọn file video', { exact: true })
+        .setInputFiles({
+          name: `Giới thiệu QA ${suffix}.mp4`,
+          mimeType: 'video/mp4',
+          buffer: Buffer.concat([fixture, free]),
+        });
+      const uploadedResponse = await uploadResponse;
+      const uploaded = (await uploadedResponse.json()).data;
+      assert.equal(uploadedResponse.status(), 201);
+      videoId = uploaded._id;
+      videoSrc = uploaded.src;
+      assert.ok(uploaded.bytes > 10 * 1024 * 1024);
+      await page.locator('.selected-video video').waitFor();
+      await page
+        .getByLabel('Nội dung video bằng văn bản')
+        .fill('Video kiểm thử chức năng phát, không phải video sản phẩm thật.');
+      await page.getByLabel(catalog[0].name, { exact: true }).check();
       const saved = await submitAndRead('/api/admin/products', () =>
         page.getByRole('button', { name: 'Lưu sản phẩm', exact: true }).click(),
       );
       productId = saved._id;
       assert.equal(saved.images.length, 2);
       assert.equal(saved.thumbnail, saved.images[0]);
+      assert.equal(saved.video, videoSrc);
+      assert.equal(saved.categories.length, 2);
       await page.waitForURL('**/admin/san-pham');
       const publicResponse = await context.request.get(`${base}/api/products/${saved.slug}`);
       assert.equal(publicResponse.status(), 404);
+      const anonymous = await browser.newContext();
+      try {
+        assert.equal((await anonymous.request.get(`${base}${videoSrc}`)).status(), 401);
+      } finally {
+        await anonymous.close();
+      }
     },
   );
   await check('Admin edits and publishes; public gallery shows saved data', async () => {
@@ -190,6 +228,43 @@ try {
     await page.getByRole('button', { name: /Phóng to ảnh/ }).click();
     await page.getByRole('button', { name: 'Ảnh trước', exact: true }).click();
     await page.keyboard.press('Escape');
+    const video = page.locator('.detail-video-section video');
+    await video.waitFor();
+    assert.equal(await video.getAttribute('preload'), 'none');
+    await video.evaluate(async (element) => {
+      element.muted = true;
+      await element.play();
+    });
+    await page.waitForFunction(
+      () => document.querySelector('.detail-video-section video').currentTime > 0.05,
+    );
+    await video.evaluate((element) => {
+      element.pause();
+      element.currentTime = 0.5;
+    });
+    await page.waitForFunction(
+      () => !document.querySelector('.detail-video-section video').seeking,
+    );
+    await page.getByText('Nội dung video', { exact: true }).click();
+    await page
+      .getByText('Video kiểm thử chức năng phát, không phải video sản phẩm thật.', { exact: true })
+      .waitFor();
+    const anonymous = await browser.newContext();
+    try {
+      assert.equal(
+        (
+          await anonymous.request.get(`${base}${videoSrc}`, { headers: { Range: 'bytes=0-63' } })
+        ).status(),
+        206,
+      );
+    } finally {
+      await anonymous.close();
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    await noOverflow();
+    await page
+      .locator('.detail-video-section')
+      .screenshot({ path: path.join(root, 'reports/product-video-mobile.png') });
     await page.setViewportSize({ width: 768, height: 1024 });
     await noOverflow();
   });
@@ -238,6 +313,15 @@ try {
       page.getByRole('button', { name: 'Xác nhận xóa', exact: true }).click(),
     );
     productId = null;
+    await goto('/admin/hinh-anh');
+    await page
+      .getByRole('button', { name: `Xóa video Giới thiệu QA ${suffix}.mp4`, exact: true })
+      .click();
+    await submitAndRead(`/api/admin/videos/${videoId}`, () =>
+      page.getByRole('button', { name: 'Xác nhận xóa', exact: true }).click(),
+    );
+    videoId = null;
+    assert.equal((await context.request.get(`${base}${videoSrc}`)).status(), 404);
     await goto('/admin/danh-muc');
     await page.getByRole('button', { name: `Xóa ${categoryName}`, exact: true }).click();
     await submitAndRead(`/api/admin/categories/${categoryId}`, () =>
@@ -283,6 +367,10 @@ try {
     });
   if (categoryId)
     await context.request.delete(`${base}/api/admin/categories/${categoryId}`, {
+      headers: { Origin: base },
+    });
+  if (videoId)
+    await context.request.delete(`${base}/api/admin/videos/${videoId}`, {
       headers: { Origin: base },
     });
   await browser.close();

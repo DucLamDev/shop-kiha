@@ -6,6 +6,8 @@ dotenv.config({ path: path.join(root, '.env'), quiet: true });
 export default {
   poweredByHeader: false,
   devIndicators: false,
+  // Allow the API's 100 MiB video limit plus multipart headers through rewrites.
+  experimental: { proxyClientMaxBodySize: '105mb', proxyTimeout: 300000 },
   turbopack: { root },
   async rewrites() {
     if (!process.env.API_INTERNAL_URL) throw new Error('Set API_INTERNAL_URL in .env');

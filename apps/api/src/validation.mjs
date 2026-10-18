@@ -46,6 +46,11 @@ export const productInput = z
     name: text(160).min(1),
     slug,
     category: objectId,
+    categories: z.array(objectId).max(20).default([]),
+    video: z
+      .union([z.literal(''), z.string().regex(/^\/api\/videos\/[a-f0-9-]{36}\.(mp4|webm)$/)])
+      .default(''),
+    videoDescription: optionalText(12000),
     shortDescription: optionalText(300),
     description: optionalText(12000),
     images: z
