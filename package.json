@@ -1,0 +1,41 @@
+{
+  "name": "kiha-furniture",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ],
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "npm run build --workspace @kiha/web",
+    "start": "node scripts/dev.mjs --production",
+    "lint": "eslint .",
+    "test": "node --test --test-concurrency=1 tests/api.test.mjs",
+    "test:browser": "node scripts/browser-check.mjs",
+    "test:design": "node scripts/design-check.mjs",
+    "test:startup": "node scripts/startup-check.mjs",
+    "media:scan": "node scripts/scan-images.mjs",
+    "db:local": "node scripts/local-db.mjs",
+    "seed": "node scripts/seed.mjs",
+    "admin:create": "node scripts/create-admin.mjs",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "eslint": "^9.39.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^16.5.0",
+    "mongodb-memory-server": "^10.3.0",
+    "playwright": "^1.56.0",
+    "prettier": "^3.9.10",
+    "sharp": "^0.35.5",
+    "supertest": "^7.1.4"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

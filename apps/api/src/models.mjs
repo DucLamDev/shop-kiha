@@ -1,0 +1,111 @@
+import mongoose from 'mongoose';
+const { Schema, model } = mongoose;
+const options = { timestamps: true, versionKey: false };
+const categorySchema = new Schema(
+  {
+    name: { type: String, required: true },
+    slug: { type: String, required: true, unique: true },
+    description: String,
+    image: String,
+    isActive: { type: Boolean, default: true },
+    sortOrder: { type: Number, default: 0 },
+  },
+  options,
+);
+const productSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    slug: { type: String, required: true, unique: true },
+    previousSlugs: { type: [String], default: [] },
+    category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
+    shortDescription: String,
+    description: String,
+    images: [String],
+    thumbnail: String,
+    price: { type: Number, min: 0, default: null },
+    priceLabel: String,
+    specifications: [{ _id: false, label: String, value: String }],
+    isFeatured: { type: Boolean, default: false },
+    status: { type: String, enum: ['draft', 'published'], default: 'draft' },
+    sortOrder: { type: Number, default: 0 },
+    seoTitle: String,
+    seoDescription: String,
+    seoImage: String,
+    isDemo: { type: Boolean, default: false },
+  },
+  options,
+);
+productSchema.index({ status: 1, category: 1, sortOrder: 1, _id: 1 });
+productSchema.index({ previousSlugs: 1 });
+export const Category = model('Category', categorySchema);
+export const Product = model('Product', productSchema);
+export const Admin = model(
+  'Admin',
+  new Schema(
+    {
+      email: { type: String, required: true, unique: true },
+      passwordHash: { type: String, required: true, select: false },
+      role: { type: String, enum: ['admin'], default: 'admin' },
+      isActive: { type: Boolean, default: true },
+    },
+    options,
+  ),
+);
+export const Session = model(
+  'Session',
+  new Schema(
+    {
+      tokenHash: { type: String, unique: true },
+      admin: { type: Schema.Types.ObjectId, ref: 'Admin' },
+      expiresAt: { type: Date, index: { expires: 0 } },
+    },
+    options,
+  ),
+);
+export const Media = model(
+  'Media',
+  new Schema(
+    {
+      assetId: { type: String, unique: true },
+      name: String,
+      src: { type: String, unique: true },
+      format: String,
+      width: Number,
+      height: Number,
+      bytes: Number,
+      sha256: String,
+    },
+    options,
+  ),
+);
+export const Settings = model(
+  'Settings',
+  new Schema(
+    {
+      key: { type: String, unique: true, default: 'site' },
+      shopName: String,
+      phone: String,
+      zaloUrl: String,
+      facebookUrl: String,
+      tiktokUrl: String,
+      mapsUrl: String,
+      address: String,
+      logo: String,
+      heroImage: String,
+      aboutImage: String,
+      heroTitle: String,
+      heroDescription: String,
+      aboutTitle: String,
+      aboutDescription: String,
+      commitments: [{ _id: false, title: String, description: String }],
+      seoTitle: String,
+      seoDescription: String,
+    },
+    options,
+  ),
+);
+export async function connectDb(uri) {
+  if (!uri) throw new Error('MONGODB_URI is required. Copy .env.example to .env first.');
+  await mongoose.connect(uri, { serverSelectionTimeoutMS: 10000 });
+  await Promise.all([Category, Product, Admin, Session, Media, Settings].map((m) => m.init()));
+}

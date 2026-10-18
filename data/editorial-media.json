@@ -1,0 +1,28 @@
+[
+  {
+    "assetId": "22163df346314cbfa6ee8362dcf74e362d3d21ccd22a82503227ebb298af5745",
+    "name": "AI · Không gian nắng chiều (ảnh minh họa)",
+    "src": "/media/22163df346314cbfa6ee8362dcf74e362d3d21ccd22a82503227ebb298af5745.webp",
+    "format": "webp",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 270958,
+    "sha256": "22163df346314cbfa6ee8362dcf74e362d3d21ccd22a82503227ebb298af5745",
+    "role": "hero",
+    "origin": "AI illustration",
+    "original": "output/imagegen/kiha-bedroom-v1.png"
+  },
+  {
+    "assetId": "6879be3ea460294466284acd281fd5844922dd2b65e591ebf64442d1206e5518",
+    "name": "AI · Chi tiết gỗ và linen (ảnh minh họa)",
+    "src": "/media/6879be3ea460294466284acd281fd5844922dd2b65e591ebf64442d1206e5518.webp",
+    "format": "webp",
+    "width": 1024,
+    "height": 1536,
+    "bytes": 178636,
+    "sha256": "6879be3ea460294466284acd281fd5844922dd2b65e591ebf64442d1206e5518",
+    "role": "detail",
+    "origin": "AI illustration",
+    "original": "output/imagegen/kiha-detail-v1.png"
+  }
+]

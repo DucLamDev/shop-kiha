@@ -1,0 +1,12 @@
+{
+  "passed": 7,
+  "checks": [
+    "Cold start brings up MongoDB, then API, then a working home page",
+    "Duplicate launch exits cleanly without disrupting the existing website",
+    "Shutdown removes the entire owned process tree, releases ports and clears the launcher lock",
+    "Restart preserves catalog data and does not stop an independently started MongoDB",
+    "Busy website port gives an actionable error without killing the occupying process",
+    "Interrupting startup also cleans up MongoDB and partially started services",
+    "Production never silently launches the development MongoDB"
+  ]
+}

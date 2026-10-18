@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "demoProductsExcluded": true,
+  "secureHttpOnlyCookie": true,
+  "publicRoutes": 6,
+  "pageErrors": []
+}

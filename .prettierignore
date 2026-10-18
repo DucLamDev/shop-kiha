@@ -1,0 +1,8 @@
+node_modules
+.next
+.local
+reports
+img
+apps/web/public
+package-lock.json
+data

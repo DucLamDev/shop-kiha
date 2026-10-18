@@ -1,0 +1,18 @@
+{
+  "mode": "Built-in image_gen.imagegen",
+  "purpose": "Decorative interior inspiration only. Original KIHA product photographs remain unchanged.",
+  "images": [
+    {
+      "role": "hero",
+      "file": "kiha-bedroom-v1.png",
+      "name": "AI · Không gian nắng chiều (ảnh minh họa)",
+      "prompt": "Create a photographic editorial interior image for a Vietnamese artisan wooden pallet bed website, KIHA. Landscape 3:2 composition, premium interiors magazine photography, entirely photorealistic natural materials. Warm intimate minimalist Japandi bedroom, large low platform bed visibly made of natural honey-colored wooden pallet slats, neatly draped warm ivory linen duvet, two pillows and a muted tobacco brown throw, softly plastered cream wall, subtle curved architectural niche, a single dark walnut bedside stool holding a small sculptural ceramic vase with one branch, large side window on the left with translucent linen curtain, late afternoon sunlight casting long delicate architectural shadows across the timber floor. Bed fully visible with beautiful unmistakable layered pallet construction. Camera three-quarter viewpoint at low eye height, 35mm lens, generous quiet space in the upper left, bedroom filling frame edge to edge, soft organic imperfections, tactile wood grain, restrained earthy palette, high-end art direction, sophisticated natural light, realistic proportions, cinematic but calm. No people, no text, no letters, no logo, no watermark, no prices, no collages. This is a decorative interior inspiration image, not a product packshot."
+    },
+    {
+      "role": "detail",
+      "file": "kiha-detail-v1.png",
+      "name": "AI · Chi tiết gỗ và linen (ảnh minh họa)",
+      "prompt": "Generate one portrait 2:3 photorealistic editorial interiors photograph, a poetic close-up corner of a low natural honey-wood pallet bed in a sophisticated warm Japandi bedroom. The wooden pallet structure and smooth tactile slatted corner occupy lower half, cream linen bedding drapes softly over the top left edge, a small deep tobacco-colored folded throw, warm afternoon sun from upper right casts beautiful long slatted window shadows across pale limewashed wall and wooden floor, one small sculptural clay vase with an olive branch on the floor beside the bed. Extremely tasteful premium interiors magazine composition, asymmetric negative space in upper right, tactile linen weave and realistic wood grain, warm ivory, walnut and caramel palette, calm intimate atmosphere, 50mm lens, natural photographic depth, beautiful imperfect detail, subtle filmic grain. No text, no logo, no watermark, no collage, no people, no artificial excessive shine. Decorative inspiration for Vietnamese wooden pallet bed brand KIHA, not a factual product photograph."
+    }
+  ]
+}

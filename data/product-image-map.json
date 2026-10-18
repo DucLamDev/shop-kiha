@@ -1,0 +1,56 @@
+[
+  {
+    "slug": "giuong-pallet-anh-01",
+    "label": "Giường pallet · Ảnh 01",
+    "category": "Giường pallet gấp làm ghế sofa",
+    "categorySlug": "giuong-pallet-gap-lam-ghe-sofa",
+    "source": "1wupukr35mkgdclpznkn2jacgvlnhx2wcniokstsxldeg2fddalals3kgorxzvntntl2.jpg",
+    "src": "/media/a9f32d95a8304ac8e833611e61cd35675ecc5db7e4eeacbfc0af68b3d2630877.jpg",
+    "reviewRequired": true
+  },
+  {
+    "slug": "giuong-pallet-anh-02",
+    "label": "Giường pallet · Ảnh 02",
+    "category": "Giường pallet gấp gọn",
+    "categorySlug": "giuong-pallet-gap-gon",
+    "source": "1wupukr35mkhe3qlkex7fn7mox5ggufxm65qatblffn9obhfrci1fnc0ygtl5xzu1se4.jpg",
+    "src": "/media/29390038fe707f9e0d367eb0b9f4d391e1ccf15623cdf88917546c3e7631ec46.jpg",
+    "reviewRequired": true
+  },
+  {
+    "slug": "giuong-pallet-anh-03",
+    "label": "Giường pallet · Ảnh 03",
+    "category": "Giường pallet hộp",
+    "categorySlug": "giuong-pallet-hop",
+    "source": "1wupukr35mkqfbttomf7ue6zyfcrz4ooetnds6hxhcm7eingvfmhvpmju0nuvsorzgt13.jpg",
+    "src": "/media/4aae5ff006a752b38f86216c4687bb7ace4b97e35ca7b520a34dc4367c9e8af8.jpg",
+    "reviewRequired": true
+  },
+  {
+    "slug": "giuong-pallet-anh-04",
+    "label": "Giường pallet · Ảnh 04",
+    "category": "Giường pallet gấp làm ghế sofa",
+    "categorySlug": "giuong-pallet-gap-lam-ghe-sofa",
+    "source": "1wupukr35mkqfbttomf7ue73uqy6ektisxuxnhvoiufxhayitq2wte12xu75mx2tiqc3.jpg",
+    "src": "/media/db431e1b3e3b4a953871e3069c58bf5832a8c437c17497a5e07359f163c6d511.jpg",
+    "reviewRequired": true
+  },
+  {
+    "slug": "giuong-pallet-anh-05",
+    "label": "Giường pallet · Ảnh 05",
+    "category": "Giường pallet bệt",
+    "categorySlug": "giuong-pallet-bet",
+    "source": "1wupukr35ml1i2xi8dbmasf2dipagt8pquz4boewrfr3duincplm7xnnmkn7rvssgbo20.jpg",
+    "src": "/media/c0ea3b5ca3f3d3b7774779415ba3eba7baeb5c46ae77ea38569240dbac1d567f.jpg",
+    "reviewRequired": true
+  },
+  {
+    "slug": "giuong-pallet-anh-06",
+    "label": "Giường pallet · Ảnh 06",
+    "category": "Giường pallet hộp",
+    "categorySlug": "giuong-pallet-hop",
+    "source": "1wupukr35ml4zkh8pcqrrp86a0j4lgiubfmxmpxtwr3luhztar6kg1ecnq1kqbvqtvd31.jpg",
+    "src": "/media/fb30bca2a8de4ea5f36f0dbc8a015374d8e364a3884162814a3f8befefe7dc80.jpg",
+    "reviewRequired": true
+  }
+]

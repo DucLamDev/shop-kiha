@@ -1,0 +1,9 @@
+{
+  "port": 27018,
+  "persistenceAfterRestart": true,
+  "adminCredentialsValid": true,
+  "products": 6,
+  "categories": 4,
+  "media": 39,
+  "qaProducts": 0
+}

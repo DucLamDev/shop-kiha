@@ -1,0 +1,12 @@
+{
+  "passed": 6,
+  "results": [
+    "Motion can be paused and resumed",
+    "Category image previews follow keyboard focus and pointer hover",
+    "System reduced-motion preference disables decorative animation",
+    "No horizontal overflow at 320, 390, 768, 1024 and 1440px",
+    "Generated inspiration imagery is labeled separately from product photos",
+    "No browser runtime errors"
+  ],
+  "errors": []
+}
