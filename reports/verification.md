@@ -1,5 +1,25 @@
 # KIHA — Kết quả kiểm tra
 
+## Thiết kế lại giao diện — 19/10/2026 (Asia/Saigon)
+
+Chạy trên máy chủ dev Linux (Node.js 22.23, MongoDB 8.0.17 local cổng riêng, web 3517 / API 4517), dữ liệu seed từ bộ ảnh chủ shop (38 sản phẩm, 6 danh mục). Trình duyệt kiểm thử: Chromium headless shell có sẵn trên máy (`CHROMIUM_PATH`).
+
+| Hạng mục | Kết quả thực tế |
+| --- | --- |
+| `npm run lint` | Thành công, không lỗi hoặc cảnh báo |
+| `npm test` | 23/23 kiểm thử API đạt (thêm kiểm tra bộ lọc `status` chỉ có hiệu lực ở API admin) |
+| `npm run build` | Next.js 16.4.2 production build thành công |
+| `npm run test:browser` | 14/14 nhóm đạt, không có lỗi JavaScript; 1440, 768, 390 px |
+| `npm run test:design` | 11/11 nhóm đạt: tương phản AA, font, hero, scroll reveal, hover, nút Zalo nổi, bộ lọc + back, reduced motion, CTA mobile, không tràn ngang 320–1440 px |
+| Ảnh chụp `vpsttt-shot` | Trang chủ, sản phẩm, chi tiết, liên hệ × (máy tính, điện thoại) × (sáng, tối) đã xem từng ảnh |
+| Ảnh gốc | Không đổi tên, không xóa file trong `img/` và `apps/web/public/media/` |
+
+Lỗi phát hiện và đã sửa trong lúc kiểm tra: cột grid tự giãn theo nội dung không xuống dòng (thanh lọc ở 1024 px, form sản phẩm admin, trang chi tiết và liên hệ ở 320 px), ô nhập lệch hàng khi một ô có gợi ý, phân trang hiện “…” thay cho đúng một trang bị bỏ qua, thư viện ảnh admin thiếu nút thử lại khi API lỗi.
+
+Lưu ý: trang sản phẩm không tồn tại trả giao diện not-found kèm `noindex` nhưng mã HTTP 200 vì trang đã stream skeleton (hành vi được Next.js ghi trong tài liệu). Giao diện chỉ có chế độ sáng theo bảng màu thương hiệu.
+
+## Các lần kiểm tra trước
+
 Ngày kiểm tra: 18/10/2026, múi giờ Asia/Saigon.
 
 Khắc phục khởi động local: `npm run dev` giờ tự bật MongoDB của dự án khi cần, chờ API rồi mới chạy website trên cổng cố định. Thêm khóa chống chạy trùng, kiểm tra cả IPv4/IPv6 và dọn cây tiến trình thuộc phiên trên Windows. `npm run test:startup` đạt 7/7 trường hợp với các dịch vụ thật; `npm run lint` đạt. Xác minh trang chủ HTTP 200, giữ dữ liệu qua lần chạy, giữ MongoDB mở riêng, không tự bật database dev trong production. Chi tiết ở `startup-results.json`. Sau kiểm tra, các cổng 3000/4000/27018 đã được giải phóng; dịch vụ MongoDB có sẵn tại 27017 vẫn giữ nguyên.

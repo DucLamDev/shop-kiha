@@ -1,16 +1,15 @@
-import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { root } from '../apps/api/src/config.mjs';
+import { launchBrowser } from './browser.mjs';
 const base = process.env.SITE_URL || 'http://localhost:3000';
-const catalog = JSON.parse(await fs.readFile(path.join(root, 'data/catalog.json'), 'utf8'));
 const credentials = await fs.readFile(path.join(root, '.local/admin-credentials.txt'), 'utf8');
 const email = credentials.match(/^Email: (.+)$/m)?.[1],
   password = credentials.match(/^Password: (.+)$/m)?.[1];
 if (!email || !password)
   throw new Error('Run npm run admin:create -- --generate-local before browser QA.');
-const browser = await chromium.launch({ channel: 'chrome', headless: true });
+const browser = await launchBrowser();
 const context = await browser.newContext({
   viewport: { width: 1440, height: 1000 },
   reducedMotion: 'reduce',
@@ -23,14 +22,16 @@ const suffix = Date.now().toString(36),
   categoryName = `Danh mục QA ${suffix}`,
   productName = `Giường QA ${suffix}`;
 let categoryId, productId, videoId, videoSrc;
+// Kỳ vọng lấy từ chính cấu hình đang lưu trong MongoDB, không ghi cứng thông tin liên hệ.
+const settings = (await (await context.request.get(`${base}/api/settings/public`)).json()).data;
+const categories = (await (await context.request.get(`${base}/api/categories`)).json()).data;
 async function check(name, task) {
   await task();
   results.push(name);
   console.log(`PASS ${name}`);
 }
 async function goto(route) {
-  const r = await page.goto(`${base}${route}`, { waitUntil: 'networkidle', timeout: 60000 });
-  return r;
+  return page.goto(`${base}${route}`, { waitUntil: 'networkidle', timeout: 60000 });
 }
 async function noOverflow() {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
@@ -46,38 +47,47 @@ async function submitAndRead(urlPart, click) {
   return json.data;
 }
 try {
-  await check('Desktop home, real contact links, image loading and layout', async () => {
+  await check('Desktop home, configured contact links, image loading and layout', async () => {
     assert.equal((await goto('/')).status(), 200);
     await noOverflow();
     assert.ok(await page.locator('h1').innerText());
-    assert.equal(await page.locator('.category-card').count(), catalog.length);
-    for (const category of catalog)
-      await page
-        .locator('.category-grid')
-        .getByRole('heading', { name: category.name, exact: true })
-        .waitFor();
-    assert.ok(await page.locator('a[href="https://zalo.me/0869572198"]').count());
-    await page.locator('.hero-visual img').evaluate((img) => img.decode());
+    const showcase = page.locator('section[aria-labelledby="category-title"]');
+    assert.equal(
+      await showcase.locator('a[href^="/san-pham?category="]').count(),
+      categories.length,
+    );
+    for (const category of categories)
+      await showcase.getByText(category.name, { exact: true }).waitFor();
+    if (settings.zaloUrl) assert.ok(await page.locator(`a[href="${settings.zaloUrl}"]`).count());
+    await page
+      .locator('section[aria-labelledby="hero-title"] img')
+      .first()
+      .evaluate((img) => img.decode());
     await page.screenshot({ path: path.join(root, 'reports/home-desktop.png'), fullPage: true });
     const broken = await page
       .locator('img')
       .evaluateAll((images) => images.filter((i) => i.complete && !i.naturalWidth).length);
     assert.equal(broken, 0);
   });
-  await check('Catalog search, empty state, category URL and back navigation', async () => {
+  await check('Catalog search, empty state, sort, category URL and back navigation', async () => {
     await goto('/san-pham');
-    await page.getByRole('textbox', { name: 'Tìm tên sản phẩm' }).fill(`absent-${suffix}`);
-    await page.getByRole('button', { name: 'Áp dụng' }).click();
-    await page.getByRole('heading', { name: 'Chưa tìm thấy sản phẩm phù hợp' }).waitFor();
+    await page.getByRole('searchbox', { name: 'Tìm sản phẩm theo tên' }).fill(`absent-${suffix}`);
+    await page.getByRole('button', { name: 'Tìm', exact: true }).click();
+    await page.getByRole('heading', { name: 'Chưa tìm thấy mẫu phù hợp' }).waitFor();
     assert.ok(page.url().includes('q='));
     await page.getByRole('link', { name: 'Xóa bộ lọc' }).click();
-    await page.locator('.product-card').first().waitFor();
+    await page.locator('#ket-qua article').first().waitFor();
+    await page.waitForURL((url) => !url.search.includes('q='));
+    await page.getByRole('combobox', { name: 'Sắp xếp sản phẩm' }).click();
+    await page.getByRole('option', { name: 'Tên A – Z' }).click();
+    await page.waitForURL('**/san-pham?sort=name');
     await page
-      .locator('.category-pills')
-      .getByRole('link', { name: catalog[0].name, exact: true })
+      .getByRole('navigation', { name: 'Lọc theo danh mục' })
+      .getByRole('link', { name: categories[0].name, exact: true })
       .click();
-    await page.waitForURL(`**/san-pham?category=${catalog[0].slug}`);
-    for (const category of catalog) {
+    await page.waitForURL(`**/san-pham?category=${categories[0].slug}&sort=name`);
+    await page.locator(`h1:has-text("${categories[0].name}")`).waitFor();
+    for (const category of categories) {
       const response = await context.request.get(`${base}/api/products?category=${category.slug}`);
       const { data } = await response.json();
       assert.ok(data.total > 0);
@@ -88,30 +98,41 @@ try {
       );
     }
     await page.goBack();
-    await page.waitForURL('**/san-pham');
+    await page.waitForURL('**/san-pham?sort=name');
+    await page.locator('h1', { hasText: 'Sản phẩm' }).waitFor();
   });
   await check('Product details and accessible image lightbox', async () => {
-    await page.locator('.product-image').first().click();
+    await page.locator('#ket-qua article h3 a').first().click();
+    await page.waitForURL('**/san-pham/*');
     await page.getByRole('button', { name: /Phóng to ảnh/ }).click();
     await page.getByRole('dialog').waitFor();
     await page.keyboard.press('Escape');
     await page.getByRole('dialog').waitFor({ state: 'hidden' });
     assert.ok(await page.locator('link[rel="canonical"]').getAttribute('href'));
+    const ld = await page.locator('script[type="application/ld+json"]').allInnerTexts();
+    assert.ok(ld.some((text) => JSON.parse(text)['@type'] === 'Product'));
     await noOverflow();
     await page.screenshot({ path: path.join(root, 'reports/product-desktop.png'), fullPage: true });
   });
-  await check('Contact page uses supplied Zalo, phone, Facebook, TikTok and Maps', async () => {
+  await check('Contact page uses configured Zalo, phone, Facebook, TikTok and Maps', async () => {
     await goto('/lien-he');
+    const tel = settings.phone ? `tel:${settings.phone.replace(/[^+\d]/g, '')}` : '';
     for (const href of [
-      'tel:0869572198',
-      'https://www.facebook.com/giuonggapgotphcm',
-      'https://maps.app.goo.gl/7b3bgs5L2yuCSvKK7',
+      tel,
+      settings.zaloUrl,
+      settings.facebookUrl,
+      settings.tiktokUrl,
+      settings.mapsUrl,
     ])
-      assert.ok(await page.locator(`a[href="${href}"]`).count());
-    assert.ok(await page.locator('a[href^="https://www.tiktok.com/@noithatkiha"]').count());
+      if (href) assert.ok(await page.locator(`a[href="${href}"]`).count(), href);
+    for (const href of [settings.facebookUrl, settings.tiktokUrl].filter(Boolean))
+      assert.equal(
+        await page.locator(`a[href="${href}"]`).first().getAttribute('target'),
+        '_blank',
+      );
     await noOverflow();
   });
-  await check('Mobile drawer, product and contact layouts at 390px', async () => {
+  await check('Mobile drawer, product CTA bar and contact layouts at 390px', async () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await goto('/');
     await noOverflow();
@@ -122,6 +143,14 @@ try {
     await page.getByRole('dialog').waitFor({ state: 'hidden' });
     await noOverflow();
     await page.screenshot({ path: path.join(root, 'reports/catalog-mobile.png'), fullPage: true });
+    await page.locator('#ket-qua article h3 a').first().click();
+    await page.waitForURL('**/san-pham/*');
+    if (settings.zaloUrl)
+      await page
+        .getByRole('link', { name: /^Tư vấn .* qua Zalo$/ })
+        .last()
+        .waitFor();
+    await noOverflow();
     await goto('/lien-he');
     await noOverflow();
   });
@@ -141,31 +170,32 @@ try {
   await check('Admin category create and validation-ready form', async () => {
     await goto('/admin/danh-muc');
     await page.getByRole('button', { name: 'Thêm danh mục', exact: true }).click();
-    await page.getByLabel('Tên danh mục *', { exact: true }).fill(categoryName);
+    await page.getByLabel(/^Tên danh mục/).fill(categoryName);
     const saved = await submitAndRead('/api/admin/categories', () =>
       page.getByRole('button', { name: 'Lưu danh mục', exact: true }).click(),
     );
     categoryId = saved._id;
-    await page.getByRole('cell', { name: categoryName, exact: true }).waitFor();
+    await page.getByText(categoryName, { exact: true }).waitFor();
   });
   await check(
     'Admin product create, media selection, gallery order and draft privacy',
     async () => {
       await goto('/admin/san-pham/tao-moi');
-      await page.getByLabel('Tên sản phẩm *', { exact: true }).fill(productName);
-      await page.getByLabel('Danh mục *', { exact: true }).selectOption(categoryId);
+      await page.getByLabel(/^Tên sản phẩm/).fill(productName);
+      await page.getByLabel(/^Danh mục chính/).selectOption(categoryId);
       await page
         .getByLabel('Mô tả ngắn', { exact: true })
         .fill('Bản kiểm thử tự động sẽ được xóa sau khi hoàn thành.');
-      await page.getByRole('button', { name: 'Chọn ảnh từ thư viện' }).click();
+      await page.getByRole('button', { name: 'Chọn ảnh', exact: true }).click();
       const dialog = page.getByRole('dialog');
-      await dialog.locator('.media-tile').first().waitFor();
-      await dialog.locator('.media-tile').nth(0).click();
-      await dialog.locator('.media-tile').nth(1).click();
+      const tiles = dialog.locator('ul button[aria-pressed]');
+      await tiles.first().waitFor();
+      await tiles.nth(0).click();
+      await tiles.nth(1).click();
       await dialog.getByRole('button', { name: 'Dùng ảnh đã chọn' }).click();
       await page.getByRole('button', { name: 'Đặt ảnh 2 làm đại diện' }).click();
-      await page.getByRole('button', { name: 'Đưa ảnh 2 về trước' }).click();
-      await page.getByLabel('Dữ liệu tham khảo', { exact: true }).check();
+      await page.getByRole('button', { name: 'Đưa ảnh 2 lên trước' }).click();
+      await page.getByRole('switch', { name: /^Dữ liệu tham khảo/ }).click();
       // A valid MP4 with a free box verifies uploads larger than 10 MB through Next's rewrite.
       const fixture = await fs.readFile(path.join(root, 'tests/fixtures/sample.mp4'));
       const free = Buffer.alloc(12 * 1024 * 1024);
@@ -174,24 +204,22 @@ try {
       const uploadResponse = page.waitForResponse(
         (r) => r.url().endsWith('/api/admin/videos') && r.request().method() === 'POST',
       );
-      await page
-        .getByLabel('Chọn file video', { exact: true })
-        .setInputFiles({
-          name: `Giới thiệu QA ${suffix}.mp4`,
-          mimeType: 'video/mp4',
-          buffer: Buffer.concat([fixture, free]),
-        });
+      await page.getByLabel('Chọn file video', { exact: true }).setInputFiles({
+        name: `Giới thiệu QA ${suffix}.mp4`,
+        mimeType: 'video/mp4',
+        buffer: Buffer.concat([fixture, free]),
+      });
       const uploadedResponse = await uploadResponse;
       const uploaded = (await uploadedResponse.json()).data;
       assert.equal(uploadedResponse.status(), 201);
       videoId = uploaded._id;
       videoSrc = uploaded.src;
       assert.ok(uploaded.bytes > 10 * 1024 * 1024);
-      await page.locator('.selected-video video').waitFor();
+      await page.locator('form video').waitFor();
       await page
         .getByLabel('Nội dung video bằng văn bản')
         .fill('Video kiểm thử chức năng phát, không phải video sản phẩm thật.');
-      await page.getByLabel(catalog[0].name, { exact: true }).check();
+      await page.getByRole('checkbox', { name: categories[0].name, exact: true }).click();
       const saved = await submitAndRead('/api/admin/products', () =>
         page.getByRole('button', { name: 'Lưu sản phẩm', exact: true }).click(),
       );
@@ -200,6 +228,8 @@ try {
       assert.equal(saved.thumbnail, saved.images[0]);
       assert.equal(saved.video, videoSrc);
       assert.equal(saved.categories.length, 2);
+      assert.equal(saved.status, 'draft');
+      assert.equal(saved.isDemo, true);
       await page.waitForURL('**/admin/san-pham');
       const publicResponse = await context.request.get(`${base}/api/products/${saved.slug}`);
       assert.equal(publicResponse.status(), 404);
@@ -213,22 +243,25 @@ try {
   );
   await check('Admin edits and publishes; public gallery shows saved data', async () => {
     await goto(`/admin/san-pham/${productId}`);
-    await page.getByLabel('Trạng thái', { exact: true }).selectOption('published');
+    await page.getByRole('switch', { name: /^Hiển thị trên website/ }).click();
     await page.getByRole('button', { name: 'Thêm thông số' }).click();
     await page.getByLabel('Tên thông số 1', { exact: true }).fill('Thông tin QA');
     await page.getByLabel('Giá trị thông số 1', { exact: true }).fill('Dữ liệu kiểm thử');
     const saved = await submitAndRead('/api/admin/products', () =>
       page.getByRole('button', { name: 'Lưu sản phẩm', exact: true }).click(),
     );
+    assert.equal(saved.status, 'published');
     await page.waitForURL('**/admin/san-pham');
     await goto(`/san-pham/${saved.slug}`);
     await page.getByRole('heading', { name: productName, exact: true }).waitFor();
-    assert.equal(await page.locator('.gallery-thumbnails button').count(), 2);
+    await page.getByText('Thông tin QA', { exact: true }).waitFor();
+    assert.equal(await page.locator('ul[aria-label="Ảnh sản phẩm"] button').count(), 2);
     await page.getByRole('button', { name: 'Xem ảnh 2', exact: true }).click();
     await page.getByRole('button', { name: /Phóng to ảnh/ }).click();
-    await page.getByRole('button', { name: 'Ảnh trước', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Ảnh trước', exact: true }).click();
+    await page.keyboard.press('ArrowRight');
     await page.keyboard.press('Escape');
-    const video = page.locator('.detail-video-section video');
+    const video = page.locator('section[aria-labelledby="video-title"] video');
     await video.waitFor();
     assert.equal(await video.getAttribute('preload'), 'none');
     await video.evaluate(async (element) => {
@@ -236,14 +269,15 @@ try {
       await element.play();
     });
     await page.waitForFunction(
-      () => document.querySelector('.detail-video-section video').currentTime > 0.05,
+      () =>
+        document.querySelector('section[aria-labelledby="video-title"] video').currentTime > 0.05,
     );
     await video.evaluate((element) => {
       element.pause();
       element.currentTime = 0.5;
     });
     await page.waitForFunction(
-      () => !document.querySelector('.detail-video-section video').seeking,
+      () => !document.querySelector('section[aria-labelledby="video-title"] video').seeking,
     );
     await page.getByText('Nội dung video', { exact: true }).click();
     await page
@@ -263,26 +297,45 @@ try {
     await page.setViewportSize({ width: 390, height: 844 });
     await noOverflow();
     await page
-      .locator('.detail-video-section')
+      .locator('section[aria-labelledby="video-title"]')
       .screenshot({ path: path.join(root, 'reports/product-video-mobile.png') });
     await page.setViewportSize({ width: 768, height: 1024 });
     await noOverflow();
   });
+  await check('Admin list toggles featured and status through the backend', async () => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await goto('/admin/san-pham');
+    await page.getByRole('searchbox', { name: 'Tìm sản phẩm' }).fill(productName);
+    await page.getByRole('button', { name: 'Tìm', exact: true }).click();
+    await page.getByRole('button', { name: `Đánh dấu nổi bật ${productName}` }).waitFor();
+    const featured = await submitAndRead(`/api/admin/products/${productId}`, () =>
+      page.getByRole('button', { name: `Đánh dấu nổi bật ${productName}` }).click(),
+    );
+    assert.equal(featured.isFeatured, true);
+    await page.getByRole('button', { name: `Bỏ nổi bật ${productName}` }).waitFor();
+    const draft = await submitAndRead(`/api/admin/products/${productId}`, () =>
+      page.getByRole('switch', { name: `Hiển thị ${productName} trên website` }).click(),
+    );
+    assert.equal(draft.status, 'draft');
+    assert.equal((await context.request.get(`${base}/api/products/${draft.slug}`)).status(), 404);
+  });
   await check('Admin media search, settings persistence and tablet layout', async () => {
     await goto('/admin/hinh-anh');
-    await page.getByRole('textbox', { name: 'Tìm tên file' }).fill('logo');
-    await page.getByRole('button', { name: 'Tìm ảnh', exact: true }).click();
-    await page.locator('.media-tile').filter({ hasText: 'logo.png' }).waitFor();
+    await page.getByRole('searchbox', { name: 'Tìm tên file' }).fill('logo');
+    await page.getByRole('button', { name: 'Tìm', exact: true }).click();
+    await page.getByRole('button', { name: /logo\.png/ }).waitFor();
     await noOverflow();
     await goto('/admin/cai-dat');
-    await page.getByLabel('Tên cửa hàng', { exact: true }).waitFor();
+    await page.getByLabel(/^Tên cửa hàng/).waitFor();
     assert.equal(
       await page.getByLabel('Số điện thoại', { exact: true }).inputValue(),
-      '0869 572 198',
+      settings.phone || '',
     );
     await submitAndRead('/api/admin/settings', () =>
       page.getByRole('button', { name: 'Lưu cài đặt', exact: true }).click(),
     );
+    await page.getByRole('tab', { name: 'SEO' }).click();
+    await page.getByLabel('Tiêu đề website').waitFor();
     await noOverflow();
     await page.setViewportSize({ width: 390, height: 844 });
     await noOverflow();
@@ -296,16 +349,16 @@ try {
       }),
     );
     await goto('/admin/hinh-anh');
-    await page.locator('.form-error[role=alert]').waitFor();
+    await page.getByText('Lỗi kết nối kiểm thử.').waitFor();
     await page.unroute('**/api/admin/media?**');
     await page.getByRole('button', { name: 'Thử lại', exact: true }).click();
-    await page.locator('.media-tile').first().waitFor();
+    await page.locator('main ul li button').first().waitFor();
   });
   await check('Admin deletion confirmations and cleanup work', async () => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await goto('/admin/san-pham');
-    await page.getByRole('textbox', { name: 'Tìm sản phẩm', exact: true }).fill(productName);
-    await page.getByRole('button', { name: 'Tìm kiếm', exact: true }).click();
+    await page.getByRole('searchbox', { name: 'Tìm sản phẩm' }).fill(productName);
+    await page.getByRole('button', { name: 'Tìm', exact: true }).click();
     await page.getByRole('button', { name: `Xóa ${productName}`, exact: true }).click();
     await page.getByRole('button', { name: 'Giữ lại', exact: true }).click();
     await page.getByRole('button', { name: `Xóa ${productName}`, exact: true }).click();
@@ -314,6 +367,7 @@ try {
     );
     productId = null;
     await goto('/admin/hinh-anh');
+    await page.getByRole('tab', { name: 'Video' }).click();
     await page
       .getByRole('button', { name: `Xóa video Giới thiệu QA ${suffix}.mp4`, exact: true })
       .click();
@@ -334,7 +388,11 @@ try {
     await page.waitForURL('**/admin/dang-nhap');
     assert.equal((await context.request.get(`${base}/api/admin/auth/me`)).status(), 401);
     await goto('/san-pham/does-not-exist-qa');
-    await page.getByRole('heading', { name: /Góc nhỏ này/ }).waitFor();
+    await page.getByRole('heading', { name: 'Không tìm thấy sản phẩm' }).waitFor();
+    assert.equal(
+      await page.locator('meta[name="robots"]').first().getAttribute('content'),
+      'noindex',
+    );
     const robots = await context.request.get(`${base}/robots.txt`);
     assert.ok((await robots.text()).includes('Disallow: /admin'));
     const sitemap = await context.request.get(`${base}/sitemap.xml`);

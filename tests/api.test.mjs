@@ -158,6 +158,20 @@ test('draft products and inactive categories are invisible across lists, direct 
   await request(app).get('/api/products/ten-moi').expect(404);
   await request(app).get('/api/products/giuong-kiem-thu').expect(404);
   assert.equal((await request(app).get('/api/products').expect(200)).body.data.total, 0);
+  // Bộ lọc trạng thái chỉ có hiệu lực ở API admin; API công khai vẫn không lộ bản nháp.
+  assert.equal(
+    (await request(app).get('/api/products?status=draft').expect(200)).body.data.total,
+    0,
+  );
+  assert.equal(
+    (await agent.get('/api/admin/products?status=draft').expect(200)).body.data.total,
+    1,
+  );
+  assert.equal(
+    (await agent.get('/api/admin/products?status=published').expect(200)).body.data.total,
+    0,
+  );
+  await agent.get('/api/admin/products?status=hidden').expect(422);
   await write('put', `/api/admin/products/${product._id}`, {
     ...payload(),
     slug: 'ten-moi',

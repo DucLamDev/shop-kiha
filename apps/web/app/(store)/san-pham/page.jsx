@@ -1,153 +1,155 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import { illustrationCaption } from '@/lib/editorial-assets';
-import { Search, SlidersHorizontal, ArrowLeft, ArrowRight } from 'lucide-react';
-import { getData, getSettings, pageMeta } from '@/lib/server-api';
-import { Breadcrumb } from '@/components/breadcrumb';
-import { ProductCard } from '@/components/product-card';
-import { Button } from '@/components/ui/button';
-export const metadata = pageMeta(
-  'Bộ sưu tập giường pallet',
-  'Khám phá các mẫu giường ngủ pallet tại KIHA. Tìm kiếm, lọc danh mục và tư vấn mẫu giường phù hợp qua Zalo.',
-  '/san-pham',
-);
+import { SearchX, X } from 'lucide-react';
+import { getCategories, getData, getSettings, jsonLd, pageMeta, siteUrl } from '@/lib/server-api';
+import { catalogHref, parseCatalogQuery } from '@/lib/catalog';
+import { Breadcrumbs } from '@/components/site/breadcrumbs';
+import { CatalogLink, CatalogShell } from '@/components/product/catalog-shell';
+import { ProductGrid } from '@/components/product/product-card';
+import { Pagination } from '@/components/product/pagination';
+import { EmptyState } from '@/components/site/empty-state';
+import { ContactBand } from '@/components/site/contact-band';
+import { ZaloButton } from '@/components/site/contact-buttons';
+import { buttonVariants } from '@/components/ui/button';
+
+const LIMIT = 12;
+
+export async function generateMetadata({ searchParams }) {
+  const current = parseCatalogQuery(await searchParams);
+  const categories = await getCategories();
+  const category = categories.find((c) => c.slug === current.category);
+  const path = category ? `/san-pham?category=${category.slug}` : '/san-pham';
+  const meta = pageMeta(
+    category ? category.name : 'Sản phẩm giường gỗ pallet',
+    category?.description ||
+      `Xem ${category ? category.name.toLowerCase() : 'các mẫu giường gỗ pallet'} tại Nội Thất KIHA. Tìm kiếm, lọc theo danh mục và tư vấn, báo giá qua Zalo.`,
+    path,
+  );
+  // Trang kết quả tìm kiếm không cần lập chỉ mục riêng.
+  return current.q ? { ...meta, robots: { index: false, follow: true } } : meta;
+}
+
 export default async function Products({ searchParams }) {
-  const raw = await searchParams;
-  const params = new URLSearchParams();
-  for (const key of ['q', 'category', 'sort', 'page'])
-    if (typeof raw[key] === 'string') params.set(key, raw[key]);
-  if (!['featured', 'newest', 'name', 'price-asc', 'price-desc'].includes(params.get('sort')))
-    params.delete('sort');
-  if (!/^[1-9]\d{0,4}$/.test(params.get('page') || '')) params.delete('page');
-  if (params.has('q')) params.set('q', params.get('q').slice(0, 120));
-  if (params.has('category') && !/^[a-z0-9-]{1,160}$/.test(params.get('category')))
-    params.delete('category');
-  const [products, categories, settings] = await Promise.all([
-    getData(`/products?${params}`),
-    getData('/categories'),
+  const current = parseCatalogQuery(await searchParams);
+  const query = new URLSearchParams({
+    limit: String(LIMIT),
+    page: String(current.page),
+    sort: current.sort,
+  });
+  if (current.q) query.set('q', current.q);
+  if (current.category) query.set('category', current.category);
+  const [products, categories, settings, priced] = await Promise.all([
+    getData(`/products?${query}`),
+    getCategories(),
     getSettings(),
+    getData('/products?sort=price-desc&limit=1'),
   ]);
-  function link(key, value) {
-    const next = new URLSearchParams(params);
-    if (value) next.set(key, value);
-    else next.delete(key);
-    if (key !== 'page') next.delete('page');
-    return `/san-pham?${next}`;
-  }
+  const category = categories.find((c) => c.slug === current.category);
+  const hasPrices = priced?.items?.[0]?.price != null;
+  const outOfRange = products.total > 0 && products.items.length === 0;
+  const first = products.total ? (products.page - 1) * LIMIT + 1 : 0;
+  const last = Math.min(products.page * LIMIT, products.total);
+  const breadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: siteUrl('/') },
+      { '@type': 'ListItem', position: 2, name: 'Sản phẩm', item: siteUrl('/san-pham') },
+      ...(category
+        ? [
+            {
+              '@type': 'ListItem',
+              position: 3,
+              name: category.name,
+              item: siteUrl(`/san-pham?category=${category.slug}`),
+            },
+          ]
+        : []),
+    ],
+  };
+
   return (
-    <div className="container catalog-page">
-      <Breadcrumb items={[{ label: 'Bộ sưu tập' }]} />
-      <div className="catalog-heading catalog-editorial-heading">
-        <div>
-          <p className="eyebrow">CHỌN MỘT GÓC BÌNH YÊN</p>
-          <h1>
-            Bộ sưu tập KIHA<span>.</span>
-          </h1>
-          <p>Những gợi ý giường ngủ pallet cho không gian của bạn.</p>
-        </div>
-        {(settings.aboutImage || settings.heroImage) && (
-          <figure className="catalog-inspiration">
-            <Image
-              src={settings.aboutImage || settings.heroImage}
-              alt=""
-              fill
-              sizes="(max-width: 800px) 1px, 240px"
-            />
-            <figcaption>
-              {illustrationCaption(settings.aboutImage || settings.heroImage) || 'Cảm hứng từ KIHA'}
-            </figcaption>
-          </figure>
-        )}
-      </div>
-      <form action="/san-pham" className="catalog-tools">
-        <div className="search-field">
-          <Search size={19} />
-          <input
-            name="q"
-            aria-label="Tìm tên sản phẩm"
-            placeholder="Tìm chiếc giường của bạn…"
-            defaultValue={params.get('q') || ''}
-            maxLength={120}
-          />
-        </div>
-        <input type="hidden" name="category" value={params.get('category') || ''} />
-        <label className="sort-field">
-          <SlidersHorizontal size={16} />
-          <span className="sr-only">Sắp xếp sản phẩm</span>
-          <select name="sort" defaultValue={params.get('sort') || 'featured'}>
-            <option value="featured">Nổi bật</option>
-            <option value="newest">Mới nhất</option>
-            <option value="name">Tên A – Z</option>
-            <option value="price-asc">Giá tăng dần</option>
-            <option value="price-desc">Giá giảm dần</option>
-          </select>
-        </label>
-        <Button type="submit" size="sm">
-          Áp dụng
-        </Button>
-      </form>
-      <div className="catalog-meta">
-        <div className="category-pills">
-          <Link className={!params.get('category') ? 'selected' : ''} href={link('category', '')}>
-            Tất cả
-          </Link>
-          {categories.map((c) => (
-            <Link
-              className={params.get('category') === c.slug ? 'selected' : ''}
-              href={link('category', c.slug)}
-              key={c._id}
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(breadcrumb)} />
+      <div className="container-page pt-6 pb-4 sm:pt-8">
+        <Breadcrumbs
+          items={
+            category
+              ? [{ label: 'Sản phẩm', href: '/san-pham' }, { label: category.name }]
+              : [{ label: 'Sản phẩm' }]
+          }
+        />
+        <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="eyebrow kiha-rise">
+              <span className="h-px w-6 bg-current opacity-60" aria-hidden="true" />
+              {category ? 'Danh mục' : 'Bộ sưu tập KIHA'}
+            </p>
+            <h1
+              className="kiha-rise mt-3 text-4xl font-extrabold tracking-[-0.035em] sm:text-5xl"
+              style={{ '--delay': '60ms' }}
             >
-              {c.name}
-            </Link>
-          ))}
+              {category ? category.name : 'Sản phẩm'}
+            </h1>
+            <p
+              className="kiha-rise mt-4 text-[17px] text-muted-foreground"
+              style={{ '--delay': '120ms' }}
+            >
+              {category?.description ||
+                'Giường gỗ pallet nhiều kiểu dáng và kích thước. Chọn mẫu bạn thích rồi nhắn KIHA qua Zalo để được tư vấn và báo giá.'}
+            </p>
+          </div>
         </div>
-        <span>{products.total} sản phẩm</span>
+        <CatalogShell current={current} categories={categories} hasPrices={hasPrices}>
+          <div className="mt-6 mb-6 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground" aria-live="polite">
+              {products.items.length > 0 ? (
+                <>
+                  Hiển thị{' '}
+                  <strong className="text-foreground">
+                    {first}–{last}
+                  </strong>{' '}
+                  trên <strong className="text-foreground">{products.total}</strong> sản phẩm
+                </>
+              ) : (
+                'Không có sản phẩm phù hợp'
+              )}
+            </p>
+            {current.q && (
+              <CatalogLink
+                href={catalogHref(current, { q: '' })}
+                className="inline-flex items-center gap-1.5 rounded-full bg-secondary py-1.5 pr-2.5 pl-3.5 text-[13px] font-semibold transition-colors hover:bg-wood-soft"
+              >
+                Từ khóa: “{current.q}”
+                <X className="size-3.5" aria-label="Bỏ từ khóa" />
+              </CatalogLink>
+            )}
+          </div>
+          {products.items.length > 0 ? (
+            <ProductGrid products={products.items} settings={settings} preloadFirst={0} />
+          ) : (
+            <EmptyState
+              icon={SearchX}
+              title={outOfRange ? 'Trang này không có sản phẩm' : 'Chưa tìm thấy mẫu phù hợp'}
+              description={
+                outOfRange
+                  ? `Danh sách hiện có ${products.total} sản phẩm. Quay về trang đầu để xem tiếp.`
+                  : current.q
+                    ? `Không có sản phẩm nào khớp với “${current.q}”. Thử từ khóa ngắn hơn hoặc xem tất cả sản phẩm.`
+                    : 'Danh mục này đang được KIHA cập nhật. Bạn có thể xem các danh mục khác hoặc nhắn Zalo để hỏi mẫu hiện có.'
+              }
+            >
+              <CatalogLink
+                href={outOfRange ? catalogHref(current, { page: 1 }) : '/san-pham'}
+                className={buttonVariants({ variant: 'outline' })}
+              >
+                {outOfRange ? 'Về trang đầu' : 'Xóa bộ lọc'}
+              </CatalogLink>
+              <ZaloButton settings={settings} />
+            </EmptyState>
+          )}
+          <Pagination current={current} page={products.page} pages={products.pages} />
+        </CatalogShell>
       </div>
-      {products.items.some((p) => p.isDemo) && (
-        <p className="demo-note">
-          Bản xem trước · Các nhãn ảnh tham khảo cần được KIHA xác nhận trước khi xuất bản chính
-          thức.
-        </p>
-      )}
-      {products.items.length ? (
-        <div className="product-grid">
-          {products.items.map((p) => (
-            <ProductCard key={p._id} product={p} settings={settings} />
-          ))}
-        </div>
-      ) : (
-        <div className="empty-state">
-          <Search size={36} strokeWidth={1.2} />
-          <h2>Chưa tìm thấy sản phẩm phù hợp</h2>
-          <p>Thử từ khóa khác hoặc xem toàn bộ bộ sưu tập.</p>
-          <Button asChild variant="outline">
-            <Link href="/san-pham">Xóa bộ lọc</Link>
-          </Button>
-        </div>
-      )}
-      {products.pages > 1 && (
-        <nav className="pagination" aria-label="Phân trang">
-          {products.page > 1 && (
-            <Button asChild variant="outline" size="sm">
-              <Link href={link('page', String(products.page - 1))}>
-                <ArrowLeft />
-                Trang trước
-              </Link>
-            </Button>
-          )}
-          <span>
-            Trang {products.page} / {products.pages}
-          </span>
-          {products.page < products.pages && (
-            <Button asChild variant="outline" size="sm">
-              <Link href={link('page', String(products.page + 1))}>
-                Trang sau
-                <ArrowRight />
-              </Link>
-            </Button>
-          )}
-        </nav>
-      )}
-    </div>
+      <ContactBand settings={settings} />
+    </>
   );
 }

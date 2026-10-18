@@ -1,12 +1,17 @@
 {
-  "passed": 6,
+  "passed": 11,
   "results": [
-    "Motion can be paused and resumed",
-    "Category image previews follow keyboard focus and pointer hover",
-    "System reduced-motion preference disables decorative animation",
-    "No horizontal overflow at 320, 390, 768, 1024 and 1440px",
-    "Generated inspiration imagery is labeled separately from product photos",
-    "No browser runtime errors"
+    "Bảng màu kem – gỗ – nâu trầm – than đạt tương phản WCAG AA cho chữ",
+    "Be Vietnam Pro cho nội dung, Manrope cho tiêu đề (next/font)",
+    "Hero hiện mềm khi tải, header dính, ảnh minh họa AI có chú thích",
+    "Nội dung xuất hiện khi cuộn tới (scroll reveal)",
+    "Nút Zalo nổi chỉ hiện sau khi cuộn qua phần đầu trang",
+    "Card sản phẩm nhấc nhẹ và phóng ảnh vừa phải khi hover",
+    "Bộ lọc danh mục đổi URL, có trạng thái chờ và hoạt động với nút Back",
+    "Tôn trọng prefers-reduced-motion: tắt chuyển động, nội dung vẫn hiển thị",
+    "Mobile: thanh Zalo/Gọi cố định ở trang chi tiết, không chồng nút nổi; menu drawer đóng/mở",
+    "Không tràn ngang ở 320, 390, 768, 1024 và 1440px trên 4 trang khách hàng",
+    "Không có lỗi JavaScript khi chạy"
   ],
   "errors": []
 }

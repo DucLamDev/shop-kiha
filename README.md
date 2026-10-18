@@ -16,7 +16,7 @@ npm run dev
 - Tài khoản local đã tạo được lưu trong `.local/admin-credentials.txt`. File này và `.env` được loại khỏi Git. Mật khẩu là chuỗi ngẫu nhiên, không có mật khẩu mặc định trong source.
 - Lệnh tự bật MongoDB local nếu chưa chạy, chờ API sẵn sàng rồi mới mở Next.js. Dữ liệu vẫn lưu trong `.local/mongodb`.
 - Dừng bằng `Ctrl+C`. Runner dừng các tiến trình do phiên này tạo, gồm cả tiến trình con của Next.js/API trên Windows. Nếu MongoDB đã được bạn mở riêng, runner dùng lại và không dừng nó.
-- Chạy lệnh lần thứ hai sẽ báo phiên đang chạy. Cổng website được cố định ở `3000`; không tự chuyển sang `3001` vì liên kết và cấu hình bảo vệ API phải cùng origin.
+- Chạy lệnh lần thứ hai sẽ báo phiên đang chạy. Cổng website mặc định `3000` (đổi bằng biến `PORT`); không tự chuyển sang cổng khác vì liên kết và cấu hình bảo vệ API phải cùng origin. Trên máy chủ dev dùng chung, chọn cổng trống cho `PORT`, `API_PORT`, cổng trong `MONGODB_URI` và đặt `SITE_URL`, `ALLOWED_ORIGINS` khớp cổng web.
 - Không xóa `.local/mongodb` nếu muốn giữ nội dung đã quản trị. `npm run db:local` vẫn dùng được khi cần chạy database riêng để seed hoặc quản trị dữ liệu.
 
 ## Cài đặt từ đầu
@@ -81,30 +81,30 @@ Mật khẩu phải dài ít nhất 14 ký tự, tối đa 72 byte UTF-8 theo gi
 
 ## Tính năng
 
-### Giao diện KIHA mới
+### Hệ thống thiết kế
 
-Trang chủ dùng bố cục tạp chí nội thất với ảnh lớn, danh mục đổi ảnh theo hover/focus, bộ sưu tập so le và phần câu chuyện màu olive. Chuyển động gồm parallax khi cuộn, chữ chạy, dấu ấn xoay, CTA phản hồi theo chuột và hiệu ứng xuất hiện. Nút tạm dừng ở dưới ảnh đầu trang; cài đặt giảm chuyển động của thiết bị được áp dụng ngay khi thay đổi.
-
-Hai ảnh trang trí được tạo bằng công cụ imagegen tích hợp, lưu bản PNG tại `output/imagegen/`, prompt đầy đủ tại `data/editorial-prompts.json`, ánh xạ WebP tại `data/editorial-media.json`. Tổng WebP khoảng 450 KB. 39 ảnh gốc trong `img/` được giữ nguyên; các sản phẩm và danh mục vẫn sử dụng ảnh KIHA. Ảnh AI có chú thích rõ ràng và tên bắt đầu bằng `AI` trong thư viện quản trị.
-
-Đổi ảnh đầu trang và ảnh câu chuyện tại **Quản trị → Cài đặt → Hình ảnh thương hiệu**. Seed mới tạo sẵn cấu hình ảnh; seed lại không ghi đè lựa chọn của admin. `scripts/apply-editorial.mjs` chỉ dùng để nâng cấp bản local ban đầu: đổi đúng ảnh hero mặc định cũ và điền ảnh câu chuyện khi còn trống. Khi cần tối ưu lại PNG đã lưu, chạy `node scripts/import-editorial.mjs` rồi `npm run seed` để đăng ký asset mới.
-
-Kiểm tra giao diện với `npm run test:design` khi MongoDB và web đang chạy. Ảnh chụp và kết quả nằm trong `reports/redesign-*`.
+- Bảng màu theo hướng dẫn thương hiệu: kem ấm `#f6f1ea` (nền), gỗ tự nhiên `#c9a882`, nâu trầm (walnut) `#6b4a35` (màu nhấn, nút chính), than đen `#262422` (chữ), trắng (card). Khai báo một lần bằng CSS variables trong `apps/web/app/globals.css`, đặt tên theo quy ước shadcn/ui (`--background`, `--primary`, `--muted-foreground`…). Các cặp chữ/nền chính đạt tương phản WCAG AA (≥ 4.5:1), được kiểm tra tự động trong `npm run test:design`.
+- Chữ: Be Vietnam Pro cho nội dung, Manrope cho tiêu đề và nút, tải qua `next/font` (có bộ ký tự tiếng Việt, không gọi font ngoài lúc chạy).
+- Component shadcn/ui (Radix) tại `components/ui/`: button, badge, card, input/textarea, label, select, switch, checkbox, dialog, alert-dialog, sheet (drawer), accordion, tabs, table, skeleton. Hiệu ứng mở/đóng dùng `tw-animate-css`.
+- Chuyển động: hero hiện dần bằng CSS (không chờ hydrate), nội dung xuất hiện khi cuộn (Motion), card nhấc nhẹ và phóng ảnh khi hover, menu điện thoại dạng drawer, chip lọc có chỉ báo trượt, gallery chuyển ảnh mờ dần và vuốt được, skeleton khi tải. `prefers-reduced-motion` tắt chuyển động vị trí; trình duyệt tắt JavaScript vẫn thấy toàn bộ nội dung.
+- Ảnh trang trí do imagegen tạo (prompt tại `data/editorial-prompts.json`, ánh xạ tại `data/editorial-media.json`) luôn có chú thích “Hình minh họa AI”; sản phẩm và danh mục chỉ dùng ảnh thật của KIHA. Đổi ảnh đầu trang và ảnh giới thiệu tại **Quản trị → Cài đặt → Hình ảnh thương hiệu**. 39 ảnh gốc trong `img/` được giữ nguyên.
 
 ### Khách hàng
 
-- Trang chủ tông kem, beige và nâu gỗ; dùng logo và ảnh KIHA có sẵn.
-- Bộ sưu tập có tìm kiếm, lọc danh mục, sắp xếp và phân trang phía server. Bộ lọc nằm trong URL và hỗ trợ back/forward.
-- Trang chi tiết với gallery, phóng to ảnh, video có nút phát/tạm dừng/tua, nội dung video bằng văn bản, thông số, giá tùy chọn và sản phẩm liên quan.
-- CTA Zalo, gọi điện, Facebook, TikTok, Google Maps lấy từ cấu hình. Không có giỏ hàng hay thanh toán.
-- Sao chép tên và URL sản phẩm để dán vào Zalo; không giả lập khả năng tự điền tin nhắn của Zalo.
-- Header mobile dạng drawer, animation Motion có hỗ trợ reduced motion, trạng thái loading, empty, error và 404.
-- SEO server rendering, metadata riêng, canonical, Open Graph, sitemap, robots, Organization và breadcrumb JSON-LD. Không tạo giá/đánh giá giả trong dữ liệu có cấu trúc.
-- `next/image`, `next/font` với Be Vietnam Pro và Manrope; Tailwind CSS và các primitive shadcn/ui dựa trên Radix.
+- **Trang chủ:** thanh thông báo kèm hotline, header dính có menu và nút Zalo, hero với ảnh lớn + thẻ “Mẫu nổi bật” + số liệu thật (số sản phẩm, số danh mục), lưới danh mục kèm số mẫu, sản phẩm nổi bật do admin chọn (chưa chọn thì hiện mẫu mới), phần Về KIHA và cam kết lấy từ cấu hình, khối kêu gọi tư vấn Zalo, footer đầy đủ liên hệ và danh mục.
+- **Sản phẩm (`/san-pham`):** tìm kiếm, chip danh mục, sắp xếp (chỉ hiện sắp xếp theo giá khi có sản phẩm có giá), phân trang số trang. Mọi bộ lọc nằm trên URL, chia sẻ được và hoạt động với back/forward; danh sách cũ mờ đi trong lúc server trả kết quả mới. Có trạng thái rỗng, lỗi, trang vượt số trang và skeleton.
+- **Chi tiết (`/san-pham/[slug]`):** gallery có thumbnail, vuốt trên điện thoại, lightbox toàn màn hình dùng phím mũi tên; giá hoặc “Liên hệ báo giá”; nút Zalo, gọi điện, sao chép tên + link để dán vào Zalo (Zalo không hỗ trợ điền sẵn tin nhắn nên không giả lập); cam kết, mô tả, thông số dạng accordion; video; sản phẩm liên quan; thanh Zalo/Gọi cố định ở đáy màn hình điện thoại có chừa vùng an toàn.
+- **Liên hệ (`/lien-he`):** thẻ cho từng kênh (Zalo, điện thoại, Facebook, TikTok, Google Maps) lấy từ cấu hình, kênh chưa có ghi “Đang cập nhật” thay vì link giả; bản đồ nhúng khi có địa chỉ chữ; các bước đặt giường.
+- Nút liên hệ nổi chỉ hiện sau khi cuộn qua phần đầu trang và tự ẩn trên trang chi tiết ở điện thoại để không chồng thanh CTA. Không có giỏ hàng hay thanh toán.
+- SEO: server rendering, metadata riêng từng trang và từng danh mục, canonical, Open Graph, sitemap, robots, JSON-LD `FurnitureStore`, `BreadcrumbList`, `Product` (chỉ khai báo giá khi admin nhập giá thật). Trang kết quả tìm kiếm đặt `noindex`. Sản phẩm không tồn tại/đã ẩn hiển thị trang not-found với `noindex` (Next.js giữ mã 200 khi trang đã bắt đầu stream skeleton).
 
 ### Quản trị
 
-- Đăng nhập, đăng xuất, dashboard và kiểm tra phiên từ backend.
+- Giao diện dashboard riêng: sidebar tối cố định trên máy tính, drawer trên tablet/điện thoại; bảng chuyển thành danh sách thẻ trên màn hình hẹp.
+- Đăng nhập (hiện/ẩn mật khẩu), đăng xuất, dashboard có số liệu, sản phẩm mới thêm và tình trạng cấu hình kênh liên hệ; kiểm tra phiên từ backend.
+- Danh sách sản phẩm lọc theo tên, trạng thái, danh mục; bật/tắt hiển thị và nổi bật ngay trên bảng (backend validate lại toàn bộ sản phẩm). Danh mục bật/tắt hiển thị ngay trên bảng.
+- Form sản phẩm chia khối, thanh lưu cố định, cảnh báo khi rời trang chưa lưu, lỗi hiện dưới từng ô, xem trước card và kết quả tìm kiếm Google.
+- Cài đặt website chia tab Liên hệ / Hình ảnh thương hiệu / Nội dung trang chủ / SEO; tab có lỗi được đánh dấu và tự mở.
 - CRUD sản phẩm và danh mục; chặn xóa danh mục còn sản phẩm.
 - Tên, slug, mô tả, danh mục, gallery, ảnh đại diện, thứ tự ảnh, thông số, giá tùy chọn, nổi bật, draft/published và SEO đều chỉnh sửa được.
 - Lưu lịch sử slug và chuyển hướng 308 từ slug cũ khi sản phẩm còn được công khai.
@@ -150,12 +150,16 @@ File nằm ngoài `public/`, mặc định `.local/uploads/videos`. Phải sao l
 ```text
 apps/
   web/
-    app/(store)/                 Trang chủ, danh sách, chi tiết, liên hệ
+    app/(store)/                 Trang chủ, danh sách, chi tiết, liên hệ, loading/error/not-found
     app/admin/(protected)/       Các trang admin kiểm tra phiên server
     app/admin/dang-nhap/         Đăng nhập
-    components/admin/            Form, bảng, media picker, dashboard
-    components/ui/               Button, dialog theo shadcn/Radix
-    lib/                         API client, server fetch, helpers
+    app/globals.css              Design tokens (màu, font, bo góc, đổ bóng) và tiện ích chung
+    components/ui/               Component shadcn/ui (Radix + Tailwind)
+    components/site/             Header, footer, nút Zalo/gọi điện, dock liên hệ, breadcrumb, reveal
+    components/home/             Hero, danh mục, giới thiệu & cam kết
+    components/product/          Card, bộ lọc URL, phân trang, gallery, video
+    components/admin/            Shell, form, bảng, media picker, video, cài đặt
+    lib/                         API client, server fetch, catalog query, kênh liên hệ, helpers
     public/media/                Bản sao ảnh được scan
   api/src/
     models.mjs                   Mongoose schemas và indexes
@@ -164,7 +168,7 @@ apps/
     app.mjs                      REST routes, middleware, lỗi thống nhất
     server.mjs                   Điểm khởi chạy Express
 img/                             39 file gốc, bảo toàn
-scripts/                         Quét ảnh, seed, admin, local DB, browser QA
+scripts/                         Quét ảnh, seed, admin, local DB, browser/design QA
 tests/api.test.mjs                Kiểm thử tích hợp API với MongoDB thật
 data/                            Manifest ảnh và ánh xạ sản phẩm
 reports/                         Kiểm kê, kết quả QA và ảnh chụp local
@@ -186,7 +190,7 @@ Response thành công: `{ "data": ... }`. Lỗi: `{ "error": { "message": "...",
 | GET              | `/api/admin/auth/me`        | Kiểm tra phiên                                                        |
 | POST             | `/api/admin/auth/logout`    | Thu hồi phiên trên server                                             |
 | GET              | `/api/admin/stats`          | Tổng quan                                                             |
-| GET, POST        | `/api/admin/products`       | Liệt kê/tạo sản phẩm                                                  |
+| GET, POST        | `/api/admin/products`       | Liệt kê/tạo sản phẩm; lọc thêm `status=draft\|published`              |
 | GET, PUT, DELETE | `/api/admin/products/:id`   | Đọc/sửa/xóa sản phẩm                                                  |
 | GET, POST        | `/api/admin/categories`     | Liệt kê/tạo danh mục                                                  |
 | PUT, DELETE      | `/api/admin/categories/:id` | Sửa/xóa danh mục                                                      |
@@ -208,12 +212,17 @@ npm test
 npm run build
 # Cần npm run dev đang chạy (tự bật MongoDB local), Chrome đã cài:
 npm run test:browser
+npm run test:design
 npm audit
 ```
 
-API test chạy 23 trường hợp với database tạm độc lập: auth, CSRF, CRUD, slug, ảnh, lọc nhiều danh mục, trạng thái hiển thị, settings, session, rate limit; upload MP4/WebM, từ chối giả định dạng/quá dung lượng, dọn file lỗi, quyền xem video, Range và xóa video đang sử dụng.
+Máy không có Chrome (ví dụ máy chủ dev Linux): đặt `CHROMIUM_PATH` trỏ tới Chromium/headless shell có sẵn trên máy, ví dụ `CHROMIUM_PATH=/đường/dẫn/chrome-headless-shell npm run test:browser`. Script không tự tải trình duyệt.
 
-Browser QA dùng Playwright + Chrome headless, kiểm tra desktop 1440 px, tablet 768 px và mobile 390 px. Có thao tác tạo/sửa/xuất bản/xóa dữ liệu QA, lựa chọn và sắp xếp ảnh, cập nhật lại cấu hình không thay đổi giá trị, thử lỗi API rồi retry. Script chỉ xóa các bản ghi QA do chính lần chạy tạo ra. Kết quả ghi ở `reports/browser-results.json`; screenshots trong `reports/`. Bộ test browser kiểm tra cấu hình KIHA ban đầu, nên cần cập nhật assertion khi bạn đổi số điện thoại hoặc kênh liên hệ.
+API test chạy 23 trường hợp với database tạm độc lập: auth, CSRF, CRUD, slug, ảnh, lọc nhiều danh mục, trạng thái hiển thị (bộ lọc `status` chỉ có hiệu lực ở API admin), settings, session, rate limit; upload MP4/WebM, từ chối giả định dạng/quá dung lượng, dọn file lỗi, quyền xem video, Range và xóa video đang sử dụng.
+
+Browser QA (14 nhóm) dùng Playwright + Chrome headless, kiểm tra desktop 1440 px, tablet 768 px và mobile 390 px. Có thao tác tạo/sửa/xuất bản/xóa dữ liệu QA, lựa chọn và sắp xếp ảnh, bật/tắt nổi bật và hiển thị ngay trên bảng, cập nhật lại cấu hình không thay đổi giá trị, thử lỗi API rồi retry. Script chỉ xóa các bản ghi QA do chính lần chạy tạo ra. Kỳ vọng về kênh liên hệ đọc từ cấu hình đang lưu, không ghi cứng. Kết quả ghi ở `reports/browser-results.json`; screenshots trong `reports/`.
+
+Design QA (11 nhóm, `npm run test:design`) kiểm tra tương phản màu, font, hero, scroll reveal, hover card, nút Zalo nổi, bộ lọc với back/forward, `prefers-reduced-motion`, thanh CTA mobile và không tràn ngang ở 320–1440 px trên 4 trang khách hàng. Kết quả ở `reports/redesign-results.json`.
 
 ## Triển khai production
 
