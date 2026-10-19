@@ -63,8 +63,9 @@ async function publicFilter() {
 }
 async function listProducts(query, isAdmin) {
   const parsed = listInput.parse(query);
-  const { page, limit, q, category, sort, featured } = parsed;
+  const { page, limit, q, category, sort, featured, status } = parsed;
   const filter = isAdmin ? {} : await publicFilter();
+  if (isAdmin && status) filter.status = status;
   if (q) filter.name = { $regex: escapeRegex(q), $options: 'i' };
   if (category) {
     const c = await Category.findOne({

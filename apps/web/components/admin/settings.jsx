@@ -1,243 +1,416 @@
 'use client';
-import { useState } from 'react';
-import Image from 'next/image';
-import { Plus, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
+import { illustrationCaption } from '@/lib/editorial-assets';
 import { Button } from '@/components/ui/button';
+import { Input, Textarea } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useResource,
   ResourceState,
   Field,
   FormError,
   MediaPicker,
+  PageHeader,
+  Panel,
+  ImagePreview,
+  fieldErrors,
   mutationError,
 } from '@/components/admin/shared';
+
+const keys = [
+  'shopName',
+  'phone',
+  'zaloUrl',
+  'facebookUrl',
+  'tiktokUrl',
+  'mapsUrl',
+  'address',
+  'logo',
+  'heroImage',
+  'aboutImage',
+  'heroTitle',
+  'heroDescription',
+  'aboutTitle',
+  'aboutDescription',
+  'commitments',
+  'seoTitle',
+  'seoDescription',
+];
+const tabOf = {
+  contact: ['shopName', 'phone', 'zaloUrl', 'facebookUrl', 'tiktokUrl', 'mapsUrl', 'address'],
+  brand: ['logo', 'heroImage', 'aboutImage'],
+  home: ['heroTitle', 'heroDescription', 'aboutTitle', 'aboutDescription', 'commitments'],
+  seo: ['seoTitle', 'seoDescription'],
+};
+
+const contactFields = [
+  ['shopName', 'Tên cửa hàng', 'text', 'Nội Thất KIHA', 'Hiển thị ở chân trang và dữ liệu SEO.'],
+  ['phone', 'Số điện thoại', 'tel', '0900 000 000', 'Dùng cho nút Gọi điện trên website.'],
+  ['zaloUrl', 'Liên kết Zalo', 'url', 'https://zalo.me/…', 'Chỉ nhận liên kết https://zalo.me.'],
+  ['facebookUrl', 'Facebook', 'url', 'https://www.facebook.com/…', ''],
+  ['tiktokUrl', 'TikTok', 'url', 'https://www.tiktok.com/@…', ''],
+  [
+    'mapsUrl',
+    'Google Maps',
+    'url',
+    'https://maps.app.goo.gl/…',
+    'Liên kết chia sẻ vị trí từ Google Maps.',
+  ],
+];
+
 export function AdminSettings() {
   const resource = useResource('/admin/settings');
   if (!resource.data || resource.error) return <ResourceState resource={resource} />;
   return <SettingsEditor initial={resource.data} />;
 }
+
 function SettingsEditor({ initial }) {
-  const [form, setForm] = useState(initial),
+  const [saved, setSaved] = useState(() =>
+    Object.fromEntries(keys.map((k) => [k, initial[k] ?? (k === 'commitments' ? [] : '')])),
+  );
+  const [form, setForm] = useState(saved),
     [busy, setBusy] = useState(false),
-    [error, setError] = useState(null);
+    [error, setError] = useState(null),
+    [tab, setTab] = useState('contact');
+  const errors = fieldErrors(error);
+  const dirty = JSON.stringify(form) !== JSON.stringify(saved);
   const set = (key, value) => setForm((f) => ({ ...f, [key]: value }));
+  const tabHasError = (name) =>
+    Object.keys(errors).some((p) => tabOf[name].includes(p.split('.')[0]));
+
+  useEffect(() => {
+    if (!dirty || busy) return;
+    const warn = (event) => event.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty, busy]);
+
+  function setCommitment(i, key, value) {
+    set(
+      'commitments',
+      form.commitments.map((v, n) => (n === i ? { ...v, [key]: value } : v)),
+    );
+  }
+  function moveCommitment(i, step) {
+    const list = [...form.commitments];
+    [list[i], list[i + step]] = [list[i + step], list[i]];
+    set('commitments', list);
+  }
   async function save(e) {
     e.preventDefault();
     setBusy(true);
     setError(null);
     try {
-      await api('/admin/settings', { method: 'PUT', body: form });
+      const result = await api('/admin/settings', { method: 'PUT', body: form });
+      const next = Object.fromEntries(keys.map((k) => [k, result?.[k] ?? form[k]]));
+      setSaved(next);
+      setForm(next);
       toast.success('Đã cập nhật cấu hình website.');
     } catch (err) {
       mutationError(err, setError);
+      const first = Object.keys(tabOf).find((name) =>
+        (err.fields || []).some((f) => tabOf[name].includes(String(f.path).split('.')[0])),
+      );
+      if (first) setTab(first);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setBusy(false);
     }
   }
+  const tabs = [
+    ['contact', 'Liên hệ'],
+    ['brand', 'Hình ảnh thương hiệu'],
+    ['home', 'Nội dung trang chủ'],
+    ['seo', 'SEO'],
+  ];
   return (
     <>
-      <div className="admin-heading">
-        <div>
-          <h1>Cài đặt website</h1>
-          <p>Thông tin thương hiệu, liên hệ và nội dung trang chủ.</p>
-        </div>
-      </div>
+      <PageHeader
+        title="Cài đặt website"
+        description="Thông tin liên hệ, hình ảnh thương hiệu và nội dung hiển thị trên trang chủ."
+      />
       <form onSubmit={save}>
-        <FormError error={error} />
-        <section className="admin-panel">
-          <h2>Thông tin liên hệ</h2>
-          <div className="form-grid">
-            {[
-              ['shopName', 'Tên cửa hàng', 'text'],
-              ['phone', 'Số điện thoại', 'tel'],
-              ['zaloUrl', 'Liên kết Zalo', 'url'],
-              ['facebookUrl', 'Facebook', 'url'],
-              ['tiktokUrl', 'TikTok', 'url'],
-              ['mapsUrl', 'Google Maps', 'url'],
-            ].map(([key, label, type]) => (
-              <Field label={label} key={key}>
-                <input
-                  type={type}
-                  required={key === 'shopName'}
-                  value={form[key]}
-                  onChange={(e) => set(key, e.target.value)}
-                />
-              </Field>
-            ))}
-            <Field label="Địa chỉ" className="form-full">
-              <input
-                maxLength={500}
-                value={form.address}
-                onChange={(e) => set('address', e.target.value)}
-              />
-            </Field>
-          </div>
-          <p className="muted text-xs">
-            Bỏ trống kênh chưa có thông tin. Website chỉ hiển thị liên kết đã được cấu hình.
-          </p>
-        </section>
-        <section className="admin-panel">
-          <h2>Hình ảnh thương hiệu</h2>
-          <p className="muted text-xs mb-5">
-            Ảnh có tên bắt đầu bằng “AI” dùng minh họa không gian. Website tự hiển thị chú thích cho
-            các ảnh này.
-          </p>
-          <div className="form-grid">
-            {[
-              ['logo', 'Logo cửa hàng'],
-              ['heroImage', 'Ảnh trang chủ'],
-              ['aboutImage', 'Ảnh câu chuyện KIHA'],
-            ].map(([key, label]) => (
-              <div key={key}>
-                <p className="text-xs mb-3">{label}</p>
-                <MediaPicker
-                  multiple={false}
-                  label={`Chọn ${label.toLowerCase()}`}
-                  value={form[key] ? [form[key]] : []}
-                  onChange={(v) => set(key, v[0] || '')}
-                />
-                {form[key] && (
-                  <div className="mt-4 mb-5">
-                    <Image
-                      src={form[key]}
-                      alt={label}
-                      width={240}
-                      height={140}
-                      style={{ objectFit: 'contain', background: '#f0ece4', borderRadius: 4 }}
-                    />
-                    <Button type="button" size="sm" variant="ghost" onClick={() => set(key, '')}>
-                      Bỏ ảnh
-                    </Button>
-                  </div>
+        <FormError error={error} className="mb-6" />
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList aria-label="Nhóm cài đặt">
+            {tabs.map(([value, label]) => (
+              <TabsTrigger key={value} value={value}>
+                {label}
+                {tabHasError(value) && (
+                  <span className="size-2 rounded-full bg-destructive" aria-label="có lỗi" />
                 )}
-              </div>
+              </TabsTrigger>
             ))}
-          </div>
-        </section>
-        <section className="admin-panel">
-          <h2>Nội dung trang chủ</h2>
-          <div className="form-grid">
-            <Field label="Tiêu đề hero">
-              <textarea
-                required
-                maxLength={180}
-                value={form.heroTitle}
-                onChange={(e) => set('heroTitle', e.target.value)}
-              />
-            </Field>
-            <Field label="Mô tả hero">
-              <textarea
-                maxLength={500}
-                value={form.heroDescription}
-                onChange={(e) => set('heroDescription', e.target.value)}
-              />
-            </Field>
-            <Field label="Tiêu đề giới thiệu">
-              <textarea
-                maxLength={200}
-                value={form.aboutTitle}
-                onChange={(e) => set('aboutTitle', e.target.value)}
-              />
-            </Field>
-            <Field label="Nội dung giới thiệu">
-              <textarea
-                maxLength={3000}
-                value={form.aboutDescription}
-                onChange={(e) => set('aboutDescription', e.target.value)}
-              />
-            </Field>
-          </div>
-        </section>
-        <section className="admin-panel">
-          <h2>Nội dung tư vấn & cam kết</h2>
-          <p className="muted text-xs mb-5">Chỉ sử dụng cam kết mà KIHA có thể xác nhận.</p>
-          {form.commitments.map((item, i) => (
-            <div className="form-grid" key={i}>
-              <Field label={`Tiêu đề ${i + 1}`}>
-                <input
-                  required
-                  maxLength={120}
-                  value={item.title}
-                  onChange={(e) =>
-                    set(
-                      'commitments',
-                      form.commitments.map((v, n) =>
-                        n === i ? { ...v, title: e.target.value } : v,
-                      ),
-                    )
-                  }
-                />
-              </Field>
-              <div className="flex gap-2">
-                <Field label="Nội dung" className="flex-1">
-                  <textarea
+          </TabsList>
+
+          <TabsContent value="contact" className="mt-6">
+            <Panel
+              title="Thông tin liên hệ"
+              description="Bỏ trống kênh chưa có. Website chỉ hiển thị liên kết đã được cấu hình, không tạo link giả."
+            >
+              <div className="grid gap-5 md:grid-cols-2">
+                {contactFields.map(([key, label, type, placeholder, hint]) => (
+                  <Field
+                    label={label}
+                    key={key}
+                    hint={hint || undefined}
+                    error={errors[key]}
+                    required={key === 'shopName'}
+                  >
+                    <Input
+                      type={type}
+                      required={key === 'shopName'}
+                      placeholder={placeholder}
+                      value={form[key]}
+                      onChange={(e) => set(key, e.target.value)}
+                    />
+                  </Field>
+                ))}
+                <Field
+                  label="Địa chỉ"
+                  className="md:col-span-2"
+                  error={errors.address}
+                  hint="Khi có địa chỉ, trang liên hệ hiển thị bản đồ nhúng."
+                >
+                  <Input
                     maxLength={500}
-                    value={item.description}
-                    onChange={(e) =>
-                      set(
-                        'commitments',
-                        form.commitments.map((v, n) =>
-                          n === i ? { ...v, description: e.target.value } : v,
-                        ),
-                      )
-                    }
+                    placeholder="Số nhà, đường, phường/xã, tỉnh/thành"
+                    value={form.address}
+                    onChange={(e) => set('address', e.target.value)}
                   />
                 </Field>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="mt-6"
-                  aria-label={`Bỏ nội dung ${i + 1}`}
-                  onClick={() =>
-                    set(
-                      'commitments',
-                      form.commitments.filter((_, n) => n !== i),
-                    )
-                  }
-                >
-                  <Trash2 />
-                </Button>
               </div>
+            </Panel>
+          </TabsContent>
+
+          <TabsContent value="brand" className="mt-6">
+            <Panel
+              title="Hình ảnh thương hiệu"
+              description="Ảnh có tên bắt đầu bằng “AI” là ảnh minh họa; website tự ghi chú “Hình minh họa AI” khi dùng các ảnh này."
+            >
+              <div className="grid gap-6 md:grid-cols-3">
+                {[
+                  ['logo', 'Logo cửa hàng', 'Hiển thị ở đầu trang.'],
+                  ['heroImage', 'Ảnh đầu trang chủ', 'Ảnh lớn cạnh tiêu đề trang chủ.'],
+                  ['aboutImage', 'Ảnh phần giới thiệu', 'Dùng ở mục Về KIHA và trang liên hệ.'],
+                ].map(([key, label, hint]) => (
+                  <div key={key} className="rounded-2xl border bg-ivory/50 p-4">
+                    <p className="text-sm font-semibold">{label}</p>
+                    <p className="mt-0.5 mb-3 text-[13px] text-muted-foreground">{hint}</p>
+                    <MediaPicker
+                      multiple={false}
+                      label="Chọn ảnh"
+                      value={form[key] ? [form[key]] : []}
+                      onChange={(v) => set(key, v[0] || '')}
+                    />
+                    <ImagePreview src={form[key]} alt={label} onRemove={() => set(key, '')} />
+                    {illustrationCaption(form[key]) && (
+                      <p className="mt-2 text-xs text-muted-foreground">Ảnh minh họa AI</p>
+                    )}
+                    {errors[key] && (
+                      <p className="mt-2 text-[13px] text-destructive">{errors[key]}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Panel>
+          </TabsContent>
+
+          <TabsContent value="home" className="mt-6 grid gap-6">
+            <Panel
+              title="Phần đầu trang chủ"
+              description="Mỗi dòng trong tiêu đề hiển thị trên một dòng riêng."
+            >
+              <div className="grid gap-5 md:grid-cols-2">
+                <Field label="Tiêu đề" required error={errors.heroTitle}>
+                  <Textarea
+                    required
+                    rows={3}
+                    maxLength={180}
+                    value={form.heroTitle}
+                    onChange={(e) => set('heroTitle', e.target.value)}
+                  />
+                </Field>
+                <Field label="Mô tả" error={errors.heroDescription}>
+                  <Textarea
+                    rows={3}
+                    maxLength={500}
+                    value={form.heroDescription}
+                    onChange={(e) => set('heroDescription', e.target.value)}
+                  />
+                </Field>
+              </div>
+            </Panel>
+            <Panel title="Giới thiệu KIHA">
+              <div className="grid gap-5 md:grid-cols-2">
+                <Field label="Tiêu đề" error={errors.aboutTitle}>
+                  <Textarea
+                    rows={3}
+                    maxLength={200}
+                    value={form.aboutTitle}
+                    onChange={(e) => set('aboutTitle', e.target.value)}
+                  />
+                </Field>
+                <Field label="Nội dung" error={errors.aboutDescription}>
+                  <Textarea
+                    rows={5}
+                    maxLength={3000}
+                    value={form.aboutDescription}
+                    onChange={(e) => set('aboutDescription', e.target.value)}
+                  />
+                </Field>
+              </div>
+            </Panel>
+            <Panel
+              title="Cam kết & quy trình tư vấn"
+              description="Hiển thị ở trang chủ, trang sản phẩm và trang liên hệ. Chỉ dùng nội dung KIHA xác nhận được. Tối đa 6 mục."
+            >
+              <ol className="grid gap-3">
+                {form.commitments.map((item, i) => (
+                  <li
+                    key={i}
+                    className="grid gap-3 rounded-2xl border bg-ivory/50 p-4 md:grid-cols-[2.25rem_1fr_1.4fr_auto] md:items-start"
+                  >
+                    <span className="flex size-9 items-center justify-center rounded-full bg-walnut font-display text-sm font-bold text-ivory">
+                      {i + 1}
+                    </span>
+                    <Field label="Tiêu đề" required error={errors[`commitments.${i}.title`]}>
+                      <Input
+                        required
+                        maxLength={120}
+                        value={item.title}
+                        onChange={(e) => setCommitment(i, 'title', e.target.value)}
+                      />
+                    </Field>
+                    <Field label="Nội dung" error={errors[`commitments.${i}.description`]}>
+                      <Input
+                        maxLength={500}
+                        value={item.description}
+                        onChange={(e) => setCommitment(i, 'description', e.target.value)}
+                      />
+                    </Field>
+                    <div className="flex gap-1 md:mt-7">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        disabled={i === 0}
+                        aria-label={`Đưa mục ${i + 1} lên`}
+                        onClick={() => moveCommitment(i, -1)}
+                      >
+                        <ArrowUp />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        disabled={i === form.commitments.length - 1}
+                        aria-label={`Đưa mục ${i + 1} xuống`}
+                        onClick={() => moveCommitment(i, 1)}
+                      >
+                        <ArrowDown />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={`Bỏ mục ${i + 1}`}
+                        className="hover:bg-[#fdf3f2] hover:text-destructive"
+                        onClick={() =>
+                          set(
+                            'commitments',
+                            form.commitments.filter((_, n) => n !== i),
+                          )
+                        }
+                      >
+                        <Trash2 />
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                disabled={form.commitments.length >= 6}
+                onClick={() =>
+                  set('commitments', [...form.commitments, { title: '', description: '' }])
+                }
+              >
+                <Plus />
+                Thêm mục
+              </Button>
+            </Panel>
+          </TabsContent>
+
+          <TabsContent value="seo" className="mt-6">
+            <Panel
+              title="SEO mặc định"
+              description="Dùng cho trang chủ và khi trang không có nội dung SEO riêng."
+            >
+              <div className="grid gap-5">
+                <Field label="Tiêu đề website" error={errors.seoTitle} hint="Nên dưới 60 ký tự.">
+                  <Input
+                    maxLength={160}
+                    value={form.seoTitle}
+                    onChange={(e) => set('seoTitle', e.target.value)}
+                  />
+                </Field>
+                <Field
+                  label="Mô tả website"
+                  error={errors.seoDescription}
+                  hint="Nên trong khoảng 120–160 ký tự."
+                >
+                  <Textarea
+                    rows={3}
+                    maxLength={320}
+                    value={form.seoDescription}
+                    onChange={(e) => set('seoDescription', e.target.value)}
+                  />
+                </Field>
+                <div
+                  className="min-w-0 overflow-hidden rounded-xl border bg-ivory/60 p-4"
+                  aria-label="Xem trước kết quả tìm kiếm"
+                >
+                  <p className="text-xs text-muted-foreground">Trang chủ</p>
+                  <p className="mt-1 line-clamp-1 text-[15px] font-semibold text-[#1a0dab]">
+                    {form.seoTitle || form.shopName}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-[13px] text-muted-foreground">
+                    {form.seoDescription}
+                  </p>
+                </div>
+              </div>
+            </Panel>
+          </TabsContent>
+        </Tabs>
+        <div className="sticky bottom-0 z-20 -mx-4 mt-8 border-t bg-ivory/92 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground">
+              {dirty ? 'Có thay đổi chưa lưu.' : 'Mọi thay đổi đã được lưu.'}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!dirty || busy}
+                onClick={() => {
+                  setForm(saved);
+                  setError(null);
+                }}
+              >
+                Hoàn tác
+              </Button>
+              <Button type="submit" disabled={busy}>
+                {busy ? 'Đang lưu…' : 'Lưu cài đặt'}
+              </Button>
             </div>
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={form.commitments.length >= 6}
-            onClick={() =>
-              set('commitments', [...form.commitments, { title: '', description: '' }])
-            }
-          >
-            <Plus />
-            Thêm nội dung
-          </Button>
-        </section>
-        <section className="admin-panel">
-          <h2>SEO mặc định</h2>
-          <Field label="Tiêu đề website">
-            <input
-              maxLength={160}
-              value={form.seoTitle}
-              onChange={(e) => set('seoTitle', e.target.value)}
-            />
-          </Field>
-          <Field label="Mô tả website">
-            <textarea
-              maxLength={320}
-              value={form.seoDescription}
-              onChange={(e) => set('seoDescription', e.target.value)}
-            />
-          </Field>
-        </section>
-        <div className="form-save">
-          <Button type="submit" disabled={busy}>
-            {busy ? 'Đang lưu…' : 'Lưu cài đặt'}
-          </Button>
+          </div>
         </div>
       </form>
     </>

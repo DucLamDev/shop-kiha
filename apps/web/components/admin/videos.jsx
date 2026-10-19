@@ -1,17 +1,25 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { Upload, Film, Trash2, X } from 'lucide-react';
+import { Film, Trash2, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { ProductVideo } from '@/components/product-video';
+import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { ProductVideo } from '@/components/product/product-video';
 import {
   useResource,
   ResourceState,
   FormError,
   DeleteDialog,
   Pager,
+  EmptyRows,
   mutationError,
 } from './shared';
 
@@ -68,7 +76,7 @@ export function VideoUpload({ onUploaded, onBusy }) {
     xhr.send(body);
   }
   return (
-    <div className="video-upload">
+    <div className="grid gap-3">
       <input
         ref={input}
         className="sr-only"
@@ -82,22 +90,32 @@ export function VideoUpload({ onUploaded, onBusy }) {
           event.target.value = '';
         }}
       />
-      <Button
-        type="button"
-        variant="outline"
-        disabled={progress !== null}
-        onClick={() => input.current.click()}
-      >
-        <Upload />
-        Tải video lên
-      </Button>
-      <p className="muted text-xs">
-        MP4 hoặc WebM · Tối đa 100 MB. Nên dùng MP4 H.264/AAC để phát tốt trên điện thoại.
-      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={progress !== null}
+          onClick={() => input.current.click()}
+        >
+          <Upload />
+          Tải video lên
+        </Button>
+        <p className="text-[13px] text-muted-foreground">
+          MP4 hoặc WebM, tối đa 100 MB. Nên dùng MP4 H.264/AAC để phát tốt trên điện thoại.
+        </p>
+      </div>
       {progress !== null && (
-        <div className="video-progress" role="status">
-          <progress max={100} value={progress} aria-label="Tiến độ tải video" />
-          <span>{progress === 100 ? 'Đang lưu video…' : `Đang tải ${progress}%`}</span>
+        <div className="flex items-center gap-3 rounded-xl border bg-ivory px-4 py-3" role="status">
+          <div className="h-2 flex-1 overflow-hidden rounded-full bg-secondary">
+            <div
+              className="h-full rounded-full bg-walnut transition-[width] duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <span className="w-28 text-right text-sm tabular-nums">
+            {progress === 100 ? 'Đang lưu…' : `Đang tải ${progress}%`}
+          </span>
           <Button type="button" size="sm" variant="ghost" onClick={() => request.current?.abort()}>
             Hủy tải
           </Button>
@@ -112,45 +130,55 @@ function VideoLibrary({ onSelect, version = 0 }) {
   const [page, setPage] = useState(1),
     [deleting, setDeleting] = useState(null);
   const resource = useResource(`/admin/videos?limit=6&page=${page}`, version);
-  if (!resource.data || resource.error) return <ResourceState resource={resource} />;
+  if (!resource.data || resource.error) return <ResourceState resource={resource} rows={2} />;
   return (
     <>
-      {!resource.data.total && (
-        <p className="muted">
-          Chưa có video. Tải video giới thiệu sản phẩm của bạn lên để bắt đầu.
-        </p>
-      )}
-      <div className="video-library">
-        {resource.data.items.map((video) => (
-          <article className="video-library-item" key={video._id}>
-            <ProductVideo src={video.src} name={video.name} />
-            <p>{video.name}</p>
-            <small className="muted">{(video.bytes / 1024 / 1024).toFixed(1)} MB</small>
-            <div className="video-actions">
-              {onSelect && (
-                <Button type="button" size="sm" onClick={() => onSelect(video)}>
-                  Dùng video này
+      {!resource.data.total ? (
+        <EmptyRows
+          icon={Film}
+          title="Chưa có video"
+          description="Tải video giới thiệu sản phẩm lên để bắt đầu."
+        />
+      ) : (
+        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {resource.data.items.map((video) => (
+            <li key={video._id} className="rounded-2xl border bg-white p-3">
+              <ProductVideo src={video.src} name={video.name} />
+              <p className="mt-3 truncate text-sm font-semibold" title={video.name}>
+                {video.name}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {(video.bytes / 1024 / 1024).toFixed(1)} MB
+              </p>
+              <div className="mt-3 flex gap-2">
+                {onSelect && (
+                  <Button type="button" size="sm" onClick={() => onSelect(video)}>
+                    Dùng video này
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDeleting(video)}
+                  aria-label={`Xóa video ${video.name}`}
+                  className="hover:bg-[#fdf3f2] hover:text-destructive"
+                >
+                  <Trash2 />
+                  Xóa
                 </Button>
-              )}
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setDeleting(video)}
-                aria-label={`Xóa video ${video.name}`}
-              >
-                <Trash2 />
-                Xóa
-              </Button>
-            </div>
-          </article>
-        ))}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="mt-5">
+        <Pager page={page} pages={resource.data.pages} onChange={setPage} />
       </div>
-      <Pager page={page} pages={resource.data.pages} onChange={setPage} />
       <DeleteDialog
         item={deleting}
         onClose={() => setDeleting(null)}
-        description="Xóa file video khỏi thư viện. Video đang gắn với sản phẩm phải được gỡ và lưu trước."
+        description="Xóa file video khỏi thư viện. Video đang gắn với sản phẩm phải được gỡ khỏi sản phẩm và lưu trước."
         onDelete={async (video) => {
           await api(`/admin/videos/${video._id}`, { method: 'DELETE' });
           setPage(1);
@@ -164,28 +192,34 @@ function VideoLibrary({ onSelect, version = 0 }) {
 export function ProductVideoEditor({ value, onChange, poster, onBusy }) {
   const [open, setOpen] = useState(false);
   return (
-    <>
+    <div className="grid gap-4">
       <VideoUpload onUploaded={(video) => onChange(video.src)} onBusy={onBusy} />
-      <Button type="button" variant="ghost" onClick={() => setOpen(true)}>
-        <Film />
-        Chọn video đã tải
-      </Button>
+      <div>
+        <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(true)}>
+          <Film />
+          Chọn video đã tải
+        </Button>
+      </div>
       {value && (
-        <div className="selected-video">
+        <div className="grid gap-3 rounded-2xl border bg-ivory/60 p-3">
           <ProductVideo key={value} src={value} poster={poster} />
-          <Button type="button" variant="ghost" onClick={() => onChange('')}>
-            <X />
-            Gỡ video khỏi sản phẩm
-          </Button>
-          <p className="muted text-xs">
-            Lưu sản phẩm để áp dụng thay đổi. Video vẫn được giữ trong thư viện.
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-[13px] text-muted-foreground">
+              Lưu sản phẩm để áp dụng. Gỡ video không xóa file khỏi thư viện.
+            </p>
+            <Button type="button" variant="ghost" size="sm" onClick={() => onChange('')}>
+              <X />
+              Gỡ video
+            </Button>
+          </div>
         </div>
       )}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="media-dialog">
-          <DialogTitle>Thư viện video</DialogTitle>
-          <DialogDescription>Chọn một video giới thiệu cho sản phẩm.</DialogDescription>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Thư viện video</DialogTitle>
+            <DialogDescription>Chọn một video giới thiệu cho sản phẩm.</DialogDescription>
+          </DialogHeader>
           {open && (
             <VideoLibrary
               onSelect={(video) => {
@@ -196,17 +230,18 @@ export function ProductVideoEditor({ value, onChange, poster, onBusy }) {
           )}
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }
 
 export function AdminVideos() {
   const [version, setVersion] = useState(0);
   return (
-    <section className="admin-panel admin-video-library">
-      <h2>Thư viện video</h2>
+    <Card className="p-5 sm:p-6">
       <VideoUpload onUploaded={() => setVersion((value) => value + 1)} />
-      <VideoLibrary version={version} />
-    </section>
+      <div className="mt-6">
+        <VideoLibrary version={version} />
+      </div>
+    </Card>
   );
 }

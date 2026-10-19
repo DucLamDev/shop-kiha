@@ -1,4 +1,6 @@
 import { AdminProducts } from '@/components/admin/products';
-export default function Page() {
-  return <AdminProducts />;
+export default async function Page({ searchParams }) {
+  const { status } = await searchParams;
+  const initial = ['draft', 'published'].includes(status) ? status : '';
+  return <AdminProducts key={initial || 'all'} initialStatus={initial} />;
 }

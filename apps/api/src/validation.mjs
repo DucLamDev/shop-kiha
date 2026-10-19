@@ -121,6 +121,8 @@ export const listInput = z
     category: z.union([slug, z.literal('')]).default(''),
     sort: z.enum(['featured', 'newest', 'name', 'price-asc', 'price-desc']).default('featured'),
     featured: z.enum(['true', 'false']).optional(),
+    // Chỉ áp dụng cho API admin; API công khai luôn giới hạn ở sản phẩm đã xuất bản.
+    status: z.enum(['draft', 'published']).optional(),
   })
   .strict();
 export const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

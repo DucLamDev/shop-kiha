@@ -15,20 +15,36 @@ const heading = Manrope({
 });
 export const metadata = {
   metadataBase: new URL(siteUrl()),
-  title: { default: 'Nội Thất KIHA | Giường ngủ pallet', template: '%s | KIHA' },
-  description: 'Giường ngủ pallet cho không gian sống của bạn. Xem bộ ảnh KIHA và tư vấn qua Zalo.',
+  title: { default: 'Nội Thất KIHA | Giường gỗ pallet', template: '%s | KIHA' },
+  description:
+    'Giường gỗ pallet cho không gian sống của bạn. Xem mẫu giường KIHA và tư vấn, báo giá qua Zalo.',
   icons: { icon: '/icon.svg' },
 };
-export const viewport = { width: 'device-width', initialScale: 1, themeColor: '#f6f3ed' };
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#f6f1ea',
+};
 export default function RootLayout({ children }) {
   return (
-    <html lang="vi">
-      <body className={`${body.variable} ${heading.variable}`}>
+    <html lang="vi" className={`${body.variable} ${heading.variable}`}>
+      <body>
+        <noscript>
+          <style>{'[data-reveal]{opacity:1!important;transform:none!important}'}</style>
+        </noscript>
         <a href="#main-content" className="skip-link">
           Bỏ qua điều hướng
         </a>
         {children}
-        <Toaster richColors position="bottom-center" />
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            classNames: {
+              toast: '!rounded-2xl !border-border !font-sans !shadow-lift',
+            },
+          }}
+        />
       </body>
     </html>
   );
