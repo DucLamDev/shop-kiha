@@ -12,7 +12,11 @@ const manifest = JSON.parse(await fs.readFile(path.join(root, 'data/media-manife
 const editorial = JSON.parse(
   await fs.readFile(path.join(root, 'data/editorial-media.json'), 'utf8'),
 );
+const decoration = JSON.parse(
+  await fs.readFile(path.join(root, 'data/decoration-media.json'), 'utf8'),
+);
 const catalog = JSON.parse(await fs.readFile(path.join(root, 'data/catalog.json'), 'utf8'));
+const homeCopy = JSON.parse(await fs.readFile(path.join(root, 'data/home-copy.json'), 'utf8'));
 const asset = (prefix) => {
   const item = manifest.find((m) => m.sha256.startsWith(prefix));
   if (!item) throw new Error(`Missing image ${prefix}`);
@@ -23,6 +27,7 @@ try {
   for (const { original: _original, duplicateOf: _duplicate, ...item } of [
     ...manifest,
     ...editorial,
+    ...decoration,
   ])
     await Media.updateOne({ assetId: item.assetId }, { $setOnInsert: item }, { upsert: true });
   await Settings.updateOne(
@@ -37,28 +42,9 @@ try {
         mapsUrl: process.env.SHOP_MAPS_URL || '',
         address: process.env.SHOP_ADDRESS || '',
         logo: asset('412aeb41'),
-        heroImage: editorial.find((image) => image.role === 'hero').src,
-        aboutImage: editorial.find((image) => image.role === 'detail').src,
-        heroTitle: 'Một chút mộc.\nMột chốn bình yên.',
-        heroDescription:
-          'Giường ngủ pallet cho những không gian sống giản dị. Cùng KIHA tìm một góc nghỉ ngơi thật vừa vặn với bạn.',
-        aboutTitle: 'Nhà là nơi\nta được là mình.',
-        aboutDescription:
-          'KIHA mang đến những gợi ý giường ngủ pallet cho không gian của bạn. Bắt đầu từ một chiếc giường, một góc nhỏ thân quen và những điều giản dị mỗi ngày.',
-        commitments: [
-          {
-            title: 'Xem trước, chọn kỹ',
-            description: 'Khám phá hình ảnh và những chi tiết bạn quan tâm.',
-          },
-          {
-            title: 'Trao đổi cùng KIHA',
-            description: 'Chia sẻ không gian và nhu cầu để được tư vấn.',
-          },
-          {
-            title: 'Rõ ràng trước khi đặt',
-            description: 'Xác nhận kích thước, hoàn thiện và báo giá qua Zalo.',
-          },
-        ],
+        heroImage: decoration.find((image) => image.role === 'hero').src,
+        aboutImage: decoration.find((image) => image.role === 'story').src,
+        ...homeCopy.current,
         seoTitle: 'Nội Thất KIHA | Giường ngủ pallet',
         seoDescription:
           'Khám phá giường ngủ pallet tại Nội Thất KIHA. Xem hình ảnh sản phẩm và liên hệ qua Zalo để được tư vấn, báo giá.',

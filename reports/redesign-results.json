@@ -1,7 +1,7 @@
 {
-  "passed": 11,
+  "passed": 12,
   "results": [
-    "Bảng màu kem – gỗ – nâu trầm – than đạt tương phản WCAG AA cho chữ",
+    "Bảng màu kem – sage – nâu trầm đạt tương phản WCAG AA cho chữ",
     "Be Vietnam Pro cho nội dung, Manrope cho tiêu đề (next/font)",
     "Hero hiện mềm khi tải, header dính, ảnh minh họa AI có chú thích",
     "Nội dung xuất hiện khi cuộn tới (scroll reveal)",
@@ -11,6 +11,7 @@
     "Tôn trọng prefers-reduced-motion: tắt chuyển động, nội dung vẫn hiển thị",
     "Mobile: thanh Zalo/Gọi cố định ở trang chi tiết, không chồng nút nổi; menu drawer đóng/mở",
     "Không tràn ngang ở 320, 390, 768, 1024 và 1440px trên 4 trang khách hàng",
+    "Không thành phần nào dùng nền đen/tối (trang khách hàng và đăng nhập)",
     "Không có lỗi JavaScript khi chạy"
   ],
   "errors": []

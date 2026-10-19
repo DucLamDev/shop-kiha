@@ -154,7 +154,7 @@ export function PageHeader({ eyebrow, title, description, children }) {
     <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
         {eyebrow && <p className="eyebrow mb-2">{eyebrow}</p>}
-        <h1 className="text-2xl font-extrabold tracking-[-0.03em] sm:text-3xl">{title}</h1>
+        <h1 className="display-title text-3xl sm:text-4xl">{title}</h1>
         {description && <p className="mt-1.5 text-[15px] text-muted-foreground">{description}</p>}
       </div>
       {children && <div className="flex shrink-0 flex-wrap gap-2">{children}</div>}
@@ -426,7 +426,7 @@ export function MediaPicker({
                       className={cn(
                         'group relative block aspect-square w-full overflow-hidden rounded-xl border-2 bg-secondary transition-[border-color,box-shadow]',
                         order >= 0
-                          ? 'border-walnut shadow-[0_0_0_3px_rgb(107_74_53/0.18)]'
+                          ? 'border-olive shadow-[0_0_0_3px_rgb(95_106_82/0.2)]'
                           : 'border-transparent hover:border-charcoal/20',
                       )}
                     >
@@ -435,13 +435,13 @@ export function MediaPicker({
                         className={cn(
                           'absolute top-1.5 right-1.5 flex size-6 items-center justify-center rounded-full border text-[11px] font-bold transition-colors',
                           order >= 0
-                            ? 'border-walnut bg-walnut text-white'
-                            : 'border-white/80 bg-black/20 text-transparent',
+                            ? 'border-olive bg-primary text-charcoal'
+                            : 'border-white bg-white/70 text-transparent',
                         )}
                       >
                         {order >= 0 ? multiple ? order + 1 : <Check className="size-3.5" /> : ''}
                       </span>
-                      <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-2 pt-4 pb-1.5 text-left text-[10px] text-white">
+                      <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-ivory to-ivory/0 px-2 pt-4 pb-1.5 text-left text-[10px] text-charcoal">
                         {m.name}
                       </span>
                     </button>

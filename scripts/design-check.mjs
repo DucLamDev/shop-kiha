@@ -57,6 +57,9 @@ try {
         '--primary',
         '--primary-foreground',
         '--card',
+        '--kiha-walnut',
+        '--kiha-olive',
+        '--kiha-sage',
       ].map((k) => [k, css.getPropertyValue(k).trim()]),
     );
   });
@@ -65,10 +68,32 @@ try {
     ['--muted-foreground', '--background'],
     ['--muted-foreground', '--card'],
     ['--primary-foreground', '--primary'],
-    ['--primary', '--background'],
+    ['--kiha-walnut', '--background'],
+    ['--kiha-walnut', '--kiha-sage'],
+    ['--kiha-olive', '--background'],
   ])
     assert.ok(contrast(tokens[fg], tokens[bg]) >= 4.5, `${fg} on ${bg}`);
-  pass('Bảng màu kem – gỗ – nâu trầm – than đạt tương phản WCAG AA cho chữ');
+  pass('Bảng màu kem – sage – nâu trầm đạt tương phản WCAG AA cho chữ');
+  // Yêu cầu thiết kế: không thành phần nào dùng nền đen/tối.
+  async function darkBackgrounds(target) {
+    return target.evaluate(() => {
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = 1;
+      const g = cv.getContext('2d', { willReadFrequently: true });
+      return [...document.querySelectorAll('body *')]
+        .filter((el) => {
+          const bg = getComputedStyle(el).backgroundColor;
+          if (!bg || bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') return false;
+          g.fillStyle = '#fff';
+          g.fillRect(0, 0, 1, 1);
+          g.fillStyle = bg;
+          g.fillRect(0, 0, 1, 1);
+          const [r, gg, b] = g.getImageData(0, 0, 1, 1).data;
+          return (0.2126 * r + 0.7152 * gg + 0.0722 * b) / 255 < 0.45;
+        })
+        .map((el) => `${el.tagName}.${String(el.className).slice(0, 60)}`);
+    });
+  }
 
   const fonts = await page.evaluate(() => ({
     body: getComputedStyle(document.body).fontFamily,
@@ -95,12 +120,12 @@ try {
   if (settings.heroImage?.endsWith('.webp'))
     assert.match(
       await page.locator('section[aria-labelledby="hero-title"]').innerText(),
-      /Hình minh họa AI/,
+      /Hình ảnh AI/,
     );
   pass('Hero hiện mềm khi tải, header dính, ảnh minh họa AI có chú thích');
 
   const reveal = page
-    .locator('#featured-title')
+    .locator('#collection-title')
     .locator('xpath=ancestor::section//*[@data-reveal]')
     .first();
   assert.ok(Number(await reveal.evaluate((el) => getComputedStyle(el).opacity)) < 0.5);
@@ -116,7 +141,10 @@ try {
   }
   await page.screenshot({ path: path.join(reports, 'redesign-desktop.png'), fullPage: true });
 
-  const card = page.locator('#featured-title').locator('xpath=ancestor::section//article').first();
+  const card = page
+    .locator('#collection-title')
+    .locator('xpath=ancestor::section//article')
+    .first();
   await card.scrollIntoViewIfNeeded();
   const before = await card.locator('img').evaluate((img) => getComputedStyle(img).scale);
   await card.hover();
@@ -199,6 +227,13 @@ try {
     }
   }
   pass('Không tràn ngang ở 320, 390, 768, 1024 và 1440px trên 4 trang khách hàng');
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  for (const route of ['/', '/san-pham', detail, '/lien-he', '/admin/dang-nhap']) {
+    await page.goto(`${base}${route}`, { waitUntil: 'networkidle' });
+    assert.deepEqual(await darkBackgrounds(page), [], `Nền tối trên ${route}`);
+  }
+  pass('Không thành phần nào dùng nền đen/tối (trang khách hàng và đăng nhập)');
 
   assert.deepEqual(errors, []);
   pass('Không có lỗi JavaScript khi chạy');

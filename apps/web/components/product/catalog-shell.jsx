@@ -66,7 +66,7 @@ function CatalogToolbar({ current, categories, hasPrices }) {
   const options = sortOptions.filter((o) => hasPrices || !o.needsPrice);
   const chips = [{ slug: '', name: 'Tất cả' }, ...categories];
   return (
-    <div className="mt-8 grid grid-cols-1 gap-4 border-y py-5 lg:sticky lg:top-[4.75rem] lg:z-30 lg:-mx-4 lg:rounded-b-2xl lg:border-x lg:border-t-0 lg:bg-ivory/90 lg:px-4 lg:backdrop-blur-md">
+    <div className="mt-8 grid grid-cols-1 gap-4 border-y py-5 border-walnut/12 lg:sticky lg:top-24 lg:z-30 lg:-mx-4 lg:rounded-3xl lg:border lg:bg-ivory/92 lg:px-4 lg:backdrop-blur-md">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <form
           role="search"
@@ -90,7 +90,7 @@ function CatalogToolbar({ current, categories, hasPrices }) {
             maxLength={120}
             placeholder="Tìm tên giường, ví dụ: gấp 3 khúc"
             aria-label="Tìm sản phẩm theo tên"
-            className="h-12 w-full rounded-full border border-input bg-white pr-28 pl-11 text-[15px] shadow-[inset_0_1px_1px_rgb(38_36_34/0.03)] transition-[border-color,box-shadow] outline-none placeholder:text-muted-foreground/75 hover:border-charcoal/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20 [&::-webkit-search-cancel-button]:hidden"
+            className="h-12 w-full rounded-full border border-input bg-white pr-28 pl-11 text-[15px] shadow-[inset_0_1px_1px_rgb(38_36_34/0.03)] transition-[border-color,box-shadow] outline-none placeholder:text-muted-foreground/75 hover:border-walnut/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20 [&::-webkit-search-cancel-button]:hidden"
           />
           {current.category && <input type="hidden" name="category" value={current.category} />}
           {current.sort !== 'featured' && <input type="hidden" name="sort" value={current.sort} />}
@@ -105,7 +105,7 @@ function CatalogToolbar({ current, categories, hasPrices }) {
           )}
           <button
             type="submit"
-            className="absolute top-1.5 right-1.5 bottom-1.5 inline-flex items-center rounded-full bg-charcoal px-4 font-display text-[13px] font-semibold text-ivory transition-colors hover:bg-walnut"
+            className="absolute top-1.5 right-1.5 bottom-1.5 inline-flex items-center rounded-full bg-primary px-5 font-display text-[13px] font-medium text-primary-foreground transition-colors hover:bg-sage-deep"
           >
             Tìm
           </button>
@@ -139,7 +139,7 @@ function CatalogToolbar({ current, categories, hasPrices }) {
                   {active && (
                     <motion.span
                       layoutId="catalog-chip"
-                      className="absolute inset-0 rounded-full bg-charcoal"
+                      className="absolute inset-0 rounded-full bg-primary"
                       transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                     />
                   )}
@@ -147,10 +147,10 @@ function CatalogToolbar({ current, categories, hasPrices }) {
                     href={catalogHref(current, { category: c.slug })}
                     aria-current={active ? 'true' : undefined}
                     className={cn(
-                      'relative z-10 block rounded-full border px-4 py-2 font-display text-[13px] font-semibold whitespace-nowrap transition-colors',
+                      'relative z-10 block rounded-full border px-4 py-2 font-display text-[13px] whitespace-nowrap transition-colors',
                       active
-                        ? 'border-transparent text-ivory'
-                        : 'border-charcoal/12 bg-white/70 text-charcoal/80 hover:border-charcoal/30 hover:text-charcoal',
+                        ? 'border-transparent text-charcoal'
+                        : 'border-walnut/15 bg-white/60 text-charcoal/75 hover:border-walnut/35 hover:text-walnut',
                     )}
                   >
                     {c.name}
@@ -162,7 +162,7 @@ function CatalogToolbar({ current, categories, hasPrices }) {
         </nav>
         <span
           className={cn(
-            'flex size-8 shrink-0 items-center justify-center text-walnut transition-opacity',
+            'flex size-8 shrink-0 items-center justify-center text-olive transition-opacity',
             isPending ? 'opacity-100' : 'opacity-0',
           )}
           role="status"

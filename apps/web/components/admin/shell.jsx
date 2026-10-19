@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
+import { Brand } from '@/components/site/brand';
 import { cn } from '@/lib/utils';
 import {
   Sheet,
@@ -48,12 +49,14 @@ function SidebarNav({ pathname, onNavigate }) {
             aria-current={active ? 'page' : undefined}
             className={cn(
               'relative flex items-center gap-3 rounded-xl px-3 py-2.5 font-display text-sm font-semibold transition-colors',
-              active ? 'bg-ivory/12 text-ivory' : 'text-ivory/65 hover:bg-ivory/6 hover:text-ivory',
+              active
+                ? 'bg-white text-walnut shadow-soft'
+                : 'text-charcoal/70 hover:bg-white/60 hover:text-walnut',
             )}
           >
             {active && (
               <span
-                className="absolute top-2 bottom-2 left-0 w-1 rounded-full bg-wood"
+                className="absolute top-2 bottom-2 left-0 w-1 rounded-full bg-olive-light"
                 aria-hidden="true"
               />
             )}
@@ -68,37 +71,35 @@ function SidebarNav({ pathname, onNavigate }) {
 
 function SidebarContent({ admin, pathname, onNavigate, onLogout }) {
   return (
-    <div className="flex h-full flex-col bg-charcoal px-4 py-6 text-ivory">
-      <Link href="/admin" onClick={onNavigate} className="px-3">
-        <span className="font-display text-[1.9rem] leading-none font-extrabold tracking-[-0.06em]">
-          kiha<span className="text-wood">.</span>
-        </span>
-        <span className="mt-1 block text-[11px] font-bold tracking-[0.16em] text-ivory/50 uppercase">
+    <div className="flex h-full flex-col border-r border-walnut/10 bg-sage px-4 py-6 text-charcoal">
+      <div className="px-3" onClickCapture={onNavigate}>
+        <Brand href="/admin" />
+        <span className="mt-2 block text-[11px] tracking-[0.16em] text-olive uppercase">
           Quản trị website
         </span>
-      </Link>
+      </div>
       <div className="mt-10">
         <SidebarNav pathname={pathname} onNavigate={onNavigate} />
       </div>
-      <div className="mt-auto grid gap-1 border-t border-ivory/10 pt-4">
+      <div className="mt-auto grid gap-1 border-t border-walnut/10 pt-4">
         <a
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-ivory/70 transition-colors hover:bg-ivory/6 hover:text-ivory"
+          className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-charcoal/70 transition-colors hover:bg-white/60 hover:text-walnut"
         >
           Xem website
           <ArrowUpRight className="size-4" />
         </a>
         <div className="px-3 pt-3 pb-1">
-          <p className="text-[11px] tracking-wide text-ivory/45 uppercase">Đăng nhập với</p>
-          <p className="truncate text-sm text-ivory/85" title={admin.email}>
+          <p className="text-[11px] tracking-wide text-muted-foreground uppercase">Đăng nhập với</p>
+          <p className="truncate text-sm text-charcoal" title={admin.email}>
             {admin.email}
           </p>
         </div>
         <button
           onClick={onLogout}
-          className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm text-ivory/70 transition-colors hover:bg-ivory/6 hover:text-ivory"
+          className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm text-charcoal/70 transition-colors hover:bg-white/60 hover:text-walnut"
         >
           <LogOut className="size-4" />
           Đăng xuất
@@ -140,7 +141,7 @@ export function AdminShell({ admin, children }) {
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="border-0 p-0 [&>button]:text-ivory/70 [&>button:hover]:bg-ivory/10"
+              className="border-0 p-0 [&>button]:text-charcoal/70 [&>button:hover]:bg-white/60"
             >
               <SheetTitle className="sr-only">Menu quản trị</SheetTitle>
               <SheetDescription className="sr-only">

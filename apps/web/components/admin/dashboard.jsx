@@ -89,7 +89,7 @@ export function Dashboard() {
                 <span className="flex size-10 items-center justify-center rounded-xl bg-secondary text-walnut">
                   <Icon className="size-5" />
                 </span>
-                <p className="mt-4 font-display text-3xl font-extrabold tracking-tight">{value}</p>
+                <p className="mt-4 font-display text-3xl tracking-[-0.03em] text-walnut">{value}</p>
                 <p className="mt-0.5 text-sm text-muted-foreground">{label}</p>
               </Card>
             </Link>

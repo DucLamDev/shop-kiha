@@ -161,7 +161,7 @@ function ProductEditor({ initial, categories, id }) {
       <div className="mt-3 mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-extrabold tracking-[-0.03em] sm:text-3xl">
+            <h1 className="display-title text-3xl sm:text-4xl">
               {id ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm'}
             </h1>
             <Badge variant={published ? 'success' : 'muted'}>
@@ -273,7 +273,7 @@ function ProductEditor({ initial, categories, id }) {
                         key={src}
                         className={cn(
                           'overflow-hidden rounded-xl border-2 bg-white',
-                          cover ? 'border-walnut' : 'border-border',
+                          cover ? 'border-olive' : 'border-border',
                         )}
                       >
                         <div className="relative aspect-[4/3] bg-secondary">
@@ -287,7 +287,7 @@ function ProductEditor({ initial, categories, id }) {
                           <span
                             className={cn(
                               'absolute top-2 left-2 rounded-full px-2 py-0.5 text-[11px] font-bold',
-                              cover ? 'bg-walnut text-white' : 'bg-white/90 text-charcoal',
+                              cover ? 'bg-primary text-charcoal' : 'bg-white/90 text-charcoal',
                             )}
                           >
                             {cover ? 'Ảnh đại diện' : `Ảnh ${i + 1}`}

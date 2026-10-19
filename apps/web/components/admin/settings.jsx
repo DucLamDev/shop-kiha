@@ -274,7 +274,7 @@ function SettingsEditor({ initial }) {
                     key={i}
                     className="grid gap-3 rounded-2xl border bg-ivory/50 p-4 md:grid-cols-[2.25rem_1fr_1.4fr_auto] md:items-start"
                   >
-                    <span className="flex size-9 items-center justify-center rounded-full bg-walnut font-display text-sm font-bold text-ivory">
+                    <span className="flex size-9 items-center justify-center rounded-full bg-accent font-display text-sm text-olive">
                       {i + 1}
                     </span>
                     <Field label="Tiêu đề" required error={errors[`commitments.${i}.title`]}>

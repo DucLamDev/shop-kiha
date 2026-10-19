@@ -83,15 +83,21 @@ Mật khẩu phải dài ít nhất 14 ký tự, tối đa 72 byte UTF-8 theo gi
 
 ### Hệ thống thiết kế
 
-- Bảng màu theo hướng dẫn thương hiệu: kem ấm `#f6f1ea` (nền), gỗ tự nhiên `#c9a882`, nâu trầm (walnut) `#6b4a35` (màu nhấn, nút chính), than đen `#262422` (chữ), trắng (card). Khai báo một lần bằng CSS variables trong `apps/web/app/globals.css`, đặt tên theo quy ước shadcn/ui (`--background`, `--primary`, `--muted-foreground`…). Các cặp chữ/nền chính đạt tương phản WCAG AA (≥ 4.5:1), được kiểm tra tự động trong `npm run test:design`.
-- Chữ: Be Vietnam Pro cho nội dung, Manrope cho tiêu đề và nút, tải qua `next/font` (có bộ ký tự tiếng Việt, không gọi font ngoài lúc chạy).
-- Component shadcn/ui (Radix) tại `components/ui/`: button, badge, card, input/textarea, label, select, switch, checkbox, dialog, alert-dialog, sheet (drawer), accordion, tabs, table, skeleton. Hiệu ứng mở/đóng dùng `tw-animate-css`.
-- Chuyển động: hero hiện dần bằng CSS (không chờ hydrate), nội dung xuất hiện khi cuộn (Motion), card nhấc nhẹ và phóng ảnh khi hover, menu điện thoại dạng drawer, chip lọc có chỉ báo trượt, gallery chuyển ảnh mờ dần và vuốt được, skeleton khi tải. `prefers-reduced-motion` tắt chuyển động vị trí; trình duyệt tắt JavaScript vẫn thấy toàn bộ nội dung.
-- Ảnh trang trí do imagegen tạo (prompt tại `data/editorial-prompts.json`, ánh xạ tại `data/editorial-media.json`) luôn có chú thích “Hình minh họa AI”; sản phẩm và danh mục chỉ dùng ảnh thật của KIHA. Đổi ảnh đầu trang và ảnh giới thiệu tại **Quản trị → Cài đặt → Hình ảnh thương hiệu**. 39 ảnh gốc trong `img/` được giữ nguyên.
+- Bố cục theo 2 mẫu thiết kế (máy tính + điện thoại) chủ shop cung cấp: header dạng viên nổi trên ảnh, hero tràn viền có điểm chú thích và thẻ “Tìm chiếc giường của bạn”, dải xanh xô thơm bo cong, ảnh phối cảnh bo vòm, lưới danh mục kẻ mảnh, footer xanh nhạt.
+- Bảng màu: kem `#faf7f1` (nền), be `#efe7da`, xanh xô thơm `#e6eadf` / `#c9d3ba` (dải nền, nút chính), ô liu `#5f6a52` (chữ nhấn nhỏ), nâu trầm `#6b4a35` (tiêu đề), nâu đậm `#3e3128` (chữ), trắng. **Không thành phần nào dùng nền đen/tối**, kể cả lớp phủ hộp thoại, lightbox, sidebar admin; `npm run test:design` kiểm tra tự động điều này cùng độ tương phản WCAG AA. Token khai báo trong `apps/web/app/globals.css` theo quy ước shadcn/ui.
+- Chữ: Be Vietnam Pro cho nội dung, Manrope nét mảnh cho tiêu đề (`display-title`), tải qua `next/font`.
+- Component shadcn/ui (Radix) tại `components/ui/`; hiệu ứng mở/đóng dùng `tw-animate-css`.
+- Chuyển động: hero hiện dần bằng CSS, nội dung xuất hiện khi cuộn (Motion), card nhấc nhẹ và phóng ảnh khi hover, điểm chú thích nhấp nháy nhẹ, tab giường gấp trượt, menu điện thoại dạng drawer. `prefers-reduced-motion` tắt chuyển động vị trí; tắt JavaScript vẫn thấy toàn bộ nội dung.
+
+### Ảnh trang trí
+
+- 15 ảnh trong `apps/web/public/media/decoration/` (giữ nguyên file gốc, kể cả các bản “- Copy”). `npm run media:decoration` tạo bản sao tên SHA-256 trong `public/media/` và ghi `data/decoration-media.json` (vai trò từng ảnh: hero, phòng ngủ, căn hộ, nhà phố, chi tiết, câu chuyện, nền tư vấn, nhành ô liu, video, hỏi đáp…). Seed đăng ký các ảnh này vào thư viện nên admin chọn được làm ảnh đầu trang/giới thiệu.
+- Ảnh trang trí luôn có chú thích “Gợi ý không gian · Hình ảnh AI”; sản phẩm và danh mục chỉ dùng ảnh thật của KIHA.
+- Cài đặt có sẵn từ bản cũ: chạy `npm run design:apply` (khi MongoDB đang chạy) để đổi ảnh đầu trang/giới thiệu và nội dung mặc định cũ sang ảnh + câu chữ của mẫu mới (`data/home-copy.json`). Nội dung admin đã tự sửa được giữ nguyên.
 
 ### Khách hàng
 
-- **Trang chủ:** thanh thông báo kèm hotline, header dính có menu và nút Zalo, hero với ảnh lớn + thẻ “Mẫu nổi bật” + số liệu thật (số sản phẩm, số danh mục), lưới danh mục kèm số mẫu, sản phẩm nổi bật do admin chọn (chưa chọn thì hiện mẫu mới), phần Về KIHA và cam kết lấy từ cấu hình, khối kêu gọi tư vấn Zalo, footer đầy đủ liên hệ và danh mục.
+- **Trang chủ** (theo thứ tự mẫu): hero, “Góc nghỉ, theo cách bạn”, lưới danh mục kèm số mẫu thật, bộ sưu tập (sản phẩm nổi bật do admin chọn, chưa chọn thì hiện mẫu mới), “Nhìn gần hơn”, giường gấp (tab Gấp gọn / Giường–sofa hiện mẫu thật của từng nhóm), Về KIHA (tiêu đề, nội dung từ cấu hình), các bước tư vấn (mục cam kết trong cấu hình), dẫn sang TikTok (chỉ hiện khi có link), hỏi đáp (kèm JSON-LD `FAQPage`, câu trả lời không tự đặt chính sách), khối tư vấn Zalo, footer.
 - **Sản phẩm (`/san-pham`):** tìm kiếm, chip danh mục, sắp xếp (chỉ hiện sắp xếp theo giá khi có sản phẩm có giá), phân trang số trang. Mọi bộ lọc nằm trên URL, chia sẻ được và hoạt động với back/forward; danh sách cũ mờ đi trong lúc server trả kết quả mới. Có trạng thái rỗng, lỗi, trang vượt số trang và skeleton.
 - **Chi tiết (`/san-pham/[slug]`):** gallery có thumbnail, vuốt trên điện thoại, lightbox toàn màn hình dùng phím mũi tên; giá hoặc “Liên hệ báo giá”; nút Zalo, gọi điện, sao chép tên + link để dán vào Zalo (Zalo không hỗ trợ điền sẵn tin nhắn nên không giả lập); cam kết, mô tả, thông số dạng accordion; video; sản phẩm liên quan; thanh Zalo/Gọi cố định ở đáy màn hình điện thoại có chừa vùng an toàn.
 - **Liên hệ (`/lien-he`):** thẻ cho từng kênh (Zalo, điện thoại, Facebook, TikTok, Google Maps) lấy từ cấu hình, kênh chưa có ghi “Đang cập nhật” thay vì link giả; bản đồ nhúng khi có địa chỉ chữ; các bước đặt giường.
@@ -222,7 +228,7 @@ API test chạy 23 trường hợp với database tạm độc lập: auth, CSRF
 
 Browser QA (14 nhóm) dùng Playwright + Chrome headless, kiểm tra desktop 1440 px, tablet 768 px và mobile 390 px. Có thao tác tạo/sửa/xuất bản/xóa dữ liệu QA, lựa chọn và sắp xếp ảnh, bật/tắt nổi bật và hiển thị ngay trên bảng, cập nhật lại cấu hình không thay đổi giá trị, thử lỗi API rồi retry. Script chỉ xóa các bản ghi QA do chính lần chạy tạo ra. Kỳ vọng về kênh liên hệ đọc từ cấu hình đang lưu, không ghi cứng. Kết quả ghi ở `reports/browser-results.json`; screenshots trong `reports/`.
 
-Design QA (11 nhóm, `npm run test:design`) kiểm tra tương phản màu, font, hero, scroll reveal, hover card, nút Zalo nổi, bộ lọc với back/forward, `prefers-reduced-motion`, thanh CTA mobile và không tràn ngang ở 320–1440 px trên 4 trang khách hàng. Kết quả ở `reports/redesign-results.json`.
+Design QA (12 nhóm, `npm run test:design`) kiểm tra tương phản màu, không có nền tối, font, hero, scroll reveal, hover card, nút Zalo nổi, bộ lọc với back/forward, `prefers-reduced-motion`, thanh CTA mobile và không tràn ngang ở 320–1440 px trên 4 trang khách hàng. Kết quả ở `reports/redesign-results.json`.
 
 ## Triển khai production
 
