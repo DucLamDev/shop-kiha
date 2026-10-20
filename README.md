@@ -67,6 +67,33 @@ Toàn bộ cấu hình ban đầu đặt trong `.env` tại root; xem `.env.exam
 
 Frontend gọi `/api` cùng origin. Next.js chuyển tiếp sang Express; trình duyệt không cần biết địa chỉ backend. Sau khi seed, cấu hình liên hệ và nội dung thương hiệu nằm trong MongoDB, được sửa tại `/admin/cai-dat`. Chạy lại seed **không ghi đè** nội dung admin đã chỉnh. `.env` local đã chứa thông tin liên hệ chủ shop cung cấp trong phiên làm việc.
 
+## Cấu hình project frontend trên Vercel
+
+Repository dùng npm workspaces với `package-lock.json` ở root. Trong **Project → Settings → Build and Deployment**, đặt:
+
+| Cài đặt | Giá trị |
+| --- | --- |
+| Root Directory | `apps/web` |
+| Include source files outside of the Root Directory in the Build Step | Bật |
+| Framework Preset | Next.js |
+| Install Command | `npm ci --include=dev` |
+| Build Command | `npm run build` |
+| Output Directory | `.next` |
+
+`apps/web/vercel.json` lưu các lệnh install/build và output directory trong source. Gỡ override cũ `npm install --prefix=../../` trên dashboard. npm tự nhận workspace và lockfile; không thêm `--prefix` hoặc `cd ../..` vào lệnh cài đặt. Sau khi đẩy commit chứa cấu hình lên GitHub, deploy commit mới.
+
+Nếu log báo `Tracker "idealTree" already exists` ngay sau lệnh `npm install --prefix=../../`, sửa Install Command như trên rồi redeploy. Log này cho thấy lỗi xảy ra trong bước npm install, trước khi Next.js build. Nếu vẫn lỗi, cần xem npm debug log đầy đủ để xác định nguyên nhân còn lại; không xóa lockfile để thử vận may.
+
+Frontend cần các biến môi trường trên Vercel:
+
+- `API_INTERNAL_URL`: URL HTTPS của Express API đã triển khai, không kèm `/api` ở cuối. Không dùng `localhost`, `127.0.0.1` hoặc URL của chính frontend.
+- `SITE_URL`: URL HTTPS của website.
+- `MONGOMS_DISABLE_POSTINSTALL=1`: bỏ tải binary MongoDB dùng cho test/local trong bước cài dependency trên Vercel.
+
+Đây là cấu hình triển khai **frontend**. Backend Express, MongoDB và kho video cần được triển khai riêng theo kiến trúc đã chọn; build frontend thành công không tự chuyển database local hoặc file video lên cloud. API cần `ALLOWED_ORIGINS` khớp URL frontend để admin đăng nhập và lưu dữ liệu.
+
+Tham khảo: [Vercel monorepos](https://vercel.com/docs/monorepos), [npm workspaces](https://docs.npmjs.com/cli/using-npm/workspaces/), [npm ci](https://docs.npmjs.com/cli/commands/npm-ci/).
+
 ## Khởi tạo admin an toàn
 
 Đối với môi trường thật, cung cấp `ADMIN_EMAIL` và `ADMIN_PASSWORD` qua môi trường hoặc file `.env` không commit, sau đó chạy:
