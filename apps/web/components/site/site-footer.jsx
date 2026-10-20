@@ -2,23 +2,25 @@ import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { Brand } from '@/components/site/brand';
 import { telHref } from '@/lib/contact';
+import { SocialIcon } from '@/components/site/social-icon';
+import { shopLocation } from '@/lib/shop-location';
 
-const linkClass =
-  'inline-flex items-center gap-1 text-[15px] text-muted-foreground transition-colors hover:text-walnut';
+const linkClass = 'footer-link inline-flex items-center gap-1 text-[15px] text-muted-foreground';
 
 function External({ href, children }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className={linkClass}>
       {children}
-      <ArrowUpRight className="size-3.5" />
+      <ArrowUpRight aria-hidden="true" className="footer-link-arrow size-3.5 shrink-0" />
     </a>
   );
 }
 
-// Footer nền xanh nhạt, bo góc như mẫu; mọi liên kết liên hệ lấy từ cấu hình.
+// Footer nền kem ấm; mọi liên kết liên hệ lấy từ cấu hình.
 export function SiteFooter({ settings, categories = [] }) {
   const s = settings || {};
   const phoneHref = telHref(s.phone);
+  const mapsUrl = shopLocation(s).openUrl;
   return (
     <footer className="rounded-t-[3rem] bg-sage-soft pb-28 sm:rounded-tl-[6rem] sm:rounded-tr-none md:pb-0">
       <div className="container-page grid gap-12 pt-16 pb-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:pt-20">
@@ -70,22 +72,26 @@ export function SiteFooter({ settings, categories = [] }) {
             {phoneHref && (
               <li>
                 <a href={phoneHref} className={linkClass}>
+                  <SocialIcon channel="phone" className="mr-1 size-4" />
                   {s.phone}
                 </a>
               </li>
             )}
             {s.zaloUrl && (
               <li>
-                <External href={s.zaloUrl}>Zalo {s.shopName || 'KIHA'}</External>
+                <External href={s.zaloUrl}>
+                  <SocialIcon channel="zalo" className="mr-1 size-5" />
+                  Zalo {s.shopName || 'KIHA'}
+                </External>
               </li>
             )}
             {s.address && <li className="text-[15px] text-muted-foreground">{s.address}</li>}
-            {s.mapsUrl && (
+            {mapsUrl && (
               <li>
-                <External href={s.mapsUrl}>Xem vị trí trên Google Maps</External>
+                <External href={mapsUrl}>Xem vị trí trên Google Maps</External>
               </li>
             )}
-            {!phoneHref && !s.zaloUrl && !s.mapsUrl && (
+            {!phoneHref && !s.zaloUrl && !mapsUrl && (
               <li className="text-[15px] text-muted-foreground">Thông tin đang được cập nhật.</li>
             )}
           </ul>
@@ -96,12 +102,18 @@ export function SiteFooter({ settings, categories = [] }) {
             <ul className="mt-5 space-y-3">
               {s.facebookUrl && (
                 <li>
-                  <External href={s.facebookUrl}>Facebook</External>
+                  <External href={s.facebookUrl}>
+                    <SocialIcon channel="facebook" className="mr-1 size-5" />
+                    Facebook
+                  </External>
                 </li>
               )}
               {s.tiktokUrl && (
                 <li>
-                  <External href={s.tiktokUrl}>TikTok</External>
+                  <External href={s.tiktokUrl}>
+                    <SocialIcon channel="tiktok" className="mr-1 size-5" />
+                    TikTok
+                  </External>
                 </li>
               )}
             </ul>
@@ -113,7 +125,7 @@ export function SiteFooter({ settings, categories = [] }) {
           <p>
             © {new Date().getFullYear()} {s.shopName || 'Nội Thất KIHA'} · Giường ngủ pallet
           </p>
-          <p>Ảnh sản phẩm do KIHA cung cấp · Ảnh không gian là hình minh họa AI</p>
+          <p>Ảnh sản phẩm do KIHA cung cấp · Ảnh không gian là hình minh họa</p>
         </div>
       </div>
     </footer>

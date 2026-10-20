@@ -108,6 +108,25 @@ export const Settings = model(
       facebookUrl: String,
       tiktokUrl: String,
       mapsUrl: String,
+      mapLocation: {
+        type: new Schema(
+          {
+            latitude: { type: Number, min: -90, max: 90, required: true },
+            longitude: { type: Number, min: -180, max: 180, required: true },
+          },
+          { _id: false },
+        ),
+        default: null,
+      },
+      statistics: {
+        salesCount: { type: Number, min: 0, default: null },
+        interestedCount: { type: Number, min: 0, default: null },
+        positiveReviewCount: { type: Number, min: 0, default: null },
+        customerCount: { type: Number, min: 0, default: null },
+        ratingAverage: { type: Number, min: 0, max: 5, default: null },
+        reviewCount: { type: Number, min: 0, default: null },
+        source: { type: String, default: '' },
+      },
       address: String,
       logo: String,
       heroImage: String,

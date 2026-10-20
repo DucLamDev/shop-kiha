@@ -3,10 +3,9 @@ import Link from 'next/link';
 import { ArrowRight, Feather } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Reveal } from '@/components/site/reveal';
-import { illustrationCaption } from '@/lib/editorial-assets';
 import { lines } from '@/lib/utils';
 
-// Tiêu đề lấy từ cấu hình; hai chữ cuối của dòng cuối được nhấn màu ô liu như mẫu.
+// Tiêu đề lấy từ cấu hình; hai chữ cuối được nhấn màu nâu gỗ.
 function Title({ text }) {
   const all = lines(text);
   return all.map((line, i) => {
@@ -30,7 +29,6 @@ function Title({ text }) {
 export function AboutSection({ settings }) {
   const s = settings;
   const image = s.aboutImage || s.heroImage;
-  const caption = illustrationCaption(image);
   if (!s.aboutTitle && !s.aboutDescription) return null;
   return (
     <section id="ve-kiha" aria-labelledby="about-title" className="px-3 sm:px-5">
@@ -63,16 +61,11 @@ export function AboutSection({ settings }) {
               {image && (
                 <Image
                   src={image}
-                  alt={caption || 'Một góc nghỉ với giường gỗ pallet'}
+                  alt="Một góc nghỉ với giường gỗ pallet"
                   fill
                   sizes="(max-width: 1024px) 94vw, 40vw"
                   className="object-cover"
                 />
-              )}
-              {caption && (
-                <span className="absolute bottom-4 left-4 rounded-full bg-white/85 px-3 py-1 text-[11px] text-muted-foreground backdrop-blur">
-                  {caption}
-                </span>
               )}
             </div>
             <span

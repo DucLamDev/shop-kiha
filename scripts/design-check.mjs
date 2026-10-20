@@ -73,8 +73,8 @@ try {
     ['--kiha-olive', '--background'],
   ])
     assert.ok(contrast(tokens[fg], tokens[bg]) >= 4.5, `${fg} on ${bg}`);
-  pass('Bảng màu kem – sage – nâu trầm đạt tương phản WCAG AA cho chữ');
-  // Yêu cầu thiết kế: không thành phần nào dùng nền đen/tối.
+  pass('Bảng màu kem – gỗ – nâu trầm đạt tương phản WCAG AA cho chữ');
+  // Không có nền đen/than. Nâu gỗ là một màu thương hiệu được phép dùng.
   async function darkBackgrounds(target) {
     return target.evaluate(() => {
       const cv = document.createElement('canvas');
@@ -89,7 +89,7 @@ try {
           g.fillStyle = bg;
           g.fillRect(0, 0, 1, 1);
           const [r, gg, b] = g.getImageData(0, 0, 1, 1).data;
-          return (0.2126 * r + 0.7152 * gg + 0.0722 * b) / 255 < 0.45;
+          return Math.max(r, gg, b) < 90 && Math.max(r, gg, b) - Math.min(r, gg, b) < 20;
         })
         .map((el) => `${el.tagName}.${String(el.className).slice(0, 60)}`);
     });
@@ -117,12 +117,43 @@ try {
     'sticky',
   );
   await page.screenshot({ path: path.join(reports, 'redesign-desktop-hero.png') });
-  if (settings.heroImage?.endsWith('.webp'))
-    assert.match(
-      await page.locator('section[aria-labelledby="hero-title"]').innerText(),
-      /Hình ảnh AI/,
-    );
-  pass('Hero hiện mềm khi tải, header dính, ảnh minh họa AI có chú thích');
+  assert.doesNotMatch(await page.locator('main').innerText(), /Hình ảnh AI|Gợi ý phối cảnh/);
+  const logo = page.locator('header .kiha-brand img');
+  assert.equal(await logo.getAttribute('alt'), settings.shopName);
+  assert.ok((await logo.getAttribute('src')).includes(encodeURIComponent(settings.logo)));
+  pass('Logo thật hiển thị, header dính, các nhãn ảnh AI đã được gỡ');
+
+  const carousel = page.locator('[data-hero-carousel]');
+  assert.equal(await carousel.locator('.hero-controls').count(), 0);
+  assert.equal(await carousel.getByText('Gỗ mộc, nắng ấm', { exact: true }).count(), 0);
+  await page.waitForFunction(() =>
+    [...document.querySelectorAll('.hero-frame img')].every(
+      (img) => img.complete && img.naturalWidth > 0,
+    ),
+  );
+  const initialSlide = await carousel.getAttribute('data-active-slide');
+  await page.waitForFunction(
+    (initial) => document.querySelector('[data-hero-carousel]').dataset.activeSlide !== initial,
+    initialSlide,
+    { timeout: 10000 },
+  );
+  // The visual toolbar is removed; keyboard users retain a focus-only pause action.
+  const pause = page.getByRole('button', { name: 'Tạm dừng banner', exact: true });
+  await pause.focus();
+  await page.keyboard.press('Enter');
+  await page.locator('header a').first().focus();
+  const pausedSlide = await carousel.getAttribute('data-active-slide');
+  await page.waitForTimeout(6800);
+  assert.equal(await carousel.getAttribute('data-active-slide'), pausedSlide);
+  await page.getByRole('button', { name: 'Phát tự động banner', exact: true }).focus();
+  await page.keyboard.press('Enter');
+  await page.locator('header a').first().focus();
+  await page.waitForFunction(
+    (previous) => document.querySelector('[data-hero-carousel]').dataset.activeSlide !== previous,
+    pausedSlide,
+    { timeout: 10000 },
+  );
+  pass('Banner tự chuyển, đã bỏ nhãn và thanh điều khiển; vẫn hỗ trợ dừng bằng bàn phím');
 
   const reveal = page
     .locator('#collection-title')
@@ -146,12 +177,45 @@ try {
     .locator('xpath=ancestor::section//article')
     .first();
   await card.scrollIntoViewIfNeeded();
-  const before = await card.locator('img').evaluate((img) => getComputedStyle(img).scale);
+  const before = await card
+    .locator('img')
+    .first()
+    .evaluate((img) => getComputedStyle(img).scale);
   await card.hover();
   await page.waitForTimeout(800);
-  const after = await card.locator('img').evaluate((img) => getComputedStyle(img).scale);
+  const after = await card
+    .locator('img')
+    .first()
+    .evaluate((img) => getComputedStyle(img).scale);
   assert.notEqual(before, after);
-  pass('Card sản phẩm nhấc nhẹ và phóng ảnh vừa phải khi hover');
+  pass('Card sản phẩm có phản hồi hover rõ với ảnh phóng và thẻ nâng lên');
+  const consult = card.locator('.product-consult-link');
+  await page.mouse.move(1, 1);
+  await page.waitForTimeout(350);
+  const consultBefore = await consult.evaluate((el) => getComputedStyle(el).backgroundColor);
+  await consult.hover();
+  await page.waitForTimeout(350);
+  assert.notEqual(
+    await consult.evaluate((el) => getComputedStyle(el).backgroundColor),
+    consultBefore,
+  );
+  assert.equal(await consult.getAttribute('href'), settings.zaloUrl);
+  await card.screenshot({ path: path.join(reports, 'kiha-consult-hover.png') });
+  const footerLink = page.locator('footer').getByRole('link', { name: 'Facebook', exact: true });
+  await footerLink.scrollIntoViewIfNeeded();
+  const footerBefore = await footerLink.evaluate((el) => getComputedStyle(el).backgroundColor);
+  await footerLink.hover();
+  await page.waitForTimeout(350);
+  assert.notEqual(
+    await footerLink.evaluate((el) => getComputedStyle(el).backgroundColor),
+    footerBefore,
+  );
+  assert.equal(
+    await footerLink.evaluate((el) => getComputedStyle(el, '::after').transform),
+    'matrix(1, 0, 0, 1, 0, 0)',
+  );
+  await page.locator('footer').screenshot({ path: path.join(reports, 'kiha-footer-hover.png') });
+  pass('Nút tư vấn đổi nền và nổi lên; liên kết footer có nền, gạch chân và chuyển động');
 
   await page.goto(`${base}/san-pham`, { waitUntil: 'networkidle' });
   const chips = page.getByRole('navigation', { name: 'Lọc theo danh mục' });
@@ -174,6 +238,9 @@ try {
 
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(base, { waitUntil: 'networkidle' });
+  const reducedSlide = await carousel.getAttribute('data-active-slide');
+  await page.waitForTimeout(6800);
+  assert.equal(await carousel.getAttribute('data-active-slide'), reducedSlide);
   assert.ok(
     parseFloat(
       await page.locator('#hero-title').evaluate((el) => getComputedStyle(el).animationDuration),
@@ -181,7 +248,7 @@ try {
   );
   await scrollThrough(page);
   assert.equal(await reveal.evaluate((el) => getComputedStyle(el).opacity), '1');
-  pass('Tôn trọng prefers-reduced-motion: tắt chuyển động, nội dung vẫn hiển thị');
+  pass('Giảm chuyển động: banner đứng yên, nội dung vẫn hiển thị đầy đủ');
 
   const mobile = await browser.newContext({
     viewport: { width: 390, height: 844 },
@@ -233,7 +300,7 @@ try {
     await page.goto(`${base}${route}`, { waitUntil: 'networkidle' });
     assert.deepEqual(await darkBackgrounds(page), [], `Nền tối trên ${route}`);
   }
-  pass('Không thành phần nào dùng nền đen/tối (trang khách hàng và đăng nhập)');
+  pass('Không thành phần nào dùng nền đen/than (trang khách hàng và đăng nhập)');
 
   assert.deepEqual(errors, []);
   pass('Không có lỗi JavaScript khi chạy');

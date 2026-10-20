@@ -252,6 +252,16 @@ test('settings allow known contact channels, reject XSS/SSRF-style URLs, and hid
     seoDescription: '',
     zaloUrl: 'https://zalo.me/0869572198',
     aboutImage: secondImage,
+    mapLocation: { latitude: 10.9413544, longitude: 106.9609977 },
+    statistics: {
+      salesCount: 1000,
+      interestedCount: 1500,
+      positiveReviewCount: 900,
+      customerCount: 245,
+      ratingAverage: 4.8,
+      reviewCount: 80,
+      source: 'Test fixture only',
+    },
   };
   await write('put', '/api/admin/settings', input).expect(200);
   for (const value of [
@@ -267,10 +277,52 @@ test('settings allow known contact channels, reject XSS/SSRF-style URLs, and hid
     ...input,
     aboutImage: `/media/${'f'.repeat(64)}.webp`,
   }).expect(422);
+  for (const mapLocation of [
+    { latitude: 91, longitude: 106 },
+    { latitude: 10, longitude: -181 },
+    { latitude: null, longitude: 106 },
+    { latitude: 10, longitude: 106, embedUrl: 'javascript:alert(1)' },
+  ]) {
+    await write('put', '/api/admin/settings', { ...input, mapLocation }).expect(422);
+  }
+  for (const statistics of [
+    { ...input.statistics, salesCount: -1 },
+    { ...input.statistics, salesCount: 100000001 },
+    { ...input.statistics, interestedCount: 1.5 },
+    { ...input.statistics, interestedCount: -1 },
+    { ...input.statistics, positiveReviewCount: '900' },
+    { ...input.statistics, positiveReviewCount: -1 },
+    { ...input.statistics, customerCount: -1 },
+    { ...input.statistics, customerCount: 1.5 },
+    { ...input.statistics, ratingAverage: 5.1 },
+    { ...input.statistics, reviewCount: '500' },
+  ]) {
+    await write('put', '/api/admin/settings', { ...input, statistics }).expect(422);
+  }
   const response = await request(app).get('/api/settings/public').expect(200);
   assert.equal(response.body.data.key, undefined);
   assert.equal(response.body.data._id, undefined);
   assert.equal(response.body.data.aboutImage, secondImage);
+  assert.deepEqual(response.body.data.mapLocation, input.mapLocation);
+  assert.deepEqual(response.body.data.statistics, input.statistics);
+  const cleared = await write('put', '/api/admin/settings', {
+    ...input,
+    mapLocation: null,
+    statistics: {
+      salesCount: 0,
+      interestedCount: null,
+      positiveReviewCount: 0,
+      customerCount: null,
+      ratingAverage: null,
+      reviewCount: null,
+      source: '',
+    },
+  }).expect(200);
+  assert.equal(cleared.body.data.mapLocation, null);
+  assert.equal(cleared.body.data.statistics.ratingAverage, null);
+  assert.equal(cleared.body.data.statistics.salesCount, 0);
+  assert.equal(cleared.body.data.statistics.interestedCount, null);
+  assert.equal(cleared.body.data.statistics.positiveReviewCount, 0);
   const media = await agent.get('/api/admin/media').expect(200);
   assert.equal(media.body.data.total, 2);
   assert.ok(!JSON.stringify(media.body).includes('C:\\'));

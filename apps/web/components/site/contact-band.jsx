@@ -59,11 +59,6 @@ export function ContactBand({
               )}
             </div>
           </div>
-          {image && (
-            <span className="absolute right-4 bottom-4 rounded-full bg-white/80 px-3 py-1 text-[11px] text-muted-foreground backdrop-blur">
-              Gợi ý không gian · Hình ảnh AI
-            </span>
-          )}
         </div>
       </Reveal>
     </section>

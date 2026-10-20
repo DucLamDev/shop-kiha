@@ -1,17 +1,19 @@
 {
-  "passed": 12,
+  "passed": 14,
   "results": [
-    "Bảng màu kem – sage – nâu trầm đạt tương phản WCAG AA cho chữ",
+    "Bảng màu kem – gỗ – nâu trầm đạt tương phản WCAG AA cho chữ",
     "Be Vietnam Pro cho nội dung, Manrope cho tiêu đề (next/font)",
-    "Hero hiện mềm khi tải, header dính, ảnh minh họa AI có chú thích",
+    "Logo thật hiển thị, header dính, các nhãn ảnh AI đã được gỡ",
+    "Banner tự chuyển, đã bỏ nhãn và thanh điều khiển; vẫn hỗ trợ dừng bằng bàn phím",
     "Nội dung xuất hiện khi cuộn tới (scroll reveal)",
     "Nút Zalo nổi chỉ hiện sau khi cuộn qua phần đầu trang",
-    "Card sản phẩm nhấc nhẹ và phóng ảnh vừa phải khi hover",
+    "Card sản phẩm có phản hồi hover rõ với ảnh phóng và thẻ nâng lên",
+    "Nút tư vấn đổi nền và nổi lên; liên kết footer có nền, gạch chân và chuyển động",
     "Bộ lọc danh mục đổi URL, có trạng thái chờ và hoạt động với nút Back",
-    "Tôn trọng prefers-reduced-motion: tắt chuyển động, nội dung vẫn hiển thị",
+    "Giảm chuyển động: banner đứng yên, nội dung vẫn hiển thị đầy đủ",
     "Mobile: thanh Zalo/Gọi cố định ở trang chi tiết, không chồng nút nổi; menu drawer đóng/mở",
     "Không tràn ngang ở 320, 390, 768, 1024 và 1440px trên 4 trang khách hàng",
-    "Không thành phần nào dùng nền đen/tối (trang khách hàng và đăng nhập)",
+    "Không thành phần nào dùng nền đen/than (trang khách hàng và đăng nhập)",
     "Không có lỗi JavaScript khi chạy"
   ],
   "errors": []

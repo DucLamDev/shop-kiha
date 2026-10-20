@@ -10,6 +10,7 @@ import { Steps } from '@/components/home/steps';
 import { VideoTeaser } from '@/components/home/video-teaser';
 import { Faq, faqItems } from '@/components/home/faq';
 import { ContactBand } from '@/components/site/contact-band';
+import { ShopStatistics } from '@/components/home/shop-statistics';
 
 export async function generateMetadata() {
   const s = await getSettings();
@@ -76,6 +77,7 @@ export default async function Home() {
       ))}
       <Hero settings={s} />
       <Spaces />
+      <ShopStatistics statistics={s.statistics} />
       <CategoryGrid items={items} />
       <Collection products={collection.items} settings={s} featured={hasFeatured} />
       <DetailStory />

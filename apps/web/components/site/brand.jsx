@@ -1,35 +1,24 @@
 import Link from 'next/link';
-import { Feather } from 'lucide-react';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
-// Logo chữ KIHA kèm lông vũ theo mẫu thiết kế. Logo ảnh trong cài đặt vẫn dùng cho SEO/JSON-LD.
+const defaultLogo = '/media/412aeb4108c6c241000120bf4dcdb000fa4b984976d5333de984b048071989b3.png';
 export function Brand({ settings, className, href = '/', size = 'default' }) {
   const name = settings?.shopName || 'Nội Thất KIHA';
   return (
     <Link
       href={href}
-      className={cn(
-        'group inline-flex shrink-0 items-center gap-3 rounded-full text-walnut',
-        className,
-      )}
+      className={cn('kiha-brand inline-flex shrink-0 items-center rounded-xl', className)}
       aria-label={`${name} — Trang chủ`}
     >
-      <Feather
-        className={cn(
-          'shrink-0 -rotate-12 transition-transform duration-500 group-hover:rotate-0',
-          size === 'lg' ? 'size-7' : 'size-6',
-        )}
-        strokeWidth={1.5}
-        aria-hidden="true"
+      <Image
+        src={settings?.logo || defaultLogo}
+        alt={name}
+        width={900}
+        height={414}
+        sizes={size === 'lg' ? '160px' : '112px'}
+        className={cn('h-auto object-contain', size === 'lg' ? 'w-40' : 'w-24 sm:w-28')}
       />
-      <span
-        className={cn(
-          'font-display leading-none font-medium tracking-[0.42em]',
-          size === 'lg' ? 'text-2xl' : 'text-xl sm:text-[1.4rem]',
-        )}
-      >
-        KIHA
-      </span>
     </Link>
   );
 }

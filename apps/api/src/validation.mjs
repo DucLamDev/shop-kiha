@@ -89,6 +89,26 @@ export const settingsInput = z
     facebookUrl: urlFor(['facebook.com', 'fb.com']),
     tiktokUrl: urlFor(['tiktok.com']),
     mapsUrl: urlFor(['maps.app.goo.gl', 'google.com', 'goo.gl']),
+    mapLocation: z
+      .object({
+        latitude: z.number().min(-90).max(90),
+        longitude: z.number().min(-180).max(180),
+      })
+      .strict()
+      .nullable()
+      .optional(),
+    statistics: z
+      .object({
+        salesCount: z.number().int().min(0).max(100000000).nullable().optional(),
+        interestedCount: z.number().int().min(0).max(100000000).nullable().optional(),
+        positiveReviewCount: z.number().int().min(0).max(100000000).nullable().optional(),
+        customerCount: z.number().int().min(0).max(100000000).nullable(),
+        ratingAverage: z.number().min(0).max(5).nullable(),
+        reviewCount: z.number().int().min(0).max(100000000).nullable(),
+        source: text(300),
+      })
+      .strict()
+      .optional(),
     address: optionalText(500),
     logo: optionalImage,
     heroImage: optionalImage,

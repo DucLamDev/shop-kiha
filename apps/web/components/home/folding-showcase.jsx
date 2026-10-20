@@ -3,7 +3,8 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowRight, MessageCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { SocialIcon } from '@/components/site/social-icon';
 import { Button } from '@/components/ui/button';
 import { Reveal } from '@/components/site/reveal';
 import { cn, priceText } from '@/lib/utils';
@@ -114,7 +115,7 @@ export function FoldingShowcase({ items, settings }) {
                       aria-label={`Tư vấn ${product.name} qua Zalo`}
                       className="relative z-10 inline-flex items-center gap-1.5 font-display text-walnut hover:text-olive"
                     >
-                      <MessageCircle className="size-4" strokeWidth={1.7} />
+                      <SocialIcon channel="zalo" className="size-5" />
                       Tư vấn
                     </a>
                   )}

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
-import { illustrationCaption } from '@/lib/editorial-assets';
+import { isEditorialImage } from '@/lib/editorial-assets';
 import { Button } from '@/components/ui/button';
 import { Input, Textarea } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -27,6 +27,8 @@ const keys = [
   'facebookUrl',
   'tiktokUrl',
   'mapsUrl',
+  'mapLocation',
+  'statistics',
   'address',
   'logo',
   'heroImage',
@@ -40,9 +42,25 @@ const keys = [
   'seoDescription',
 ];
 const tabOf = {
-  contact: ['shopName', 'phone', 'zaloUrl', 'facebookUrl', 'tiktokUrl', 'mapsUrl', 'address'],
+  contact: [
+    'shopName',
+    'phone',
+    'zaloUrl',
+    'facebookUrl',
+    'tiktokUrl',
+    'mapsUrl',
+    'mapLocation',
+    'address',
+  ],
   brand: ['logo', 'heroImage', 'aboutImage'],
-  home: ['heroTitle', 'heroDescription', 'aboutTitle', 'aboutDescription', 'commitments'],
+  home: [
+    'heroTitle',
+    'heroDescription',
+    'aboutTitle',
+    'aboutDescription',
+    'commitments',
+    'statistics',
+  ],
   seo: ['seoTitle', 'seoDescription'],
 };
 
@@ -68,8 +86,21 @@ export function AdminSettings() {
 }
 
 function SettingsEditor({ initial }) {
+  const defaults = {
+    commitments: [],
+    mapLocation: null,
+    statistics: {
+      salesCount: null,
+      interestedCount: null,
+      positiveReviewCount: null,
+      customerCount: null,
+      ratingAverage: null,
+      reviewCount: null,
+      source: '',
+    },
+  };
   const [saved, setSaved] = useState(() =>
-    Object.fromEntries(keys.map((k) => [k, initial[k] ?? (k === 'commitments' ? [] : '')])),
+    Object.fromEntries(keys.map((k) => [k, initial[k] ?? (k in defaults ? defaults[k] : '')])),
   );
   const [form, setForm] = useState(saved),
     [busy, setBusy] = useState(false),
@@ -104,7 +135,14 @@ function SettingsEditor({ initial }) {
     setBusy(true);
     setError(null);
     try {
-      const result = await api('/admin/settings', { method: 'PUT', body: form });
+      const body = {
+        ...form,
+        mapLocation:
+          form.mapLocation?.latitude == null && form.mapLocation?.longitude == null
+            ? null
+            : form.mapLocation,
+      };
+      const result = await api('/admin/settings', { method: 'PUT', body });
       const next = Object.fromEntries(keys.map((k) => [k, result?.[k] ?? form[k]]));
       setSaved(next);
       setForm(next);
@@ -182,6 +220,34 @@ function SettingsEditor({ initial }) {
                     onChange={(e) => set('address', e.target.value)}
                   />
                 </Field>
+                <div className="grid gap-4 rounded-2xl border bg-ivory/50 p-4 md:col-span-2 md:grid-cols-2">
+                  <p className="text-sm text-muted-foreground md:col-span-2">
+                    Tọa độ ghim cửa hàng trên Google Maps. Khi có đủ hai tọa độ, bản đồ sẽ ưu tiên
+                    vị trí này thay vì tìm theo địa chỉ.
+                  </p>
+                  {[
+                    ['latitude', 'Vĩ độ', -90, 90],
+                    ['longitude', 'Kinh độ', -180, 180],
+                  ].map(([key, label, min, max]) => (
+                    <Field key={key} label={label} error={errors[`mapLocation.${key}`]}>
+                      <Input
+                        type="number"
+                        inputMode="decimal"
+                        step="any"
+                        min={min}
+                        max={max}
+                        value={form.mapLocation?.[key] ?? ''}
+                        onChange={(event) =>
+                          set('mapLocation', {
+                            latitude: form.mapLocation?.latitude ?? null,
+                            longitude: form.mapLocation?.longitude ?? null,
+                            [key]: event.target.value === '' ? null : Number(event.target.value),
+                          })
+                        }
+                      />
+                    </Field>
+                  ))}
+                </div>
               </div>
             </Panel>
           </TabsContent>
@@ -189,7 +255,7 @@ function SettingsEditor({ initial }) {
           <TabsContent value="brand" className="mt-6">
             <Panel
               title="Hình ảnh thương hiệu"
-              description="Ảnh có tên bắt đầu bằng “AI” là ảnh minh họa; website tự ghi chú “Hình minh họa AI” khi dùng các ảnh này."
+              description="Chọn logo, ảnh banner đầu tiên và ảnh phần giới thiệu. Thông tin nguồn ảnh chỉ hiển thị trong quản trị."
             >
               <div className="grid gap-6 md:grid-cols-3">
                 {[
@@ -207,7 +273,7 @@ function SettingsEditor({ initial }) {
                       onChange={(v) => set(key, v[0] || '')}
                     />
                     <ImagePreview src={form[key]} alt={label} onRemove={() => set(key, '')} />
-                    {illustrationCaption(form[key]) && (
+                    {isEditorialImage(form[key]) && (
                       <p className="mt-2 text-xs text-muted-foreground">Ảnh minh họa AI</p>
                     )}
                     {errors[key] && (
@@ -220,6 +286,49 @@ function SettingsEditor({ initial }) {
           </TabsContent>
 
           <TabsContent value="home" className="mt-6 grid gap-6">
+            <Panel
+              title="KIHA qua những con số"
+              description="Ba chỉ số trên trang chủ có hiệu ứng đếm tăng khi cuộn tới. Nhập số liệu thực tế của cửa hàng; để trống sẽ hiển thị “Đang cập nhật”. Đây là số liệu do KIHA tổng hợp, không tự tăng theo lượt truy cập website."
+            >
+              <div className="grid gap-5 md:grid-cols-3">
+                {[
+                  ['salesCount', 'Lượt bán', 100000000, 1],
+                  ['interestedCount', 'Khách hàng quan tâm', 100000000, 1],
+                  ['positiveReviewCount', 'Lượt đánh giá tốt', 100000000, 1],
+                ].map(([key, label, max, step]) => (
+                  <Field key={key} label={label} error={errors[`statistics.${key}`]}>
+                    <Input
+                      type="number"
+                      inputMode={step === 1 ? 'numeric' : 'decimal'}
+                      min={0}
+                      max={max}
+                      step={step}
+                      value={form.statistics[key] ?? ''}
+                      onChange={(event) =>
+                        set('statistics', {
+                          ...form.statistics,
+                          [key]: event.target.value === '' ? null : Number(event.target.value),
+                        })
+                      }
+                    />
+                  </Field>
+                ))}
+                <Field
+                  label="Nguồn / thời điểm cập nhật"
+                  className="md:col-span-3"
+                  error={errors['statistics.source']}
+                >
+                  <Input
+                    maxLength={300}
+                    value={form.statistics.source || ''}
+                    placeholder="Nguồn đánh giá và thời điểm tổng hợp"
+                    onChange={(event) =>
+                      set('statistics', { ...form.statistics, source: event.target.value })
+                    }
+                  />
+                </Field>
+              </div>
+            </Panel>
             <Panel
               title="Phần đầu trang chủ"
               description="Mỗi dòng trong tiêu đề hiển thị trên một dòng riêng."

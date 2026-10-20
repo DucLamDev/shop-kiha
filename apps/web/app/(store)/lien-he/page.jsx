@@ -1,10 +1,12 @@
-import { ArrowUpRight, Facebook, MapPin, MessageCircleMore, Music2, Phone } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { getSettings, pageMeta } from '@/lib/server-api';
 import { contactChannels } from '@/lib/contact';
 import { cn, pad } from '@/lib/utils';
 import { PageIntro } from '@/components/site/page-intro';
 import { ZaloButton, PhoneButton } from '@/components/site/contact-buttons';
-import { RevealGroup, RevealItem, Reveal } from '@/components/site/reveal';
+import { RevealGroup, RevealItem } from '@/components/site/reveal';
+import { SocialIcon } from '@/components/site/social-icon';
+import { ShopMap } from '@/components/site/shop-map';
 
 export const metadata = pageMeta(
   'Liên hệ',
@@ -12,13 +14,6 @@ export const metadata = pageMeta(
   '/lien-he',
 );
 
-const icons = {
-  zalo: MessageCircleMore,
-  phone: Phone,
-  facebook: Facebook,
-  tiktok: Music2,
-  maps: MapPin,
-};
 const actions = {
   zalo: 'Mở Zalo',
   phone: 'Gọi ngay',
@@ -68,51 +63,7 @@ export default async function Contact() {
         </div>
       </section>
 
-      {(s.address || s.mapsUrl) && (
-        <section aria-labelledby="map-title" className="container-page py-16 sm:py-20">
-          <Reveal>
-            <div className="grid grid-cols-1 overflow-hidden rounded-[2rem] rounded-tr-[5rem] bg-sand/70 lg:grid-cols-[0.9fr_1.1fr]">
-              <div className="p-8 sm:p-10">
-                <p className="eyebrow">
-                  <MapPin className="size-4" aria-hidden="true" />
-                  Ghé cửa hàng
-                </p>
-                <h2 id="map-title" className="display-title mt-4 text-[2.4rem] sm:text-5xl">
-                  Vị trí KIHA
-                </h2>
-                <p className="mt-3 text-muted-foreground">
-                  {s.address ||
-                    'Mở Google Maps để xem đường đi tới cửa hàng. Nên nhắn KIHA qua Zalo trước khi ghé để được hỗ trợ tốt nhất.'}
-                </p>
-                {s.mapsUrl && (
-                  <a
-                    href={s.mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-6 inline-flex h-11 items-center gap-2 rounded-full bg-primary px-6 font-display text-sm text-primary-foreground transition-colors hover:bg-sage-deep"
-                  >
-                    Mở Google Maps
-                    <ArrowUpRight className="size-4" />
-                  </a>
-                )}
-              </div>
-              <div className="relative min-h-64 bg-ivory-deep">
-                {s.address ? (
-                  <iframe
-                    title={`Bản đồ: ${s.address}`}
-                    src={`https://www.google.com/maps?q=${encodeURIComponent(s.address)}&output=embed`}
-                    className="absolute inset-0 size-full border-0"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                ) : (
-                  <MapDecoration />
-                )}
-              </div>
-            </div>
-          </Reveal>
-        </section>
-      )}
+      <ShopMap settings={s} />
 
       {steps.length > 0 && (
         <section aria-labelledby="steps-title" className="pb-8 sm:pb-12">
@@ -143,7 +94,6 @@ export default async function Contact() {
 }
 
 function ChannelCard({ channel, primary }) {
-  const Icon = icons[channel.key];
   const content = (
     <>
       <span
@@ -152,13 +102,16 @@ function ChannelCard({ channel, primary }) {
           primary ? 'bg-white/70 text-walnut' : 'bg-accent text-olive',
         )}
       >
-        <Icon className="size-5" />
+        <SocialIcon
+          channel={channel.key}
+          className={channel.key === 'phone' || channel.key === 'maps' ? 'size-6' : 'size-9'}
+        />
       </span>
       <span className="min-w-0 flex-1 sm:mt-6">
         <span className="block text-xs tracking-[0.14em] uppercase opacity-75">
           {channel.label}
         </span>
-        <span className="mt-1 block truncate font-display text-lg tracking-[-0.02em] text-walnut sm:text-xl">
+        <span className="mt-1 block break-words font-display text-base tracking-[-0.02em] text-walnut sm:text-xl">
           {channel.href ? channel.value : 'Đang cập nhật'}
         </span>
       </span>
@@ -191,26 +144,5 @@ function ChannelCard({ channel, primary }) {
     >
       {content}
     </a>
-  );
-}
-
-function MapDecoration() {
-  return (
-    <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
-      <div
-        className="absolute inset-0 opacity-60"
-        style={{
-          backgroundImage:
-            'linear-gradient(var(--kiha-wood-soft) 1px, transparent 1px), linear-gradient(90deg, var(--kiha-wood-soft) 1px, transparent 1px)',
-          backgroundSize: '44px 44px',
-        }}
-      />
-      <div className="absolute top-[38%] left-[-10%] h-10 w-[120%] -rotate-6 bg-white/80" />
-      <div className="absolute top-[-10%] left-[58%] h-[120%] w-8 rotate-12 bg-white/80" />
-      <span className="absolute top-1/2 left-1/2 flex size-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-walnut shadow-lift">
-        <MapPin className="size-7" />
-      </span>
-      <span className="absolute top-1/2 left-1/2 size-16 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full bg-sage-strong/60 motion-reduce:hidden" />
-    </div>
   );
 }

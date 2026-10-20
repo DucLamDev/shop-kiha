@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { ArrowRight, MessageCircle, Phone } from 'lucide-react';
+import { ArrowRight, MessageCircle } from 'lucide-react';
+import { SocialIcon } from '@/components/site/social-icon';
 import { Button } from '@/components/ui/button';
 import { telHref } from '@/lib/contact';
 
@@ -26,7 +27,7 @@ export function ZaloButton({
   return (
     <Button asChild variant={variant} size={size} className={className}>
       <a href={settings.zaloUrl} target="_blank" rel="noopener noreferrer" aria-label={label}>
-        <MessageCircle strokeWidth={1.7} />
+        <SocialIcon channel="zalo" />
         {children}
         {arrow && <ArrowRight className="size-4" />}
       </a>
@@ -46,7 +47,7 @@ export function PhoneButton({
   return (
     <Button asChild variant={variant} size={size} className={className}>
       <a href={href} aria-label={`Gọi ${settings.phone}`}>
-        <Phone strokeWidth={1.7} />
+        <SocialIcon channel="phone" />
         {children ?? settings.phone}
       </a>
     </Button>

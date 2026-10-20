@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'motion/react';
-import { ArrowUpRight, Menu, MessageCircle, Phone } from 'lucide-react';
+import { ArrowUpRight, Menu } from 'lucide-react';
+import { SocialIcon } from '@/components/site/social-icon';
 import { Brand } from '@/components/site/brand';
 import { ZaloButton } from '@/components/site/contact-buttons';
 import {
@@ -70,7 +71,7 @@ export function SiteHeader({ settings, categories = [] }) {
                     href={link.href}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
-                      'relative z-10 block rounded-full px-4 py-2 font-display text-sm transition-colors lg:px-5',
+                      'kiha-nav-link relative z-10 block rounded-full px-4 py-2 font-display text-sm lg:px-5',
                       active ? 'text-charcoal' : 'text-charcoal/70 hover:text-walnut',
                     )}
                   >
@@ -87,7 +88,7 @@ export function SiteHeader({ settings, categories = [] }) {
               href={phoneHref}
               className="hidden items-center gap-2 rounded-full px-3 py-2 font-display text-sm text-walnut transition-colors hover:text-olive lg:inline-flex"
             >
-              <Phone className="size-4" strokeWidth={1.6} />
+              <SocialIcon channel="phone" className="size-4" />
               {settings.phone}
             </a>
           )}
@@ -106,7 +107,7 @@ export function SiteHeader({ settings, categories = [] }) {
               aria-label="Tư vấn qua Zalo"
               className="inline-flex h-11 items-center gap-1.5 rounded-full bg-primary px-4 font-display text-[13px] font-medium text-primary-foreground sm:hidden"
             >
-              <MessageCircle className="size-4" strokeWidth={1.7} />
+              <SocialIcon channel="zalo" />
               Zalo
             </a>
           )}
@@ -119,13 +120,16 @@ export function SiteHeader({ settings, categories = [] }) {
                 <Menu className="size-5" strokeWidth={1.7} />
               </button>
             </SheetTrigger>
-            <SheetContent side="right" className="px-6 pt-6 pb-8">
+            <SheetContent
+              side="right"
+              className="px-5 pt-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+            >
               <SheetTitle className="sr-only">Menu KIHA</SheetTitle>
               <SheetDescription className="sr-only">
                 Điều hướng website và liên hệ tư vấn
               </SheetDescription>
               <Brand settings={settings} className="self-start" />
-              <nav aria-label="Menu di động" className="mt-10">
+              <nav aria-label="Menu di động" className="mt-6">
                 <ul className="space-y-1">
                   {navLinks.map((link, i) => (
                     <motion.li
@@ -138,7 +142,7 @@ export function SiteHeader({ settings, categories = [] }) {
                         href={link.href}
                         onClick={() => setOpen(false)}
                         aria-current={isActive(pathname, link.href) ? 'page' : undefined}
-                        className="flex items-center justify-between rounded-2xl px-3 py-3 font-display text-[1.6rem] tracking-[-0.03em] text-walnut transition-colors hover:bg-accent aria-[current=page]:bg-accent"
+                        className="flex min-h-12 items-center justify-between rounded-2xl px-3 py-2.5 font-display text-2xl tracking-[-0.03em] text-walnut transition-colors hover:bg-accent aria-[current=page]:bg-accent"
                       >
                         {link.label}
                         <ArrowUpRight className="size-5 opacity-50" />
@@ -148,7 +152,7 @@ export function SiteHeader({ settings, categories = [] }) {
                 </ul>
               </nav>
               {categories.length > 0 && (
-                <div className="mt-8">
+                <div className="mt-6">
                   <p className="eyebrow px-3">Danh mục</p>
                   <ul className="mt-3 grid gap-0.5">
                     {categories.map((c) => (
@@ -166,13 +170,32 @@ export function SiteHeader({ settings, categories = [] }) {
                 </div>
               )}
               <div className="mt-auto grid gap-2 pt-8">
+                <div className="mb-2 grid grid-cols-2 gap-2">
+                  {[
+                    ['facebook', settings?.facebookUrl, 'Facebook'],
+                    ['tiktok', settings?.tiktokUrl, 'TikTok'],
+                  ]
+                    .filter(([, href]) => href)
+                    .map(([key, href, label]) => (
+                      <a
+                        key={key}
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-walnut/10 bg-white/60 text-sm text-walnut"
+                      >
+                        <SocialIcon channel={key} />
+                        {label}
+                      </a>
+                    ))}
+                </div>
                 <ZaloButton settings={settings} size="lg" className="w-full" />
                 {phoneHref && (
                   <a
                     href={phoneHref}
                     className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-walnut/25 bg-white/60 font-display text-[15px] text-walnut"
                   >
-                    <Phone className="size-4" />
+                    <SocialIcon channel="phone" className="size-4" />
                     Gọi {settings.phone}
                   </a>
                 )}

@@ -62,9 +62,6 @@ export function Faq({ settings, categories }) {
           {image && (
             <div className="relative mt-10 hidden aspect-[5/4] overflow-hidden rounded-[2rem_6rem_2rem_2rem] bg-sand lg:block">
               <Image src={image.src} alt="" fill sizes="36vw" className="object-cover" />
-              <span className="absolute bottom-4 left-4 rounded-full bg-white/85 px-3 py-1 text-[11px] text-muted-foreground backdrop-blur">
-                Gợi ý không gian · Hình ảnh AI
-              </span>
             </div>
           )}
         </Reveal>

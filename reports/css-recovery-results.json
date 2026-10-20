@@ -1,0 +1,30 @@
+{
+  "cause": "Stale Turbopack dev filesystem cache retaining a missing CSS dependency",
+  "cacheEnabledAfterRecovery": true,
+  "pages": [
+    {
+      "route": "/",
+      "status": 200,
+      "animationCSS": true
+    },
+    {
+      "route": "/san-pham",
+      "status": 200,
+      "animationCSS": true
+    },
+    {
+      "route": "/lien-he",
+      "status": 200,
+      "animationCSS": true
+    },
+    {
+      "route": "/admin/dang-nhap",
+      "status": 200,
+      "animationCSS": true
+    }
+  ],
+  "mobileDrawerAnimation": "enter",
+  "mobileOverflow": false,
+  "browserErrors": [],
+  "productionBuild": "passed"
+}

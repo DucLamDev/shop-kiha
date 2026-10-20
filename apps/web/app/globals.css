@@ -3,40 +3,41 @@
 
 /*
  * KIHA design tokens.
- * Bảng màu: kem sáng · gỗ tự nhiên · xanh xô thơm (sage) · nâu trầm · trắng.
+ * Bảng màu: kem ấm #f5f0e7 · gỗ tự nhiên #c5a17d · nâu trầm #674b38.
  * Không dùng nền đen/than cho bất kỳ thành phần nào; chữ đậm nhất là nâu đậm.
  * Tên biến theo quy ước shadcn/ui để các component dùng chung một nguồn màu.
  */
 :root {
-  --kiha-ivory: #faf7f1;
-  --kiha-ivory-deep: #f3eee5;
-  --kiha-sand: #efe7da;
-  --kiha-wood: #c9a882;
-  --kiha-wood-soft: #eadcc8;
-  --kiha-sage: #e6eadf;
-  --kiha-sage-soft: #eef0e8;
-  --kiha-sage-strong: #c9d3ba;
-  --kiha-sage-deep: #bccaa9;
-  --kiha-olive: #5f6a52;
-  --kiha-olive-light: #6e7d5c;
-  --kiha-walnut: #6b4a35;
+  --kiha-ivory: #f5f0e7;
+  --kiha-ivory-deep: #eee5d9;
+  --kiha-sand: #eaddcc;
+  --kiha-wood: #c5a17d;
+  --kiha-wood-soft: #e4cfb7;
+  /* Compatibility aliases: existing components inherit the warm palette. */
+  --kiha-sage: var(--kiha-sand);
+  --kiha-sage-soft: var(--kiha-ivory-deep);
+  --kiha-sage-strong: var(--kiha-wood);
+  --kiha-sage-deep: #d1b18e;
+  --kiha-olive: var(--kiha-walnut);
+  --kiha-olive-light: #87654b;
+  --kiha-walnut: #674b38;
   --kiha-walnut-deep: #553a29;
-  --kiha-charcoal: #3e3128;
+  --kiha-charcoal: #423125;
   --kiha-gold: #a47e2c;
 
   --background: var(--kiha-ivory);
   --foreground: var(--kiha-charcoal);
-  --card: #ffffff;
+  --card: #fffbf5;
   --card-foreground: var(--kiha-charcoal);
   --popover: #fffdf9;
   --popover-foreground: var(--kiha-charcoal);
-  --primary: var(--kiha-sage-strong);
+  --primary: var(--kiha-wood);
   --primary-foreground: var(--kiha-charcoal);
   --secondary: var(--kiha-sand);
   --secondary-foreground: var(--kiha-charcoal);
   --muted: var(--kiha-ivory-deep);
   --muted-foreground: #6f6458;
-  --accent: var(--kiha-sage);
+  --accent: var(--kiha-sand);
   --accent-foreground: var(--kiha-charcoal);
   --destructive: #b42318;
   --success: #3f6b3a;
@@ -274,9 +275,569 @@
   line-height: 1.8;
 }
 
+/* Slow crossfades keep the headline stable while the room changes behind it. */
+.hero-frame {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease-in-out;
+}
+.hero-frame.is-active {
+  opacity: 1;
+}
+.hero-frame.is-active img {
+  animation: kiha-room-drift 9s ease-out both;
+}
+@keyframes kiha-room-drift {
+  from {
+    transform: scale(1.065);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+.category-section {
+  background: radial-gradient(ellipse at 0% 70%, rgb(197 161 125 / 0.19), transparent 55%);
+}
+.category-scene {
+  border-radius: 9rem 2rem 2rem 2rem;
+}
+.category-card {
+  transition:
+    transform 0.5s var(--ease-soft),
+    box-shadow 0.5s,
+    border-color 0.5s,
+    background-color 0.5s;
+}
+.category-card-image,
+.category-scene-image {
+  transition: scale 0.85s var(--ease-soft);
+}
+.category-arrow {
+  transition:
+    transform 0.45s var(--ease-soft),
+    background-color 0.45s;
+}
+.category-card:focus-visible,
+.category-scene:focus-visible {
+  outline: 3px solid var(--kiha-walnut);
+  outline-offset: 5px;
+}
+.category-card:is(:hover, :focus-visible) {
+  border-color: var(--kiha-wood);
+  background: var(--card);
+  box-shadow: 0 18px 36px -16px rgb(103 75 56 / 0.32);
+}
+.category-card:is(:hover, :focus-visible) .category-arrow,
+.category-scene:is(:hover, :focus-visible) .category-arrow {
+  background: var(--kiha-wood);
+  transform: rotate(-35deg);
+}
+.kiha-brand img {
+  transition: transform 0.5s var(--ease-soft);
+}
+.kiha-photo-link {
+  transition:
+    transform 0.55s var(--ease-soft),
+    box-shadow 0.55s;
+}
+.kiha-nav-link {
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s,
+    color 0.3s;
+}
+.kiha-nav-link:is(:hover, :focus-visible) {
+  background: var(--kiha-wood-soft);
+  box-shadow: inset 0 -2px var(--kiha-wood);
+}
+[data-slot='button'] > svg {
+  transition: transform 0.4s var(--ease-soft);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .kiha-brand:hover img {
+    transform: scale(1.06) rotate(-2deg);
+  }
+  .category-card:hover {
+    transform: translateY(-8px);
+  }
+  .category-card:hover .category-card-image {
+    scale: 1.09;
+  }
+  .category-scene:hover .category-scene-image {
+    scale: 1.065;
+  }
+  .kiha-photo-link:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lift);
+  }
+  [data-slot='button']:not(:disabled):hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+  }
+  [data-slot='button']:not(:disabled):hover > svg:last-child {
+    transform: translateX(3px) rotate(-8deg);
+  }
+}
+.category-card:focus-visible .category-card-image {
+  scale: 1.05;
+}
+
+.product-consult-link {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgb(197 161 125 / 0.45);
+  background: var(--kiha-ivory);
+  transition:
+    background-color 0.25s,
+    border-color 0.25s,
+    box-shadow 0.3s,
+    transform 0.3s var(--ease-soft);
+}
+.product-consult-link .social-icon,
+.product-consult-link .consult-arrow,
+.footer-link .social-icon,
+.footer-link-arrow {
+  transition: transform 0.3s var(--ease-soft);
+}
+.product-consult-link:is(:hover, :focus-visible) {
+  background: var(--kiha-wood-soft);
+  border-color: var(--kiha-wood);
+  box-shadow: 0 6px 18px rgb(103 75 56 / 0.16);
+}
+.product-consult-link:is(:hover, :focus-visible) .social-icon {
+  transform: scale(1.12) rotate(-8deg);
+}
+.product-consult-link:is(:hover, :focus-visible) .consult-arrow {
+  transform: translateX(3px);
+}
+.footer-link {
+  position: relative;
+  max-width: calc(100% - 0.25rem);
+  padding-block: 0.25rem;
+  border-radius: 0.25rem;
+  transition:
+    color 0.25s,
+    background-color 0.25s,
+    transform 0.3s var(--ease-soft);
+}
+.footer-link::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--kiha-walnut);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--ease-soft);
+}
+.footer-link:is(:hover, :focus-visible) {
+  color: var(--kiha-walnut);
+  background: var(--kiha-wood-soft);
+}
+.footer-link:is(:hover, :focus-visible)::after {
+  transform: scaleX(1);
+}
+.footer-link:is(:hover, :focus-visible) .footer-link-arrow {
+  transform: translate(2px, -2px);
+}
+.footer-link:is(:hover, :focus-visible) .social-icon {
+  transform: scale(1.12);
+}
+.product-consult-link:focus-visible,
+.footer-link:focus-visible {
+  outline: 2px solid var(--kiha-walnut);
+  outline-offset: 4px;
+}
+.store-shell footer .kiha-brand {
+  transition: transform 0.3s var(--ease-soft);
+}
+@media (hover: hover) and (pointer: fine) {
+  .product-consult-link:hover {
+    transform: translateY(-3px);
+  }
+  .footer-link:hover {
+    transform: translateX(3px);
+  }
+  .store-shell footer .kiha-brand:hover {
+    transform: translateY(-3px);
+  }
+}
+
+/* Contact actions use the same assets in the header, cards, footer and dock. */
+.contact-dock {
+  position: fixed;
+  z-index: 30;
+  inset-inline: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  display: flex;
+  width: max-content;
+  margin-inline: auto;
+  gap: 0.75rem;
+}
+.contact-dock-link {
+  position: relative;
+  isolation: isolate;
+  flex: none;
+  width: 3.25rem;
+  height: 3.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 0.95);
+  border-radius: 50%;
+  background: var(--kiha-ivory);
+  box-shadow: 0 4px 18px rgb(103 75 56 / 0.18);
+  color: var(--kiha-walnut);
+  cursor: pointer;
+  transition:
+    background-color 0.25s,
+    box-shadow 0.25s,
+    transform 0.3s var(--ease-soft);
+}
+.contact-dock-link::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -1px;
+  border: 2px solid var(--kiha-wood);
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  animation: contact-ripple 3s ease-out var(--contact-delay, 0s) infinite;
+}
+@keyframes contact-ripple {
+  0%,
+  12% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  20% {
+    opacity: 0.65;
+  }
+  65%,
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+.contact-dock-primary {
+  background: var(--kiha-wood);
+}
+.contact-dock-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--kiha-ivory);
+}
+.contact-dock-link:is(:hover, :focus-visible) {
+  background: var(--kiha-wood-soft);
+  box-shadow: 0 6px 24px rgb(103 75 56 / 0.25);
+}
+.contact-dock-link:focus-visible,
+.contact-phone-number:focus-visible,
+.contact-phone-close:focus-visible {
+  outline: 2px solid var(--kiha-walnut);
+  outline-offset: 4px;
+}
+.contact-phone-panel {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 1rem);
+  width: 15.25rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--kiha-wood-soft);
+  border-radius: 1.25rem;
+  background: var(--kiha-ivory);
+  box-shadow: 0 8px 32px rgb(103 75 56 / 0.18);
+  color: var(--kiha-walnut);
+}
+.contact-phone-caption {
+  display: block;
+  padding-right: 1.25rem;
+  font-size: 0.7rem;
+}
+.contact-phone-number {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  min-height: 2.75rem;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.contact-phone-close {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.contact-phone-close:hover {
+  background: var(--kiha-wood-soft);
+}
+.contact-dock-detail {
+  display: none;
+}
+@media (width >= 48rem) {
+  .contact-dock {
+    inset-inline: auto 1.25rem;
+    bottom: 1.5rem;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.85rem;
+  }
+  .contact-dock-detail {
+    display: flex;
+  }
+  .contact-dock-link {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+  .contact-dock-phone {
+    position: relative;
+  }
+  .contact-phone-panel {
+    left: auto;
+    right: calc(100% + 1rem);
+    top: 0;
+    bottom: auto;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .contact-dock-link:hover {
+    transform: translateY(-4px) scale(1.08);
+  }
+}
+.stats-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  border: 1px solid rgb(197 161 125 / 0.4);
+  border-radius: 1.75rem;
+  padding: 1.5rem;
+  background: linear-gradient(115deg, var(--kiha-sand), var(--kiha-ivory) 70%);
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem 1rem;
+}
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-top: 1px solid rgb(103 75 56 / 0.15);
+  padding-top: 1rem;
+}
+.stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--kiha-wood-soft);
+  color: var(--kiha-walnut);
+}
+@media (width >= 40rem) {
+  .stats-panel {
+    padding: 2rem;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(var(--stat-count), minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .stat-item {
+    display: block;
+  }
+  .stat-icon {
+    margin-bottom: 1rem;
+  }
+}
+@media (width >= 64rem) {
+  .stats-panel {
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+    padding: 2.25rem;
+  }
+  .stats-heading {
+    width: 12rem;
+    flex-shrink: 0;
+  }
+  .stats-grid {
+    flex: 1;
+  }
+  .stat-item {
+    border-top: 0;
+    border-left: 1px solid rgb(103 75 56 / 0.15);
+    padding: 0.25rem 0 0.25rem 1.5rem;
+  }
+}
+.spaces-gallery {
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 0;
+}
+@media (width < 40rem) {
+  .store-shell .container-page {
+    padding-inline: 1.125rem;
+  }
+  .store-shell .display-title {
+    font-size: clamp(1.9rem, 8.2vw, 2.4rem);
+    line-height: 1.1;
+  }
+  .store-shell #hero-title {
+    font-size: clamp(2.25rem, 10.2vw, 2.8rem);
+    line-height: 1.04;
+  }
+  .store-shell .eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+  }
+  .store-shell > header {
+    padding: 0.625rem 0.625rem 0;
+  }
+  .store-shell > header > div {
+    height: 3.65rem;
+    border-radius: 1.25rem;
+    padding-left: 1rem;
+    gap: 0.5rem;
+  }
+  .store-shell > header .kiha-brand img {
+    width: 5.3rem;
+  }
+  .hero-copy > div:first-child > p:not(.eyebrow) {
+    margin-top: 1.125rem;
+    font-size: 0.875rem;
+    max-width: 21rem;
+    line-height: 1.7;
+  }
+  .hero-copy > div:first-child > div:last-child {
+    margin-top: 1.4rem;
+  }
+  .hero-frames img {
+    object-position: 58% 65%;
+  }
+  .store-shell #khong-gian {
+    padding-block: 2.5rem;
+  }
+  .store-shell #khong-gian .container-page {
+    gap: 1.5rem;
+  }
+  .category-section {
+    padding-block: 3rem;
+  }
+  .category-scene {
+    min-height: 21rem;
+    border-radius: 4.5rem 1.5rem 1.5rem 1.5rem;
+    padding: 1.25rem;
+  }
+  .category-scene > span {
+    top: 1.25rem;
+    left: 1.25rem;
+  }
+  .category-scene p {
+    font-size: 1.75rem;
+    max-width: 12rem;
+  }
+  .category-scene img {
+    object-position: 50% 62%;
+  }
+  .category-card {
+    border-radius: 1.15rem;
+    padding: 0.5rem;
+  }
+  .category-card h3 {
+    min-height: 2.5rem;
+    font-size: 0.875rem;
+  }
+  .category-card .category-arrow {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+  .category-card > div:last-child {
+    padding-inline: 0.25rem;
+  }
+  .category-card > div:last-child > span > span:first-child {
+    font-size: 0.625rem;
+  }
+  .stat-item:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  .page-intro > div {
+    border-radius: 1.5rem 3.5rem 1.5rem 1.5rem;
+  }
+  .page-intro .container-page {
+    padding-block: 1.75rem;
+  }
+  .page-intro .container-page > div > .eyebrow {
+    margin-top: 1.5rem;
+  }
+  .page-intro [data-slot='button'] {
+    max-width: 100%;
+    white-space: normal;
+  }
+  .store-shell article h3 {
+    font-size: 0.95rem;
+  }
+  .store-shell article > div:first-child {
+    padding: 0.5rem;
+    border-radius: 1.25rem;
+  }
+  .store-shell footer > .container-page:first-child {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 1.25rem;
+    padding-top: 2.5rem;
+  }
+  .store-shell footer > .container-page:first-child > div:first-child {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+  .store-shell footer a {
+    font-size: 0.8125rem;
+    overflow-wrap: anywhere;
+  }
+  .store-shell footer h2 {
+    line-height: 1.4;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .hero-frame img {
+    animation: none !important;
+  }
+  .contact-dock-link::before {
+    animation: none !important;
+  }
+  .product-consult-link,
+  .product-consult-link .social-icon,
+  .product-consult-link .consult-arrow,
+  .footer-link,
+  .footer-link .social-icon,
+  .footer-link-arrow,
+  .store-shell footer .kiha-brand {
+    transform: none !important;
+  }
+  .category-card-image,
+  .category-scene-image {
+    scale: 1 !important;
   }
   *,
   ::before,

@@ -22,7 +22,7 @@ export function SheetContent({ className, children, side = 'right', ...props }) 
       <DialogPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          'fixed z-50 flex flex-col bg-background shadow-lift outline-none data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500 data-[state=open]:ease-(--ease-soft)',
+          'fixed z-50 flex flex-col overflow-y-auto overscroll-contain bg-background shadow-lift outline-none data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500 data-[state=open]:ease-(--ease-soft)',
           sides[side],
           className,
         )}

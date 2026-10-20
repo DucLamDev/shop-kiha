@@ -35,7 +35,7 @@ export function VideoTeaser({ settings }) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Xem video của KIHA trên TikTok (mở tab mới)"
-            className="group relative block aspect-[4/5] overflow-hidden rounded-[2rem] bg-sand sm:aspect-[16/9]"
+            className="kiha-photo-link group relative block aspect-[4/5] overflow-hidden rounded-[2rem] bg-sand sm:aspect-[16/9]"
           >
             {image && (
               <Image
@@ -43,7 +43,7 @@ export function VideoTeaser({ settings }) {
                 alt=""
                 fill
                 sizes="(max-width: 1024px) 94vw, 60vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.08] group-focus-visible:scale-[1.08]"
               />
             )}
             <span
@@ -61,9 +61,6 @@ export function VideoTeaser({ settings }) {
                 Xem thêm video từ KIHA trên TikTok. Mẫu nào có video sẽ hiện ngay trên trang chi
                 tiết sản phẩm.
               </span>
-            </span>
-            <span className="absolute top-4 right-4 rounded-full bg-white/85 px-3 py-1 text-[11px] text-muted-foreground backdrop-blur">
-              Gợi ý không gian · Hình ảnh AI
             </span>
           </a>
         </Reveal>

@@ -50,7 +50,6 @@ export function Login() {
               Quản lý sản phẩm, danh mục, hình ảnh và thông tin liên hệ hiển thị trên website.
             </p>
           </div>
-          <p className="text-xs text-muted-foreground">Gợi ý không gian · Hình ảnh AI</p>
         </div>
       </div>
       <div className="flex items-center justify-center px-5 py-12">

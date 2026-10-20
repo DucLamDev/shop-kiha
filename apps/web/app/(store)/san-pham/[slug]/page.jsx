@@ -1,6 +1,7 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, CircleCheck, MessageCircle, Phone } from 'lucide-react';
+import { ArrowRight, CircleCheck } from 'lucide-react';
+import { SocialIcon } from '@/components/site/social-icon';
 import { getData, getSettings, jsonLd, pageMeta, siteUrl } from '@/lib/server-api';
 import { telHref } from '@/lib/contact';
 import { hasPrice, priceText } from '@/lib/utils';
@@ -284,7 +285,7 @@ function MobileCtaBar({ settings, name }) {
             aria-label={`Gọi ${settings.phone}`}
             className="flex size-12 shrink-0 items-center justify-center rounded-full border border-walnut/20 bg-white text-walnut"
           >
-            <Phone className="size-5" />
+            <SocialIcon channel="phone" className="size-5" />
           </a>
         )}
         {settings.zaloUrl && (
@@ -295,7 +296,7 @@ function MobileCtaBar({ settings, name }) {
             aria-label={`Tư vấn ${name} qua Zalo`}
             className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-primary font-display text-[15px] font-medium text-primary-foreground"
           >
-            <MessageCircle className="size-5" />
+            <SocialIcon channel="zalo" className="size-6" />
             Tư vấn qua Zalo
           </a>
         )}

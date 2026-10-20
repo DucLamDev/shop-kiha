@@ -1,0 +1,12 @@
+{
+  "results": [
+    "Sales, interested customers and positive reviews animate to saved values; missing data stays explicit",
+    "Round icon-only dock pulses; phone reveals on click with valid call link, keyboard and outside dismissal",
+    "Real Google Maps frame loads; preview and outgoing link use the same verified pin",
+    "Four store routes fit 320–1440px; mobile dock and product CTA do not overlap",
+    "Small-screen menu scrolls to its social links and closes with Escape",
+    "Reduced-motion mode disables contact pulses and shows final counter values immediately",
+    "Admin exposes saved map coordinates and editable customer/review fields without publishing test data"
+  ],
+  "errors": []
+}

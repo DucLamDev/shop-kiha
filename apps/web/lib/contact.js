@@ -1,3 +1,4 @@
+import { shopLocation } from './shop-location';
 // Mọi kênh liên hệ lấy từ cấu hình website (MongoDB, sửa tại /admin/cai-dat).
 // Component chỉ gọi các hàm này, không tự ghép link ở nhiều nơi.
 export function telHref(phone) {
@@ -38,7 +39,7 @@ export function contactChannels(settings) {
       key: 'maps',
       label: 'Google Maps',
       value: s.address || 'Xem vị trí cửa hàng',
-      href: s.mapsUrl,
+      href: shopLocation(s).openUrl,
       external: true,
     },
   ];

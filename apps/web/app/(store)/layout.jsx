@@ -8,7 +8,7 @@ export default async function StoreLayout({ children }) {
   const [settings, categories] = await Promise.all([getSettings(), getCategories()]);
   return (
     <MotionProvider>
-      <div className="flex min-h-dvh flex-col">
+      <div className="store-shell flex min-h-dvh flex-col">
         <SiteHeader settings={settings} categories={categories} />
         <main id="main-content" className="flex-1">
           {children}

@@ -12,3 +12,4 @@ test-results/
 # Ảnh trang trí: chỉ commit bản WebP đang dùng; bản PNG gốc nặng và bản "- Copy" trùng nội dung giữ cục bộ.
 apps/web/public/media/decoration/*.png
 apps/web/public/media/decoration/* - Copy.*
+output/
