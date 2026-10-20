@@ -109,7 +109,7 @@ export function VideoUpload({ onUploaded, onBusy }) {
         <div className="flex items-center gap-3 rounded-xl border bg-ivory px-4 py-3" role="status">
           <div className="h-2 flex-1 overflow-hidden rounded-full bg-secondary">
             <div
-              className="h-full rounded-full bg-walnut transition-[width] duration-300"
+              className="h-full rounded-full bg-olive-light transition-[width] duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>

@@ -3,39 +3,47 @@
 
 /*
  * KIHA design tokens.
- * Bảng màu: kem ấm · gỗ tự nhiên · nâu trầm (walnut) · than đen · trắng.
+ * Bảng màu: kem sáng · gỗ tự nhiên · xanh xô thơm (sage) · nâu trầm · trắng.
+ * Không dùng nền đen/than cho bất kỳ thành phần nào; chữ đậm nhất là nâu đậm.
  * Tên biến theo quy ước shadcn/ui để các component dùng chung một nguồn màu.
  */
 :root {
-  --kiha-ivory: #f6f1ea;
-  --kiha-ivory-deep: #efe7dc;
-  --kiha-sand: #ede3d6;
+  --kiha-ivory: #faf7f1;
+  --kiha-ivory-deep: #f3eee5;
+  --kiha-sand: #efe7da;
   --kiha-wood: #c9a882;
-  --kiha-wood-soft: #e4d3bd;
+  --kiha-wood-soft: #eadcc8;
+  --kiha-sage: #e6eadf;
+  --kiha-sage-soft: #eef0e8;
+  --kiha-sage-strong: #c9d3ba;
+  --kiha-sage-deep: #bccaa9;
+  --kiha-olive: #5f6a52;
+  --kiha-olive-light: #6e7d5c;
   --kiha-walnut: #6b4a35;
-  --kiha-walnut-deep: #4e3526;
-  --kiha-charcoal: #262422;
+  --kiha-walnut-deep: #553a29;
+  --kiha-charcoal: #3e3128;
   --kiha-gold: #a47e2c;
 
   --background: var(--kiha-ivory);
   --foreground: var(--kiha-charcoal);
   --card: #ffffff;
   --card-foreground: var(--kiha-charcoal);
-  --popover: #ffffff;
+  --popover: #fffdf9;
   --popover-foreground: var(--kiha-charcoal);
-  --primary: var(--kiha-walnut);
-  --primary-foreground: #ffffff;
+  --primary: var(--kiha-sage-strong);
+  --primary-foreground: var(--kiha-charcoal);
   --secondary: var(--kiha-sand);
   --secondary-foreground: var(--kiha-charcoal);
   --muted: var(--kiha-ivory-deep);
-  --muted-foreground: #6b6259;
-  --accent: var(--kiha-wood-soft);
-  --accent-foreground: var(--kiha-walnut-deep);
+  --muted-foreground: #6f6458;
+  --accent: var(--kiha-sage);
+  --accent-foreground: var(--kiha-charcoal);
   --destructive: #b42318;
-  --success: #2f6b3f;
-  --border: #e2d7c8;
-  --input: #d9ccbb;
-  --ring: var(--kiha-walnut);
+  --success: #3f6b3a;
+  --border: #e6ddcf;
+  --input: #ddd2c2;
+  --ring: var(--kiha-olive);
+  --overlay: rgb(234 226 212 / 0.72);
   --radius: 0.875rem;
 }
 
@@ -65,6 +73,13 @@
   --color-sand: var(--kiha-sand);
   --color-wood: var(--kiha-wood);
   --color-wood-soft: var(--kiha-wood-soft);
+  --color-sage: var(--kiha-sage);
+  --color-sage-soft: var(--kiha-sage-soft);
+  --color-sage-strong: var(--kiha-sage-strong);
+  --color-sage-deep: var(--kiha-sage-deep);
+  --color-olive: var(--kiha-olive);
+  --color-olive-light: var(--kiha-olive-light);
+  --color-overlay: var(--overlay);
   --color-walnut: var(--kiha-walnut);
   --color-walnut-deep: var(--kiha-walnut-deep);
   --color-charcoal: var(--kiha-charcoal);
@@ -80,8 +95,8 @@
   --radius-2xl: calc(var(--radius) + 6px);
   --radius-3xl: calc(var(--radius) + 14px);
 
-  --shadow-soft: 0 1px 2px rgb(38 36 34 / 0.04), 0 10px 30px -14px rgb(38 36 34 / 0.16);
-  --shadow-lift: 0 2px 6px rgb(38 36 34 / 0.05), 0 24px 48px -20px rgb(78 53 38 / 0.32);
+  --shadow-soft: 0 1px 2px rgb(107 74 53 / 0.04), 0 10px 30px -16px rgb(107 74 53 / 0.18);
+  --shadow-lift: 0 2px 6px rgb(107 74 53 / 0.05), 0 24px 48px -22px rgb(107 74 53 / 0.3);
 
   --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -120,7 +135,7 @@
     text-wrap: pretty;
   }
   ::selection {
-    background: var(--kiha-wood-soft);
+    background: var(--kiha-sage-strong);
     color: var(--kiha-charcoal);
   }
   :focus-visible {
@@ -151,11 +166,28 @@
   align-items: center;
   gap: 0.6rem;
   font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: var(--kiha-olive);
+}
+
+/* Tiêu đề lớn nét mảnh, màu nâu trầm như mẫu thiết kế. */
+@utility display-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
   color: var(--kiha-walnut);
+}
+
+/* Khung ảnh bo vòm lệch như mẫu (góc trên lớn, góc dưới vừa). */
+@utility arch {
+  border-radius: 46% 46% 1.75rem 1.75rem / 30% 30% 1.75rem 1.75rem;
+}
+@utility organic {
+  border-radius: 5rem 1.75rem 5rem 1.75rem;
 }
 
 @utility skeleton {
@@ -224,8 +256,8 @@
   top: -4rem;
   z-index: 100;
   border-radius: 999px;
-  background: var(--kiha-charcoal);
-  color: #fff;
+  background: var(--kiha-sage-strong);
+  color: var(--kiha-charcoal);
   padding: 0.7rem 1.1rem;
   font-size: 0.875rem;
   font-weight: 600;

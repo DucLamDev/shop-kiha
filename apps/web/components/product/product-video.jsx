@@ -17,7 +17,7 @@ export function ProductVideo({ src, poster, name, description, className }) {
         aria-label={`Video giới thiệu ${name || 'sản phẩm'}`}
         onError={() => setFailed(true)}
         onLoadedData={() => setFailed(false)}
-        className="aspect-video w-full rounded-2xl bg-charcoal object-contain"
+        className="aspect-video w-full rounded-2xl bg-sand object-contain"
       >
         <source src={src} type={src.endsWith('.webm') ? 'video/webm' : 'video/mp4'} />
         Trình duyệt của bạn không hỗ trợ phát video.

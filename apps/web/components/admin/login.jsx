@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Eye, EyeOff, LockKeyhole } from 'lucide-react';
 import { api } from '@/lib/api';
-import { editorialImages } from '@/lib/editorial-assets';
+import { decor } from '@/lib/editorial-assets';
+import { Brand } from '@/components/site/brand';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Field, FormError } from '@/components/admin/shared';
@@ -15,7 +16,7 @@ export function Login() {
     [error, setError] = useState(null),
     [show, setShow] = useState(false);
   const router = useRouter();
-  const image = editorialImages.hero?.src;
+  const image = decor('hero')?.src;
   async function submit(e) {
     e.preventDefault();
     setBusy(true);
@@ -36,38 +37,29 @@ export function Login() {
   }
   return (
     <main id="main-content" className="grid min-h-dvh bg-ivory lg:grid-cols-[1.1fr_1fr]">
-      <div className="relative hidden overflow-hidden bg-charcoal lg:block">
-        {image && (
-          <Image src={image} alt="" fill sizes="55vw" className="object-cover opacity-70" preload />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/30 to-charcoal/10" />
-        <div className="relative flex h-full flex-col justify-between p-12 text-ivory">
-          <Link href="/" className="font-display text-4xl font-extrabold tracking-[-0.06em]">
-            kiha<span className="text-wood">.</span>
-          </Link>
+      <div className="relative hidden overflow-hidden bg-sand lg:block">
+        {image && <Image src={image} alt="" fill sizes="55vw" className="object-cover" preload />}
+        <div className="absolute inset-0 bg-gradient-to-r from-ivory/90 via-ivory/50 to-ivory/10" />
+        <div className="relative flex h-full flex-col justify-between p-12 text-walnut">
+          <Brand size="lg" />
           <div>
-            <p className="max-w-md font-display text-4xl leading-tight font-extrabold tracking-[-0.03em]">
+            <p className="display-title max-w-md text-5xl">
               Chăm chút bộ sưu tập giường gỗ của KIHA.
             </p>
-            <p className="mt-4 max-w-sm text-ivory/70">
+            <p className="mt-4 max-w-sm text-muted-foreground">
               Quản lý sản phẩm, danh mục, hình ảnh và thông tin liên hệ hiển thị trên website.
             </p>
           </div>
-          <p className="text-xs text-ivory/50">Ảnh minh họa AI</p>
+          <p className="text-xs text-muted-foreground">Gợi ý không gian · Hình ảnh AI</p>
         </div>
       </div>
       <div className="flex items-center justify-center px-5 py-12">
         <div className="w-full max-w-sm">
-          <Link
-            href="/"
-            className="font-display text-3xl font-extrabold tracking-[-0.06em] lg:hidden"
-          >
-            kiha<span className="text-wood">.</span>
-          </Link>
+          <Brand className="lg:hidden" />
           <span className="mt-10 flex size-12 items-center justify-center rounded-2xl bg-white text-walnut shadow-soft lg:mt-0">
             <LockKeyhole className="size-5" />
           </span>
-          <h1 className="mt-6 text-3xl font-extrabold tracking-[-0.03em]">Đăng nhập quản trị</h1>
+          <h1 className="display-title mt-6 text-4xl">Đăng nhập quản trị</h1>
           <p className="mt-2 text-muted-foreground">Dành cho tài khoản quản trị viên của KIHA.</p>
           <form className="mt-8 grid gap-5" onSubmit={submit}>
             <FormError error={error} />

@@ -1,43 +1,34 @@
-import Image from 'next/image';
 import Link from 'next/link';
+import { Feather } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export function Brand({ settings, className, inverse = false, href = '/' }) {
+// Logo chữ KIHA kèm lông vũ theo mẫu thiết kế. Logo ảnh trong cài đặt vẫn dùng cho SEO/JSON-LD.
+export function Brand({ settings, className, href = '/', size = 'default' }) {
   const name = settings?.shopName || 'Nội Thất KIHA';
   return (
     <Link
       href={href}
-      className={cn('group inline-flex shrink-0 items-center gap-3 rounded-lg', className)}
+      className={cn(
+        'group inline-flex shrink-0 items-center gap-3 rounded-full text-walnut',
+        className,
+      )}
       aria-label={`${name} — Trang chủ`}
     >
-      {settings?.logo && !inverse ? (
-        <Image
-          src={settings.logo}
-          width={87}
-          height={40}
-          alt="KIHA"
-          loading="eager"
-          className="h-9 w-auto sm:h-10"
-        />
-      ) : (
-        <span
-          className={cn(
-            'font-display text-[1.9rem] leading-none font-extrabold tracking-[-0.06em]',
-            inverse ? 'text-ivory' : 'text-charcoal',
-          )}
-        >
-          kiha<span className="text-wood">.</span>
-        </span>
-      )}
+      <Feather
+        className={cn(
+          'shrink-0 -rotate-12 transition-transform duration-500 group-hover:rotate-0',
+          size === 'lg' ? 'size-7' : 'size-6',
+        )}
+        strokeWidth={1.5}
+        aria-hidden="true"
+      />
       <span
         className={cn(
-          'hidden border-l pl-3 text-[10px] leading-tight font-bold tracking-[0.18em] uppercase sm:block',
-          inverse ? 'border-ivory/20 text-ivory/70' : 'border-charcoal/15 text-muted-foreground',
+          'font-display leading-none font-medium tracking-[0.42em]',
+          size === 'lg' ? 'text-2xl' : 'text-xl sm:text-[1.4rem]',
         )}
       >
-        Nội thất
-        <br />
-        gỗ pallet
+        KIHA
       </span>
     </Link>
   );

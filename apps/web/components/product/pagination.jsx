@@ -53,7 +53,9 @@ export function Pagination({ current, page, pages }) {
             aria-label={`Trang ${n}`}
             className={cn(
               base,
-              n === page ? 'bg-charcoal text-ivory' : 'hover:bg-white hover:shadow-soft',
+              n === page
+                ? 'bg-primary text-primary-foreground'
+                : 'text-walnut hover:bg-white hover:shadow-soft',
             )}
           >
             {n}

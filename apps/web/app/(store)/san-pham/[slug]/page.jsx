@@ -1,6 +1,6 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, CircleCheck, MessageCircleMore, Phone } from 'lucide-react';
+import { ArrowRight, CircleCheck, MessageCircle, Phone } from 'lucide-react';
 import { getData, getSettings, jsonLd, pageMeta, siteUrl } from '@/lib/server-api';
 import { telHref } from '@/lib/contact';
 import { hasPrice, priceText } from '@/lib/utils';
@@ -125,19 +125,19 @@ export default async function ProductDetail({ params }) {
                 <Link
                   key={c._id}
                   href={`/san-pham?category=${c.slug}`}
-                  className="rounded-full border border-walnut/20 bg-white/70 px-3 py-1 text-xs font-bold tracking-wide text-walnut transition-colors hover:border-walnut hover:bg-white"
+                  className="rounded-full bg-accent px-3 py-1 text-xs text-olive transition-colors hover:bg-sage-strong hover:text-charcoal"
                 >
                   {c.name}
                 </Link>
               ))}
               {product.isDemo && (
-                <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-muted-foreground">
+                <span className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">
                   Ảnh tham khảo · chưa xác nhận thông tin
                 </span>
               )}
             </div>
             <h1
-              className="kiha-rise mt-4 text-[2rem] leading-[1.12] font-extrabold tracking-[-0.03em] sm:text-4xl lg:text-[2.6rem]"
+              className="display-title kiha-rise mt-4 text-[2.2rem] leading-[1.08] sm:text-[2.75rem] lg:text-[3.1rem]"
               style={{ '--delay': '100ms' }}
             >
               {product.name}
@@ -151,13 +151,11 @@ export default async function ProductDetail({ params }) {
               </p>
             )}
             <div
-              className="kiha-rise mt-6 rounded-2xl border bg-white p-5 shadow-soft sm:p-6"
+              className="kiha-rise mt-6 rounded-[1.75rem] bg-sand/70 p-5 sm:p-6"
               style={{ '--delay': '180ms' }}
             >
-              <p className="text-xs font-bold tracking-[0.14em] text-muted-foreground uppercase">
-                {hasPrice(product) ? 'Giá tham khảo' : 'Giá bán'}
-              </p>
-              <p className="mt-1 font-display text-[1.75rem] font-extrabold tracking-tight text-walnut">
+              <p className="eyebrow">{hasPrice(product) ? 'Giá tham khảo' : 'Giá bán'}</p>
+              <p className="mt-2 font-display text-[1.75rem] tracking-[-0.03em] text-walnut">
                 {priceText(product)}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -182,9 +180,9 @@ export default async function ProductDetail({ params }) {
               <ul className="kiha-rise mt-6 grid gap-3" style={{ '--delay': '220ms' }}>
                 {s.commitments.map((item, i) => (
                   <li key={i} className="flex gap-3 text-[15px]">
-                    <CircleCheck className="mt-0.5 size-5 shrink-0 text-walnut" />
+                    <CircleCheck className="mt-0.5 size-5 shrink-0 text-olive" strokeWidth={1.6} />
                     <span>
-                      <strong className="font-semibold">{item.title}</strong>
+                      <strong className="font-medium text-walnut">{item.title}</strong>
                       {item.description && (
                         <span className="text-muted-foreground"> — {item.description}</span>
                       )}
@@ -196,7 +194,7 @@ export default async function ProductDetail({ params }) {
             <Accordion
               type="multiple"
               defaultValue={['description', 'specs']}
-              className="kiha-rise mt-8 border-t"
+              className="kiha-rise mt-8 border-t border-walnut/15"
               style={{ '--delay': '260ms' }}
             >
               <AccordionItem value="description">
@@ -211,7 +209,7 @@ export default async function ProductDetail({ params }) {
                 <AccordionItem value="specs">
                   <AccordionTrigger>Thông số</AccordionTrigger>
                   <AccordionContent>
-                    <dl className="divide-y rounded-xl border bg-white">
+                    <dl className="divide-y divide-walnut/10 rounded-2xl bg-white/70">
                       {product.specifications.map((spec, i) => (
                         <div
                           key={i}
@@ -248,12 +246,12 @@ export default async function ProductDetail({ params }) {
         </section>
       )}
       {relatedItems.length > 0 && (
-        <section aria-labelledby="related-title" className="border-t bg-white py-16 sm:py-20">
+        <section aria-labelledby="related-title" className="py-16 sm:py-20">
           <div className="container-page">
             <SectionHeading
               id="related-title"
               eyebrow={category?.name || 'Gợi ý'}
-              title="Sản phẩm liên quan"
+              title={['Có thể bạn', 'cũng sẽ thích.']}
               action={
                 <Button asChild variant="outline">
                   <Link href={category ? `/san-pham?category=${category.slug}` : '/san-pham'}>
@@ -278,13 +276,13 @@ function MobileCtaBar({ settings, name }) {
   const phone = telHref(settings.phone);
   if (!settings.zaloUrl && !phone) return null;
   return (
-    <div className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t bg-white/95 px-4 pt-3 shadow-[0_-12px_30px_-20px_rgb(38_36_34/0.4)] backdrop-blur md:hidden">
+    <div className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-white bg-ivory/95 px-4 pt-3 shadow-[0_-12px_30px_-20px_rgb(107_74_53/0.35)] backdrop-blur md:hidden">
       <div className="flex gap-2.5">
         {phone && (
           <a
             href={phone}
             aria-label={`Gọi ${settings.phone}`}
-            className="flex size-12 shrink-0 items-center justify-center rounded-full border border-charcoal/15 bg-white"
+            className="flex size-12 shrink-0 items-center justify-center rounded-full border border-walnut/20 bg-white text-walnut"
           >
             <Phone className="size-5" />
           </a>
@@ -295,9 +293,9 @@ function MobileCtaBar({ settings, name }) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Tư vấn ${name} qua Zalo`}
-            className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-primary font-display text-[15px] font-semibold text-primary-foreground"
+            className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-primary font-display text-[15px] font-medium text-primary-foreground"
           >
-            <MessageCircleMore className="size-5" />
+            <MessageCircle className="size-5" />
             Tư vấn qua Zalo
           </a>
         )}

@@ -1,59 +1,69 @@
-import { ZaloButton, PhoneButton } from '@/components/site/contact-buttons';
+import Image from 'next/image';
+import { ArrowUpRight } from 'lucide-react';
+import { ZaloButton } from '@/components/site/contact-buttons';
 import { Reveal } from '@/components/site/reveal';
+import { decor } from '@/lib/editorial-assets';
+import { telHref } from '@/lib/contact';
 
-// Khối kêu gọi tư vấn dùng chung ở cuối trang chủ, danh sách và chi tiết sản phẩm.
+// Khối kêu gọi tư vấn sáng màu trên nền ảnh trang trí, dùng chung ở cuối các trang.
 export function ContactBand({
   settings,
-  eyebrow = 'Tư vấn qua Zalo',
-  title = 'Chưa chọn được mẫu giường phù hợp?',
-  description = 'Gửi KIHA kích thước phòng, kích thước nệm và mẫu bạn thích. KIHA sẽ tư vấn và báo giá trực tiếp qua Zalo.',
+  eyebrow = 'Bắt đầu từ một cuộc trò chuyện',
+  title = ['Cùng chọn', 'một góc bình yên.'],
+  description = 'Gửi KIHA mẫu giường bạn thích và kích thước phòng. Mình cùng tìm lựa chọn phù hợp nhé.',
 }) {
+  const image = decor('consultation-banner');
+  const phone = telHref(settings?.phone);
   return (
-    <section className="container-page py-16 sm:py-20" aria-labelledby="contact-band-title">
+    <section className="container-page py-16 sm:py-24" aria-labelledby="contact-band-title">
       <Reveal>
-        <div className="relative overflow-hidden rounded-[2rem] bg-walnut-deep px-6 py-12 text-ivory sm:px-12 sm:py-16 lg:px-16">
+        <div className="relative overflow-hidden rounded-[2rem] bg-sand sm:rounded-[2.75rem]">
+          {image && (
+            <Image
+              src={image.src}
+              alt=""
+              fill
+              sizes="(max-width: 1280px) 100vw, 1200px"
+              className="object-cover object-right"
+            />
+          )}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 opacity-[0.08]"
-            style={{
-              backgroundImage:
-                'repeating-linear-gradient(100deg, transparent 0 26px, rgb(255 255 255 / 0.9) 26px 27px, transparent 27px 58px)',
-            }}
+            className="absolute inset-0 bg-gradient-to-r from-ivory via-ivory/80 to-ivory/10"
           />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-wood/25 blur-3xl"
-          />
-          <div className="relative grid grid-cols-1 items-center gap-8 lg:grid-cols-[1.4fr_1fr]">
-            <div>
-              <p className="eyebrow text-wood">
-                <span className="h-px w-6 bg-current opacity-60" aria-hidden="true" />
-                {eyebrow}
-              </p>
-              <h2
-                id="contact-band-title"
-                className="mt-4 text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl lg:text-[2.75rem]"
-              >
-                {title}
-              </h2>
-              <p className="mt-4 max-w-xl text-[17px] text-ivory/75">{description}</p>
-            </div>
-            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-end">
-              <ZaloButton
-                settings={settings}
-                variant="inverse"
-                size="lg"
-                arrow
-                className="lg:min-w-64"
-              />
-              <PhoneButton
-                settings={settings}
-                variant="inverse-outline"
-                size="lg"
-                className="lg:min-w-64"
-              />
+          <div className="relative max-w-xl px-6 py-14 sm:px-12 sm:py-20 lg:px-16">
+            <p className="eyebrow">{eyebrow}</p>
+            <h2
+              id="contact-band-title"
+              className="display-title mt-4 text-[2.4rem] sm:text-5xl lg:text-[3.6rem]"
+            >
+              {title.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
+            </h2>
+            <p className="mt-5 max-w-md text-[16px] text-muted-foreground">{description}</p>
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <ZaloButton settings={settings} size="lg" arrow className="px-7">
+                Tư vấn Zalo
+              </ZaloButton>
+              {phone && (
+                <a
+                  href={phone}
+                  className="inline-flex items-center gap-1 font-display text-[15px] text-walnut underline-offset-4 hover:underline"
+                >
+                  {settings.phone}
+                  <ArrowUpRight className="size-4" />
+                </a>
+              )}
             </div>
           </div>
+          {image && (
+            <span className="absolute right-4 bottom-4 rounded-full bg-white/80 px-3 py-1 text-[11px] text-muted-foreground backdrop-blur">
+              Gợi ý không gian · Hình ảnh AI
+            </span>
+          )}
         </div>
       </Reveal>
     </section>

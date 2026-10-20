@@ -1,132 +1,157 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowDown, ArrowRight, Feather, Lamp, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ZaloButton } from '@/components/site/contact-buttons';
 import { illustrationCaption } from '@/lib/editorial-assets';
-import { cn, lines } from '@/lib/utils';
+import { lines } from '@/lib/utils';
 
-export function Hero({ settings, spotlight, productCount, categoryCount }) {
+const hotspots = [
+  { label: 'Tựa đầu, tựa bình yên', className: 'top-[44%] left-[44%]' },
+  { label: 'Mộc mạc từ những thanh gỗ', className: 'top-[67%] left-[39%]' },
+];
+const promises = [
+  { icon: MessageCircle, label: 'Lắng nghe nhu cầu' },
+  { icon: Feather, label: 'Gợi ý mẫu phù hợp' },
+  { icon: Lamp, label: 'Chọn góc nghỉ của riêng bạn' },
+];
+
+// Hero tràn viền: ảnh nằm dưới header nổi, chữ nâu trên nền sáng, thẻ tư vấn bên phải.
+export function Hero({ settings }) {
   const s = settings;
-  const title = lines(s.heroTitle || 'Giường gỗ pallet\ncho tổ ấm của bạn.');
+  const title = lines(s.heroTitle || 'Một góc nhỏ.\nThật nhiều bình yên.');
+  const description = lines(s.heroDescription);
   const caption = illustrationCaption(s.heroImage);
-  const stats = [
-    productCount > 0 && { value: productCount, label: 'sản phẩm' },
-    categoryCount > 0 && { value: categoryCount, label: 'dòng sản phẩm' },
-    s.zaloUrl && { value: 'Zalo', label: 'tư vấn & báo giá' },
-  ].filter(Boolean);
-
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-0 right-0 hidden h-full w-[42%] bg-ivory-deep lg:block"
-      />
-      <div className="container-page relative grid grid-cols-1 items-center gap-10 pt-8 pb-16 sm:pt-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-14 lg:pb-24">
-        <div className="max-w-2xl">
-          <p className="eyebrow kiha-rise">
-            <span className="h-px w-8 bg-current opacity-60" aria-hidden="true" />
-            Nội thất gỗ pallet KIHA
-          </p>
-          <h1
-            id="hero-title"
-            className="kiha-rise mt-5 text-[2.6rem] leading-[1.04] font-extrabold tracking-[-0.04em] sm:text-6xl lg:text-[4.4rem]"
-            style={{ '--delay': '80ms' }}
-          >
-            {title.map((line, i) => (
-              <span
-                key={i}
-                className={i === title.length - 1 && i > 0 ? 'block text-walnut' : 'block'}
-              >
-                {line}
-              </span>
-            ))}
-          </h1>
-          {s.heroDescription && (
-            <p
-              className="kiha-rise mt-6 max-w-xl text-[17px] leading-relaxed text-muted-foreground sm:text-lg"
-              style={{ '--delay': '160ms' }}
+    <section
+      aria-labelledby="hero-title"
+      className="relative -mt-[76px] bg-sage pb-2 sm:-mt-[84px] lg:pb-0"
+    >
+      <div className="relative h-[44rem] overflow-hidden sm:h-[50rem] lg:h-[min(54rem,100svh)] lg:min-h-[46rem]">
+        {s.heroImage && (
+          <Image
+            src={s.heroImage}
+            alt={caption || 'Phòng ngủ sáng với giường gỗ pallet'}
+            fill
+            preload
+            sizes="100vw"
+            className="kiha-settle object-cover object-[62%_60%] lg:object-center"
+          />
+        )}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-b from-ivory/85 via-ivory/35 to-transparent lg:bg-gradient-to-r lg:from-ivory/75 lg:via-ivory/20 lg:to-transparent"
+        />
+        <div className="container-page relative pt-32 sm:pt-40 lg:pt-44">
+          <div className="max-w-3xl">
+            <p className="eyebrow kiha-rise">Nội thất KIHA · Mộc mạc từng góc nhỏ</p>
+            <h1
+              id="hero-title"
+              className="display-title kiha-rise mt-5 text-[2.75rem] sm:text-6xl lg:text-[4.6rem]"
+              style={{ '--delay': '80ms' }}
             >
-              {s.heroDescription}
-            </p>
-          )}
-          <div className="kiha-rise mt-8 flex flex-wrap gap-3" style={{ '--delay': '240ms' }}>
-            <ZaloButton settings={s} size="lg" arrow />
-            <Button asChild variant="outline" size="lg">
-              <Link href="/san-pham">
-                Xem tất cả sản phẩm
-                <ArrowRight />
-              </Link>
-            </Button>
-          </div>
-          {stats.length > 0 && (
-            <dl
-              className="kiha-rise mt-10 grid max-w-lg grid-cols-3 border-t border-charcoal/10 pt-6"
-              style={{ '--delay': '320ms' }}
-            >
-              {stats.map((item, i) => (
-                <div
-                  key={item.label}
-                  className={cn(
-                    'flex flex-col-reverse',
-                    i && 'border-l border-charcoal/10 pl-4 sm:pl-6',
-                  )}
-                >
-                  <dt className="mt-1 text-xs text-muted-foreground sm:text-[13px]">
-                    {item.label}
-                  </dt>
-                  <dd className="font-display text-2xl font-extrabold tracking-tight sm:text-3xl">
-                    {item.value}
-                  </dd>
-                </div>
+              {title.map((line, i) => (
+                <span key={i} className="block">
+                  {line}
+                </span>
               ))}
-            </dl>
-          )}
-        </div>
-        <div className="relative lg:pl-4">
-          <div className="kiha-settle relative aspect-[4/3] overflow-hidden rounded-[2rem] bg-sand shadow-lift sm:aspect-[16/11] lg:aspect-auto lg:h-[min(38rem,74vh)]">
-            {s.heroImage && (
-              <Image
-                src={s.heroImage}
-                alt={caption || 'Không gian phòng ngủ với giường gỗ pallet KIHA'}
-                fill
-                preload
-                sizes="(max-width: 1024px) 94vw, 48vw"
-                className="object-cover"
-              />
+            </h1>
+            {description.length > 0 && (
+              <p
+                className="kiha-rise mt-6 max-w-md text-[15px] leading-relaxed text-charcoal/75 sm:text-base"
+                style={{ '--delay': '160ms' }}
+              >
+                {description.map((line, i) => (
+                  <span key={i} className="block">
+                    {line}
+                  </span>
+                ))}
+              </p>
             )}
-            {caption && (
-              <span className="absolute top-4 left-4 rounded-full bg-white/85 px-3 py-1 text-[11px] font-semibold text-charcoal/80 backdrop-blur">
-                {caption}
-              </span>
-            )}
+            <div className="kiha-rise mt-8" style={{ '--delay': '240ms' }}>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="bg-white/45 px-7 backdrop-blur"
+              >
+                <Link href="/san-pham">
+                  Khám phá
+                  <ArrowRight />
+                </Link>
+              </Button>
+            </div>
           </div>
-          {spotlight && (
-            <Link
-              href={`/san-pham/${spotlight.slug}`}
-              className="kiha-rise group absolute -bottom-8 left-4 flex w-[min(19rem,calc(100%-2rem))] items-center gap-3 rounded-2xl border border-white/60 bg-white/95 p-2.5 pr-4 shadow-lift backdrop-blur transition-transform duration-500 hover:-translate-y-1 sm:left-6 lg:-left-10"
-              style={{ '--delay': '500ms' }}
-            >
-              <span className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-sand">
-                <Image
-                  src={spotlight.thumbnail}
-                  alt=""
-                  fill
-                  sizes="64px"
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[11px] font-bold tracking-[0.12em] text-walnut uppercase">
-                  Mẫu nổi bật
+        </div>
+        {hotspots.map((spot, i) => (
+          <span
+            key={spot.label}
+            aria-hidden="true"
+            className={`kiha-rise absolute hidden items-center gap-3 lg:flex ${spot.className}`}
+            style={{ '--delay': `${600 + i * 150}ms` }}
+          >
+            <span className="relative flex size-5 items-center justify-center rounded-full border-2 border-white bg-olive-light shadow-sm">
+              <span className="absolute inset-0 animate-ping rounded-full bg-white/60 motion-reduce:hidden" />
+            </span>
+            <span className="rounded-xl bg-white/95 px-3.5 py-2 text-xs text-charcoal shadow-soft">
+              {spot.label}
+            </span>
+          </span>
+        ))}
+        <a
+          href="#khong-gian"
+          className="absolute bottom-24 left-5 hidden items-center gap-3 border-l border-walnut/40 py-1 pl-4 text-xs leading-snug text-walnut sm:flex lg:bottom-20 lg:left-14"
+        >
+          <span>
+            Cuộn xuống
+            <br />
+            khám phá thêm
+          </span>
+          <ArrowDown className="size-3.5 animate-bounce motion-reduce:animate-none" />
+        </a>
+        {caption && (
+          <span className="absolute right-4 bottom-20 hidden rounded-full bg-white/80 px-3 py-1 text-[11px] text-muted-foreground backdrop-blur sm:block lg:bottom-14">
+            {caption}
+          </span>
+        )}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 1440 80"
+          preserveAspectRatio="none"
+          className="absolute inset-x-0 -bottom-px h-10 w-full text-sage sm:h-16"
+        >
+          <path fill="currentColor" d="M0 34 C 360 4 1080 4 1440 52 L1440 80 L0 80 Z" />
+        </svg>
+      </div>
+      <div className="relative z-10 container-page -mt-40 sm:-mt-48 lg:pointer-events-none lg:absolute lg:inset-x-0 lg:bottom-28 lg:mt-0 lg:flex lg:justify-end">
+        <div
+          className="kiha-rise pointer-events-auto rounded-[1.75rem] border border-white/80 bg-ivory/95 p-6 shadow-lift backdrop-blur-md lg:w-[21rem]"
+          style={{ '--delay': '420ms' }}
+        >
+          <div className="flex gap-4">
+            <Feather className="mt-1 size-6 shrink-0 text-olive" strokeWidth={1.4} />
+            <div>
+              <h2 className="font-display text-lg tracking-[-0.02em] text-walnut">
+                Tìm chiếc giường của bạn
+              </h2>
+              <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
+                Chia sẻ nhu cầu, KIHA cùng bạn chọn mẫu giường phù hợp.
+              </p>
+            </div>
+          </div>
+          <ZaloButton settings={s} size="lg" arrow className="mt-5 w-full">
+            Tư vấn Zalo
+          </ZaloButton>
+          <ul className="mt-5 hidden grid-cols-3 divide-x divide-walnut/10 text-center lg:grid">
+            {promises.map(({ icon: Icon, label }) => (
+              <li key={label} className="px-2">
+                <Icon className="mx-auto size-5 text-walnut" strokeWidth={1.4} />
+                <span className="mt-2 block text-[11px] leading-snug text-muted-foreground">
+                  {label}
                 </span>
-                <span className="mt-0.5 line-clamp-2 font-display text-sm leading-snug font-bold">
-                  {spotlight.name}
-                </span>
-              </span>
-              <ArrowUpRight className="ml-auto size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-walnut" />
-            </Link>
-          )}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

@@ -1,7 +1,7 @@
 import { SearchX, X } from 'lucide-react';
 import { getCategories, getData, getSettings, jsonLd, pageMeta, siteUrl } from '@/lib/server-api';
 import { catalogHref, parseCatalogQuery } from '@/lib/catalog';
-import { Breadcrumbs } from '@/components/site/breadcrumbs';
+import { PageIntro } from '@/components/site/page-intro';
 import { CatalogLink, CatalogShell } from '@/components/product/catalog-shell';
 import { ProductGrid } from '@/components/product/product-card';
 import { Pagination } from '@/components/product/pagination';
@@ -69,35 +69,21 @@ export default async function Products({ searchParams }) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(breadcrumb)} />
-      <div className="container-page pt-6 pb-4 sm:pt-8">
-        <Breadcrumbs
-          items={
-            category
-              ? [{ label: 'Sản phẩm', href: '/san-pham' }, { label: category.name }]
-              : [{ label: 'Sản phẩm' }]
-          }
-        />
-        <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <p className="eyebrow kiha-rise">
-              <span className="h-px w-6 bg-current opacity-60" aria-hidden="true" />
-              {category ? 'Danh mục' : 'Bộ sưu tập KIHA'}
-            </p>
-            <h1
-              className="kiha-rise mt-3 text-4xl font-extrabold tracking-[-0.035em] sm:text-5xl"
-              style={{ '--delay': '60ms' }}
-            >
-              {category ? category.name : 'Sản phẩm'}
-            </h1>
-            <p
-              className="kiha-rise mt-4 text-[17px] text-muted-foreground"
-              style={{ '--delay': '120ms' }}
-            >
-              {category?.description ||
-                'Giường gỗ pallet nhiều kiểu dáng và kích thước. Chọn mẫu bạn thích rồi nhắn KIHA qua Zalo để được tư vấn và báo giá.'}
-            </p>
-          </div>
-        </div>
+      <PageIntro
+        breadcrumbs={
+          category
+            ? [{ label: 'Sản phẩm', href: '/san-pham' }, { label: category.name }]
+            : [{ label: 'Sản phẩm' }]
+        }
+        eyebrow={category ? 'Danh mục' : 'Bộ sưu tập KIHA'}
+        title={category ? category.name : ['Mỗi chiếc giường,', 'một góc nghỉ.']}
+        description={
+          category?.description ||
+          'Giường gỗ pallet nhiều kiểu dáng và kích thước. Chọn mẫu bạn thích rồi nhắn KIHA qua Zalo để được tư vấn và báo giá.'
+        }
+        imageRole="collection"
+      />
+      <div className="container-page pb-4">
         <CatalogShell current={current} categories={categories} hasPrices={hasPrices}>
           <div className="mt-6 mb-6 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground" aria-live="polite">
@@ -116,7 +102,7 @@ export default async function Products({ searchParams }) {
             {current.q && (
               <CatalogLink
                 href={catalogHref(current, { q: '' })}
-                className="inline-flex items-center gap-1.5 rounded-full bg-secondary py-1.5 pr-2.5 pl-3.5 text-[13px] font-semibold transition-colors hover:bg-wood-soft"
+                className="inline-flex items-center gap-1.5 rounded-full bg-accent py-1.5 pr-2.5 pl-3.5 text-[13px] transition-colors hover:bg-sage-strong"
               >
                 Từ khóa: “{current.q}”
                 <X className="size-3.5" aria-label="Bỏ từ khóa" />

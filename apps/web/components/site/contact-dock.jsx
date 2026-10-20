@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'motion/react';
-import { MessageCircleMore, Phone } from 'lucide-react';
+import { MessageCircle, Phone } from 'lucide-react';
 import { telHref } from '@/lib/contact';
 import { cn } from '@/lib/utils';
 
@@ -40,11 +40,11 @@ export function ContactDock({ settings }) {
             <a
               href={phoneHref}
               aria-label={`Gọi ${settings.phone}`}
-              className="group hidden h-12 items-center gap-2 rounded-full border border-charcoal/10 bg-white pr-2 pl-4 font-display text-sm font-bold text-charcoal shadow-lift transition-colors hover:border-walnut/40 md:inline-flex"
+              className="group hidden h-12 items-center gap-2 rounded-full border border-white bg-ivory/95 pr-2 pl-4 font-display text-sm text-walnut shadow-lift backdrop-blur transition-colors hover:bg-white md:inline-flex"
             >
               {settings.phone}
-              <span className="flex size-9 items-center justify-center rounded-full bg-secondary transition-colors group-hover:bg-walnut group-hover:text-white">
-                <Phone className="size-4" />
+              <span className="flex size-9 items-center justify-center rounded-full bg-accent transition-colors group-hover:bg-primary">
+                <Phone className="size-4" strokeWidth={1.7} />
               </span>
             </a>
           )}
@@ -54,11 +54,11 @@ export function ContactDock({ settings }) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Chat với KIHA qua Zalo"
-              className="inline-flex h-13 items-center gap-2 rounded-full bg-primary pr-5 pl-2 font-display text-sm font-bold text-primary-foreground shadow-lift transition-colors hover:bg-walnut-deep"
+              className="inline-flex h-13 items-center gap-2 rounded-full border border-white/70 bg-primary pr-5 pl-2 font-display text-sm font-medium text-primary-foreground shadow-lift transition-colors hover:bg-sage-deep"
             >
-              <span className="relative flex size-9 items-center justify-center rounded-full bg-white/15">
-                <span className="absolute inset-0 animate-ping rounded-full bg-white/20 motion-reduce:hidden" />
-                <MessageCircleMore className="size-5" />
+              <span className="relative flex size-9 items-center justify-center rounded-full bg-white/55">
+                <span className="absolute inset-0 animate-ping rounded-full bg-white/40 motion-reduce:hidden" />
+                <MessageCircle className="size-5" strokeWidth={1.7} />
               </span>
               Chat Zalo
             </a>

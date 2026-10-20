@@ -99,7 +99,7 @@ try {
     }
     await page.goBack();
     await page.waitForURL('**/san-pham?sort=name');
-    await page.locator('h1', { hasText: 'Sản phẩm' }).waitFor();
+    await page.locator('h1', { hasText: 'Mỗi chiếc giường' }).waitFor();
   });
   await check('Product details and accessible image lightbox', async () => {
     await page.locator('#ket-qua article h3 a').first().click();

@@ -1,5 +1,18 @@
 # KIHA — Kết quả kiểm tra
 
+## Thiết kế theo 2 mẫu mới, bỏ nền đen — 19/10/2026
+
+| Hạng mục | Kết quả thực tế |
+| --- | --- |
+| `npm run lint` | Thành công |
+| `npm test` | 23/23 kiểm thử API đạt |
+| `npm run build` | Thành công |
+| `npm run test:browser` | 14/14 nhóm đạt |
+| `npm run test:design` | 12/12 nhóm đạt, gồm kiểm tra không có nền đen/tối trên trang chủ, sản phẩm, chi tiết, liên hệ, đăng nhập |
+| Admin | Tổng quan, form sản phẩm, cài đặt, đăng nhập: không lỗi JS, không tràn ngang, không nền tối |
+| `vpsttt-shot` | 4 trang khách hàng × máy tính/điện thoại × sáng/tối đã xem từng ảnh |
+| Ảnh trang trí | 15 ảnh `decoration/` đăng ký vào thư viện (bản sao SHA-256), file gốc giữ nguyên |
+
 ## Thiết kế lại giao diện — 19/10/2026 (Asia/Saigon)
 
 Chạy trên máy chủ dev Linux (Node.js 22.23, MongoDB 8.0.17 local cổng riêng, web 3517 / API 4517), dữ liệu seed từ bộ ảnh chủ shop (38 sản phẩm, 6 danh mục). Trình duyệt kiểm thử: Chromium headless shell có sẵn trên máy (`CHROMIUM_PATH`).
