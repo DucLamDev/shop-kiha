@@ -44,21 +44,60 @@ export async function assertPortFree(port, host, label) {
   });
 }
 
-export async function mongoReady(uri) {
+export async function mongoReady(uri, { timeout = 1200, onError } = {}) {
   if (!uri) return false;
-  const client = new mongoose.mongo.MongoClient(uri, {
-    serverSelectionTimeoutMS: 1200,
-    connectTimeoutMS: 1200,
-  });
+  let client;
   try {
+    client = new mongoose.mongo.MongoClient(uri, {
+      serverSelectionTimeoutMS: timeout,
+      connectTimeoutMS: timeout,
+    });
     await client.connect();
     await client.db().command({ ping: 1 });
     return true;
-  } catch {
+  } catch (error) {
+    onError?.(error);
     return false;
   } finally {
-    await client.close();
+    await client?.close();
   }
+}
+
+export function mongoFailureMessage(error, { atlas = false } = {}) {
+  const causes = [];
+  const seen = new Set();
+  for (let cause = error; cause && !seen.has(cause); cause = cause.cause) {
+    seen.add(cause);
+    causes.push(`${cause.name} ${cause.code} ${cause.message}`);
+  }
+  const details = causes.join(' ');
+  const accessHint = atlas
+    ? 'Trong Atlas, kiểm tra Network Access → IP Access List của đúng project: IP public hiện tại phải được cho phép và có trạng thái Active. Kiểm tra cluster đang chạy; nếu vẫn lỗi, kiểm tra VPN/proxy/firewall.'
+    : 'Kiểm tra MongoDB đang chạy, địa chỉ/cổng trong MONGODB_URI và firewall.';
+  let hint;
+  if (/MongoParseError|MongoInvalidArgumentError/.test(details)) {
+    hint =
+      'MONGODB_URI không hợp lệ. Lấy lại connection string và mã hóa ký tự đặc biệt trong tài khoản/mật khẩu.';
+  } else if (
+    /AuthenticationFailed|authentication failed|bad auth|MongoServerError 18\b/i.test(details)
+  ) {
+    hint = 'Xác thực thất bại. Kiểm tra database user, mật khẩu và authSource trong MONGODB_URI.';
+  } else if (/CERT_|certificate|self.signed/i.test(details)) {
+    hint =
+      'Không xác minh được chứng chỉ TLS. Kiểm tra ngày giờ máy, CA tin cậy và proxy can thiệp HTTPS/TLS.';
+  } else if (/TLS|SSL/i.test(details)) {
+    const label = /tlsv1 alert internal error|SSL alert number 80/i.test(details)
+      ? 'TLS alert 80'
+      : 'Lỗi TLS/SSL';
+    hint = `${label}: không hoàn tất được kết nối bảo mật tới MongoDB. ${accessHint}`;
+  } else if (/querySrv|queryTxt|ENOTFOUND|EAI_AGAIN|ENODATA/i.test(details)) {
+    hint =
+      'Không tra cứu được DNS của MongoDB. Kiểm tra hostname trong MONGODB_URI, DNS/mạng và trạng thái cluster.';
+  } else {
+    hint = `Không nhận được phản hồi MongoDB hợp lệ trong thời gian chờ. ${accessHint}`;
+  }
+  // Never echo driver messages or the URI: either can contain credentials.
+  return `Không kết nối được MongoDB${atlas ? ' Atlas' : ' đã cấu hình'}.\n${hint}`;
 }
 
 export async function waitFor(check, { timeout = 30000, signal, message }) {

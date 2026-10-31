@@ -1,7 +1,7 @@
 import { getData, siteUrl } from '@/lib/server-api';
 export const dynamic = 'force-dynamic';
 export default async function sitemap() {
-  const entries = ['/', '/san-pham', '/lien-he'].map((path) => ({
+  const entries = ['/', '/san-pham', '/ve-kiha', '/lien-he'].map((path) => ({
     url: siteUrl(path),
     changeFrequency: 'weekly',
     priority: path === '/' ? 1 : 0.8,

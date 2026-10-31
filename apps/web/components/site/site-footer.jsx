@@ -44,7 +44,7 @@ export function SiteFooter({ settings, categories = [] }) {
               </Link>
             </li>
             <li>
-              <Link href="/#ve-kiha" className={linkClass}>
+              <Link href="/ve-kiha" className={linkClass}>
                 Về KIHA
               </Link>
             </li>

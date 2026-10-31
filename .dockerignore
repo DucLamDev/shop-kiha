@@ -1,0 +1,14 @@
+.git
+.env
+.env.*
+**/.env
+**/.env.*
+**/node_modules
+**/.next
+.local
+output
+reports
+img
+**/*.log
+deploy/vps/transfer
+deploy/vps/backups

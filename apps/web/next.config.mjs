@@ -10,7 +10,10 @@ export default {
   experimental: { proxyClientMaxBodySize: '105mb', proxyTimeout: 300000 },
   turbopack: { root },
   async rewrites() {
-    if (!process.env.API_INTERNAL_URL) throw new Error('Set API_INTERNAL_URL in .env');
+    if (!process.env.API_INTERNAL_URL)
+      throw new Error(
+        'API_INTERNAL_URL is required at build time and runtime. Set it in the server environment or root .env file. The VPS Compose configuration supplies http://api:4000 automatically.',
+      );
     return [{ source: '/api/:path*', destination: `${process.env.API_INTERNAL_URL}/api/:path*` }];
   },
   async headers() {

@@ -20,7 +20,7 @@ import { cn } from '@/lib/utils';
 export const navLinks = [
   { href: '/', label: 'Trang chủ' },
   { href: '/san-pham', label: 'Sản phẩm' },
-  { href: '/#ve-kiha', label: 'Về KIHA' },
+  { href: '/ve-kiha', label: 'Về KIHA' },
   { href: '/lien-he', label: 'Liên hệ' },
 ];
 

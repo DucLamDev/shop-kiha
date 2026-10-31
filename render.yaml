@@ -1,0 +1,22 @@
+# Backend preview on Render. The frontend remains on Vercel.
+# Free instances sleep and cannot persist uploaded videos; see README before launch.
+services:
+  - type: web
+    name: kiha-api
+    runtime: node
+    plan: free
+    branch: master
+    buildCommand: npm ci --workspace=@kiha/api --omit=dev --include-workspace-root=false
+    startCommand: npm run start --workspace=@kiha/api
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "24.21.0"
+      - key: NODE_ENV
+        value: production
+      - key: API_HOST
+        value: 0.0.0.0
+      - key: MONGODB_URI
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false

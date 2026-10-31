@@ -45,6 +45,8 @@ Nếu muốn dùng một dịch vụ MongoDB có sẵn, đặt `MONGODB_URI` tư
 
 `npm run dev` chỉ tự khởi động database cho URI local `mongodb://127.0.0.1:27018/kiha` (hoặc `localhost`) không có tài khoản. Với URI khác, database cần sẵn sàng trước khi chạy. `npm start` luôn yêu cầu MongoDB đã chạy và không tự bật database phát triển.
 
+Với MongoDB Atlas, runner cho phép 10 giây để chọn server/kết nối và báo riêng lỗi TLS, DNS, URI hoặc xác thực; không in tài khoản/mật khẩu. Nếu báo `TLS alert 80`, kiểm tra **Network Access → IP Access List** trong đúng project: IP public hiện tại phải được cho phép và có trạng thái **Active**. Kiểm tra cluster đang chạy và VPN/proxy/firewall nếu vẫn lỗi; thông báo TLS chưa đủ để kết luận chắc chắn IP bị chặn. Xem [hướng dẫn kết nối Atlas](https://www.mongodb.com/docs/atlas/troubleshoot-connection/). Sau khi sửa cấu hình Atlas, chạy lại `npm run dev`.
+
 Nếu gặp `ECONNREFUSED ...:27018` trên bản cũ, cập nhật mã rồi chạy lại `npm run dev`. Nếu cổng `3000`/`4000` đang bận, dừng phiên cũ bằng `Ctrl+C` trong terminal đang chạy nó; runner không tự tắt tiến trình khác. Một khóa phiên bị bỏ lại khi đóng cưỡng bức terminal sẽ được bỏ qua ở lần chạy tiếp theo khi PID cũ đã dừng.
 
 Kiểm tra hồi quy khởi động bằng `npm run test:startup` khi đã dừng các phiên KIHA. Bộ kiểm tra dùng dịch vụ thật, xác minh thứ tự khởi động, mở trùng, dừng giữa chừng, lưu dữ liệu qua lần chạy và quyền sở hữu MongoDB; không ghi dữ liệu cửa hàng. Kết quả ở `reports/startup-results.json`.
@@ -67,7 +69,15 @@ Toàn bộ cấu hình ban đầu đặt trong `.env` tại root; xem `.env.exam
 
 Frontend gọi `/api` cùng origin. Next.js chuyển tiếp sang Express; trình duyệt không cần biết địa chỉ backend. Sau khi seed, cấu hình liên hệ và nội dung thương hiệu nằm trong MongoDB, được sửa tại `/admin/cai-dat`. Chạy lại seed **không ghi đè** nội dung admin đã chỉnh. `.env` local đã chứa thông tin liên hệ chủ shop cung cấp trong phiên làm việc.
 
-## Cấu hình project frontend trên Vercel
+## Triển khai hiện tại: VPS Ubuntu 24.04
+
+Website dùng **https://noithatkiha.vn/**. Bộ cài ở [`deploy/vps/README.md`](deploy/vps/README.md): Docker Compose chạy Next.js, Express và MongoDB trên cùng VPS; Nginx cấp HTTPS; MongoDB và video dùng volume bền vững. `API_INTERNAL_URL` được cấp tự động trong Compose.
+
+Có script chuyển sản phẩm, danh mục, ảnh, nội dung, số liệu và video từ máy local; không mang tài khoản admin/session local lên VPS. Có cấu hình proxy cho upload video và giới hạn đăng nhập theo IP khách, script backup, hướng dẫn cập nhật/quay lại code cũ.
+
+Các phần Vercel/Render bên dưới chỉ là tài liệu của phương án trước, không cần thực hiện khi dùng VPS.
+
+## Phương án cũ: frontend trên Vercel
 
 Repository dùng npm workspaces với `package-lock.json` ở root. Trong **Project → Settings → Build and Deployment**, đặt:
 
@@ -92,7 +102,33 @@ Frontend cần các biến môi trường trên Vercel:
 
 Đây là cấu hình triển khai **frontend**. Backend Express, MongoDB và kho video cần được triển khai riêng theo kiến trúc đã chọn; build frontend thành công không tự chuyển database local hoặc file video lên cloud. API cần `ALLOWED_ORIGINS` khớp URL frontend để admin đăng nhập và lưu dữ liệu.
 
+Nếu build dừng ở `API_INTERNAL_URL is required` (hoặc thông báo cũ `Set API_INTERNAL_URL in .env`), bước cài dependency đã qua. Thêm biến trong **Vercel → Project → Settings → Environment Variables**, chọn **Production** và **Preview** cần dùng, lưu rồi redeploy. File `.env` local được Git bỏ qua; không commit file này để sửa lỗi. Khi backend vẫn chỉ chạy trên máy cá nhân, cần thực hiện phần bên dưới trước.
+
 Tham khảo: [Vercel monorepos](https://vercel.com/docs/monorepos), [npm workspaces](https://docs.npmjs.com/cli/using-npm/workspaces/), [npm ci](https://docs.npmjs.com/cli/commands/npm-ci/).
+
+## Phương án cũ: backend trên Render và MongoDB Atlas
+
+`render.yaml` đã chuẩn bị một Web Service dùng gói Free để chạy thử backend. Chưa có tài nguyên cloud nào được tạo chỉ bằng việc thêm file này. Thực hiện theo thứ tự:
+
+1. **Tạo MongoDB Atlas.** Tạo cluster, database user có quyền `readWrite` với database `kiha`, lấy connection string trong **Connect → Drivers** và chọn database `kiha` trong URI. Lưu URI ở mục secret/environment của hosting, không đưa lên GitHub hoặc dán vào chat.
+2. **Đẩy code lên GitHub**, gồm `render.yaml` và thay đổi `apps/api/src/config.mjs`.
+3. **Render → New → Blueprint**, kết nối repository `DucLamDev/shop-kiha`, nhánh `master`. Blueprint dùng thư mục gốc repository để đọc được workspace và lockfile. Nhập hai biến khi Render yêu cầu:
+
+   | Biến trên Render | Giá trị |
+   | --- | --- |
+   | `MONGODB_URI` | Connection string Atlas thật của database `kiha` |
+   | `ALLOWED_ORIGINS` | Origin HTTPS của frontend Vercel, không có dấu `/` cuối; nhiều origin phân cách bằng dấu phẩy |
+
+   `ALLOWED_ORIGINS` dùng tên miền ổn định ở mục **Domains** của Vercel. Muốn đăng nhập admin trên một URL preview khác, thêm chính xác origin đó. Backend tự đọc `PORT` do Render cấp và lắng nghe trên `0.0.0.0`; không đặt `API_PORT` local trên Render.
+4. **Cho phép kết nối Atlas.** Trong Render service, mở **Connect → Outbound** để lấy dải IP outbound; thêm các dải đó vào Atlas **Network Access → IP Access List**. Nếu lần deploy đầu không kết nối được database trước khi thêm IP, redeploy backend sau bước này. Khi dùng công cụ chuyển dữ liệu từ máy cá nhân, thêm IP hiện tại của máy vào Atlas.
+5. **Chuyển dữ liệu trước khi mở cửa hàng.** Cluster Atlas mới chưa có sản phẩm, nội dung admin và tài khoản. Dùng MongoDB Database Tools (`mongodump`/`mongorestore`) để chuyển dữ liệu từ database local vào một database Atlas trống, kiểm tra lại số lượng sản phẩm, danh mục và cấu hình. Không dùng `--drop` với database đang có dữ liệu. Tài khoản demo/local không dùng làm tài khoản quản trị production; tạo tài khoản mới bằng `npm run admin:create` với `MONGODB_URI` trỏ Atlas và `ADMIN_EMAIL`/`ADMIN_PASSWORD` riêng. Không đặt seed hoặc import dữ liệu trong lệnh build/start tự động. Video là file riêng, không được chuyển theo bản sao MongoDB.
+6. **Kiểm tra backend** tại URL Render vừa cấp, đường dẫn `/api/health`; kết quả cần là HTTP 200 và `{"data":{"status":"ok"}}`. Kiểm tra thêm `/api/products?limit=1` và `/api/settings/public` để xác nhận dữ liệu đã có.
+7. **Kết nối Vercel.** Thêm `API_INTERNAL_URL` bằng origin HTTPS thật của backend Render, không kèm `/api` hoặc dấu `/` cuối. Đặt `SITE_URL` bằng origin HTTPS ổn định của frontend. Chọn môi trường Production/Preview tương ứng và redeploy frontend.
+8. **Kiểm tra website online:** danh sách sản phẩm, chi tiết sản phẩm, ảnh, nút Zalo, `/admin/dang-nhap`, lưu một thay đổi cấu hình rồi tải lại. Nếu thao tác admin báo 403, kiểm tra origin website có trong `ALLOWED_ORIGINS` trên Render.
+
+Gói Render Free ngủ sau 15 phút không có truy cập và có thể mất khoảng một phút để khởi động lại. Website hiện chờ API tối đa 10 giây, nên lần truy cập đầu có thể hiện lỗi và cần thử lại khi API đã thức. **File video tải lên filesystem của gói Free sẽ mất khi restart/redeploy/ngủ**. Cấu hình này dành cho kiểm thử; trước khi sử dụng upload video thực tế, cần kho lưu trữ bền vững hoặc persistent disk trên gói hỗ trợ và cấu hình `VIDEO_UPLOAD_DIR`. Không coi triển khai hoàn tất chỉ vì frontend build xanh.
+
+Tài liệu: [Render Express](https://render.com/docs/deploy-node-express-app), [Blueprint](https://render.com/docs/blueprint-spec), [giới hạn Render Free](https://render.com/docs/free), [IP outbound Render](https://render.com/docs/outbound-ip-addresses), [Atlas IP Access List](https://www.mongodb.com/docs/atlas/security/ip-access-list/), [biến môi trường Vercel](https://vercel.com/docs/environment-variables).
 
 ## Khởi tạo admin an toàn
 

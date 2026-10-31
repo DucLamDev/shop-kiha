@@ -1,0 +1,39 @@
+{
+  "checkedAt": "2026-10-27T06:03:49.884Z",
+  "settingsRestored": true,
+  "checks": [
+    {
+      "route": "/",
+      "width": 1440,
+      "socialLinks": 3,
+      "iconsLoaded": true,
+      "phone": "0869 572 198",
+      "footer": true
+    },
+    {
+      "route": "/lien-he",
+      "width": 1440,
+      "socialLinks": 3,
+      "iconsLoaded": true,
+      "phone": "0869 572 198",
+      "footer": true
+    },
+    {
+      "route": "/",
+      "width": 390,
+      "socialLinks": 3,
+      "iconsLoaded": true,
+      "phone": "0869 572 198",
+      "footer": true
+    },
+    {
+      "route": "/lien-he",
+      "width": 390,
+      "socialLinks": 3,
+      "iconsLoaded": true,
+      "phone": "0869 572 198",
+      "footer": true
+    }
+  ],
+  "browserErrors": []
+}

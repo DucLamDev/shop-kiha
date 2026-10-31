@@ -96,6 +96,7 @@ async function listProducts(query, isAdmin) {
 }
 export function createApp(options = {}) {
   const app = express();
+  if (config.trustProxy.length) app.set('trust proxy', config.trustProxy);
   app.disable('x-powered-by');
   app.use(helmet());
   app.use(

@@ -13,3 +13,5 @@ test-results/
 apps/web/public/media/decoration/*.png
 apps/web/public/media/decoration/* - Copy.*
 output/
+deploy/vps/transfer/
+deploy/vps/backups/

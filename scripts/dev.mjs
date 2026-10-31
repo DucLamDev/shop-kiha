@@ -2,7 +2,14 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { config, root } from '../apps/api/src/config.mjs';
-import { assertPortFree, mongoReady, httpReady, waitFor, stopOwnedChild } from './runtime.mjs';
+import {
+  assertPortFree,
+  mongoReady,
+  mongoFailureMessage,
+  httpReady,
+  waitFor,
+  stopOwnedChild,
+} from './runtime.mjs';
 
 const production = process.argv.includes('--production');
 const webPort = Number(process.env.PORT || 3000);
@@ -134,24 +141,32 @@ try {
     );
   if (!config.mongoUri) throw new Error('Thiếu MONGODB_URI trong .env.');
   console.log('[KIHA] 1/3 · Kiểm tra MongoDB…');
-  if (!(await mongoReady(config.mongoUri))) {
-    let uri;
-    try {
-      uri = new URL(config.mongoUri);
-    } catch {
-      /* remote MongoDB URIs may contain multiple hosts */
-    }
-    const canAutoStart =
-      !production &&
-      uri?.protocol === 'mongodb:' &&
-      ['127.0.0.1', 'localhost'].includes(uri.hostname) &&
-      uri.port === '27018' &&
-      uri.pathname === '/kiha' &&
-      !uri.username &&
-      !uri.password;
+  let uri;
+  try {
+    uri = new URL(config.mongoUri);
+  } catch {
+    /* remote MongoDB URIs may contain multiple hosts */
+  }
+  const canAutoStart =
+    !production &&
+    uri?.protocol === 'mongodb:' &&
+    ['127.0.0.1', 'localhost'].includes(uri.hostname) &&
+    uri.port === '27018' &&
+    uri.pathname === '/kiha' &&
+    !uri.username &&
+    !uri.password;
+  let mongoError;
+  const ready = await mongoReady(config.mongoUri, {
+    // Local auto-start should be quick; remote DNS/TLS needs the same budget as the API.
+    timeout: canAutoStart ? 1200 : 10000,
+    onError: (error) => {
+      mongoError = error;
+    },
+  });
+  if (!ready) {
     if (!canAutoStart)
       throw new Error(
-        'Không kết nối được MongoDB đã cấu hình. Kiểm tra database/MONGODB_URI; chỉ tự khởi động MongoDB local của KIHA tại cổng 27018 khi chạy dev.',
+        mongoFailureMessage(mongoError, { atlas: uri?.hostname.endsWith('.mongodb.net') }),
       );
     await assertPortFree(27018, '127.0.0.1', 'MongoDB local');
     console.log('[KIHA] Đang bật MongoDB local, giữ dữ liệu trong .local/mongodb.');

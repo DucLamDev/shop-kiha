@@ -65,7 +65,7 @@ export function DetailStory() {
             </RevealGroup>
             <Reveal className="mt-8">
               <Button asChild variant="outline" size="lg" className="px-7">
-                <Link href="/#ve-kiha">
+                <Link href="/ve-kiha">
                   Câu chuyện KIHA
                   <ArrowRight />
                 </Link>

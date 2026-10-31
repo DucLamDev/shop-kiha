@@ -1,0 +1,99 @@
+name: kiha
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '3'
+
+services:
+  mongo:
+    image: mongo:8.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: kiha_root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?Run setup-env.sh first}
+      MONGO_INITDB_DATABASE: kiha
+      MONGO_APP_PASSWORD: ${MONGO_APP_PASSWORD:?Run setup-env.sh first}
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/kiha.js:ro
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', 'quit(db.adminCommand({ping:1}).ok ? 0 : 1)']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    logging: *logging
+
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/vps/Dockerfile
+      target: api
+    restart: unless-stopped
+    init: true
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      API_HOST: 0.0.0.0
+      API_PORT: '4000'
+      MONGODB_URI: mongodb://kiha_app:${MONGO_APP_PASSWORD:?Run setup-env.sh first}@mongo:27017/kiha?authSource=kiha
+      ALLOWED_ORIGINS: ${SITE_URL:?Run setup-env.sh first}
+      TRUST_PROXY: loopback,uniquelocal
+      VIDEO_UPLOAD_DIR: /var/lib/kiha/videos
+    ports:
+      - '127.0.0.1:4100:4000'
+    volumes:
+      - video_data:/var/lib/kiha/videos
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:4000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    logging: *logging
+
+  web:
+    build:
+      context: ../..
+      dockerfile: deploy/vps/Dockerfile
+      target: web
+      args:
+        SITE_URL: ${SITE_URL:?Run setup-env.sh first}
+    restart: unless-stopped
+    init: true
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      SITE_URL: ${SITE_URL:?Run setup-env.sh first}
+      API_INTERNAL_URL: http://api:4000
+    ports:
+      - '127.0.0.1:3100:3000'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/robots.txt').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    logging: *logging
+
+volumes:
+  mongo_data:
+  video_data:

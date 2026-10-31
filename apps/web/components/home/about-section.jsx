@@ -50,8 +50,8 @@ export function AboutSection({ settings }) {
               </p>
             )}
             <Button asChild variant="outline" size="lg" className="mt-8 px-7">
-              <Link href="/lien-he">
-                Trò chuyện cùng KIHA
+              <Link href="/ve-kiha">
+                Khám phá câu chuyện KIHA
                 <ArrowRight />
               </Link>
             </Button>

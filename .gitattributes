@@ -1,0 +1,5 @@
+deploy/vps/*.sh text eol=lf
+deploy/vps/*.conf text eol=lf
+deploy/vps/*.yaml text eol=lf
+deploy/vps/Dockerfile text eol=lf
+.dockerignore text eol=lf

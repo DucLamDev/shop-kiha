@@ -41,6 +41,26 @@ after(async () => {
   await mongoose.disconnect();
   if (db) await db.stop();
 });
+test('trusted reverse proxy keeps login limits per client IP', async () => {
+  const previous = config.trustProxy;
+  let proxied;
+  try {
+    config.trustProxy = ['loopback'];
+    proxied = createApp();
+  } finally {
+    config.trustProxy = previous;
+  }
+  const attempt = (ip) =>
+    request(proxied)
+      .post('/api/admin/auth/login')
+      .set('Origin', origin)
+      .set('X-Forwarded-For', ip)
+      .send({});
+  for (let i = 0; i < 10; i++) await attempt('203.0.113.10').expect(422);
+  await attempt('203.0.113.10').expect(429);
+  await attempt('203.0.113.11').expect(422);
+});
+
 test('health and public settings do not require authentication', async () => {
   await request(app).get('/api/health').expect(200);
   const res = await request(app).get('/api/settings/public').expect(200);
