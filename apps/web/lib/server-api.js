@@ -12,6 +12,20 @@ export const getData = cache(async (path) => {
 });
 export const getSettings = async () => (await getData('/settings/public')) || {};
 export const getCategories = async () => (await getData('/categories')) || [];
+export async function getCatalogProducts({ q, category, sort }) {
+  const query = new URLSearchParams({ limit: '60', sort });
+  if (q) query.set('q', q);
+  if (category) query.set('category', category);
+  const items = [];
+  // API trả tối đa 60 sản phẩm mỗi lần; gom đủ kết quả trước khi hiển thị.
+  for (let page = 1, pages = 1; page <= pages; page++) {
+    query.set('page', String(page));
+    const result = await getData(`/products?${query}`);
+    items.push(...result.items);
+    pages = result.pages;
+  }
+  return items;
+}
 export function siteUrl(path = '') {
   return `${(process.env.SITE_URL || 'http://localhost:3000').replace(/\/$/, '')}${path}`;
 }

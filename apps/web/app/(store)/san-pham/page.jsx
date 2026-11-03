@@ -1,16 +1,21 @@
 import { SearchX, X } from 'lucide-react';
-import { getCategories, getData, getSettings, jsonLd, pageMeta, siteUrl } from '@/lib/server-api';
+import {
+  getCatalogProducts,
+  getCategories,
+  getData,
+  getSettings,
+  jsonLd,
+  pageMeta,
+  siteUrl,
+} from '@/lib/server-api';
 import { catalogHref, parseCatalogQuery } from '@/lib/catalog';
 import { PageIntro } from '@/components/site/page-intro';
 import { CatalogLink, CatalogShell } from '@/components/product/catalog-shell';
 import { ProductGrid } from '@/components/product/product-card';
-import { Pagination } from '@/components/product/pagination';
 import { EmptyState } from '@/components/site/empty-state';
 import { ContactBand } from '@/components/site/contact-band';
 import { ZaloButton } from '@/components/site/contact-buttons';
 import { buttonVariants } from '@/components/ui/button';
-
-const LIMIT = 12;
 
 export async function generateMetadata({ searchParams }) {
   const current = parseCatalogQuery(await searchParams);
@@ -29,24 +34,14 @@ export async function generateMetadata({ searchParams }) {
 
 export default async function Products({ searchParams }) {
   const current = parseCatalogQuery(await searchParams);
-  const query = new URLSearchParams({
-    limit: String(LIMIT),
-    page: String(current.page),
-    sort: current.sort,
-  });
-  if (current.q) query.set('q', current.q);
-  if (current.category) query.set('category', current.category);
   const [products, categories, settings, priced] = await Promise.all([
-    getData(`/products?${query}`),
+    getCatalogProducts(current),
     getCategories(),
     getSettings(),
     getData('/products?sort=price-desc&limit=1'),
   ]);
   const category = categories.find((c) => c.slug === current.category);
   const hasPrices = priced?.items?.[0]?.price != null;
-  const outOfRange = products.total > 0 && products.items.length === 0;
-  const first = products.total ? (products.page - 1) * LIMIT + 1 : 0;
-  const last = Math.min(products.page * LIMIT, products.total);
   const breadcrumb = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -87,13 +82,10 @@ export default async function Products({ searchParams }) {
         <CatalogShell current={current} categories={categories} hasPrices={hasPrices}>
           <div className="mt-6 mb-6 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground" aria-live="polite">
-              {products.items.length > 0 ? (
+              {products.length > 0 ? (
                 <>
-                  Hiển thị{' '}
-                  <strong className="text-foreground">
-                    {first}–{last}
-                  </strong>{' '}
-                  trên <strong className="text-foreground">{products.total}</strong> sản phẩm
+                  Hiển thị tất cả <strong className="text-foreground">{products.length}</strong> sản
+                  phẩm
                 </>
               ) : (
                 'Không có sản phẩm phù hợp'
@@ -109,30 +101,24 @@ export default async function Products({ searchParams }) {
               </CatalogLink>
             )}
           </div>
-          {products.items.length > 0 ? (
-            <ProductGrid products={products.items} settings={settings} preloadFirst={0} />
+          {products.length > 0 ? (
+            <ProductGrid products={products} settings={settings} preloadFirst={0} />
           ) : (
             <EmptyState
               icon={SearchX}
-              title={outOfRange ? 'Trang này không có sản phẩm' : 'Chưa tìm thấy mẫu phù hợp'}
+              title="Chưa tìm thấy mẫu phù hợp"
               description={
-                outOfRange
-                  ? `Danh sách hiện có ${products.total} sản phẩm. Quay về trang đầu để xem tiếp.`
-                  : current.q
-                    ? `Không có sản phẩm nào khớp với “${current.q}”. Thử từ khóa ngắn hơn hoặc xem tất cả sản phẩm.`
-                    : 'Danh mục này đang được KIHA cập nhật. Bạn có thể xem các danh mục khác hoặc nhắn Zalo để hỏi mẫu hiện có.'
+                current.q
+                  ? `Không có sản phẩm nào khớp với “${current.q}”. Thử từ khóa ngắn hơn hoặc xem tất cả sản phẩm.`
+                  : 'Danh mục này đang được KIHA cập nhật. Bạn có thể xem các danh mục khác hoặc nhắn Zalo để hỏi mẫu hiện có.'
               }
             >
-              <CatalogLink
-                href={outOfRange ? catalogHref(current, { page: 1 }) : '/san-pham'}
-                className={buttonVariants({ variant: 'outline' })}
-              >
-                {outOfRange ? 'Về trang đầu' : 'Xóa bộ lọc'}
+              <CatalogLink href="/san-pham" className={buttonVariants({ variant: 'outline' })}>
+                Xóa bộ lọc
               </CatalogLink>
               <ZaloButton settings={settings} />
             </EmptyState>
           )}
-          <Pagination current={current} page={products.page} pages={products.pages} />
         </CatalogShell>
       </div>
       <ContactBand settings={settings} />

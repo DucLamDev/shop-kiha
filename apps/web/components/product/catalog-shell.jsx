@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 const CatalogContext = createContext(null);
 
 // Bộ lọc điều hướng bằng URL bên trong transition: danh sách cũ mờ đi trong lúc server
-// trả kết quả mới, không tải toàn bộ sản phẩm về trình duyệt.
+// trả đầy đủ sản phẩm khớp với bộ lọc mới.
 export function CatalogShell({ current, categories, hasPrices, children }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -39,7 +39,7 @@ export function CatalogShell({ current, categories, hasPrices, children }) {
   );
 }
 
-export function CatalogLink({ href, scrollToResults = false, onClick, ...props }) {
+export function CatalogLink({ href, onClick, ...props }) {
   const catalog = useContext(CatalogContext);
   return (
     <Link
@@ -51,10 +51,6 @@ export function CatalogLink({ href, scrollToResults = false, onClick, ...props }
         if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         event.preventDefault();
         catalog.navigate(href);
-        if (scrollToResults)
-          document
-            .getElementById('ket-qua')
-            ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }}
       {...props}
     />

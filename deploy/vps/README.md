@@ -146,12 +146,44 @@ Kiểm tra trang chủ, ảnh, trang sản phẩm, Về KIHA, Zalo, canonical/si
 
 ## 6. Cập nhật, backup và quay lại phiên bản cũ
 
+Nếu VPS đã chạy KIHA theo bộ Docker Compose này, cập nhật bản bỏ phân trang như sau.
+
+Trên máy Windows, tại thư mục dự án, kiểm tra rồi đẩy thay đổi lên nhánh `master`:
+
+```powershell
+git status --short
+git add apps/web deploy/vps/README.md
+git commit -m "Show all catalog products without pagination"
+git push origin master
+```
+
+SSH vào VPS bằng tài khoản deploy của bạn (`USER` và `IP_VPS` là thông tin cần thay):
+
+```powershell
+ssh USER@IP_VPS
+```
+
+Trên VPS, sao lưu rồi lấy code mới và build lại:
+
 ```bash
 cd /opt/kiha
 sudo bash deploy/vps/backup.sh
 git pull --ff-only
 sudo bash deploy/vps/deploy.sh
 ```
+
+Chỉ chạy lệnh tiếp theo khi lệnh trước thành công. Nếu `git pull` báo xung đột hoặc có thay đổi local, xử lý trước khi deploy. Lệnh `deploy.sh` build image và chờ các dịch vụ sẵn sàng. Bản bỏ phân trang không cần seed, import lại sản phẩm hay tạo lại admin.
+
+Kiểm tra sau khi cập nhật:
+
+```bash
+curl -fsS https://noithatkiha.vn/api/health
+cd /opt/kiha/deploy/vps
+sudo docker compose ps
+sudo docker compose logs --tail=80 web api
+```
+
+Mở `https://noithatkiha.vn/san-pham`: dòng số lượng phải là “Hiển thị tất cả … sản phẩm”, cuối danh sách không còn nút chuyển trang. Thử tìm kiếm, lọc danh mục và sắp xếp; mỗi bộ lọc hiển thị đầy đủ sản phẩm phù hợp. Link cũ như `/san-pham?page=2` cũng hiển thị toàn bộ kết quả. Nếu cài VPS lần đầu, làm theo các mục 1–5, gồm chuyển dữ liệu và tạo admin.
 
 Backup tạm dừng API để MongoDB và video nhất quán, rồi bật lại bằng trap kể cả khi có lỗi. Kết quả ở `deploy/vps/backups/<timestamp>/`, gồm MongoDB archive, video tar và file env; giữ riêng tư và sao chép ra khỏi VPS. Volume bền vững không thay thế backup.
 
